@@ -30,7 +30,7 @@ import controller.*;
 public class Application {
 
 	/**
-	 * @param args
+	 * Inicializa a aplicação
 	 */
 	public static void main(String[] args) {
 		// inicializa o controller

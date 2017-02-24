@@ -113,6 +113,13 @@ public class AppConfigAutomaton extends JFrame {
 		return true;
 	}
 
+	/**
+	 * Salva o nome dos estados
+	 * 
+	 * Author: Madson
+	 * 
+	 * @param controller
+	 */
 	private void saveStateNames(AppController controller) {
 		controller.setNameState1(txtEstado1.getText());
 		controller.setNameState2(txtEstado2.getText());
@@ -218,6 +225,9 @@ public class AppConfigAutomaton extends JFrame {
 		matrizPanel.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent arg0) {
+				// Detecta onde o click ocorreu, verifica os estados possíveis e
+				// altera a cor da célula para a correspondente à do próximo
+				// estado possível
 				int estadosPossiveis = Integer.parseInt(estadosPossiveisComboBox.getSelectedItem().toString());
 				controller.setNextColor(AppConfigAutomaton.this, arg0, estadosPossiveis);
 			}
@@ -257,6 +267,7 @@ public class AppConfigAutomaton extends JFrame {
 		txtEstado1.addKeyListener(new KeyAdapter() {
 			@Override
 			public void keyTyped(KeyEvent e) {
+				// checa se o nome não é maior que o tamanho limite
 				if (txtEstado1.getText().length() > maxStateNameSize) {
 					txtEstado1.setText(txtEstado1.getText().substring(0, 12));
 				}
@@ -272,6 +283,7 @@ public class AppConfigAutomaton extends JFrame {
 		txtEstado2.addKeyListener(new KeyAdapter() {
 			@Override
 			public void keyTyped(KeyEvent e) {
+				// checa se o nome não é maior que o tamanho limite
 				if (txtEstado2.getText().length() > maxStateNameSize) {
 					txtEstado2.setText(txtEstado2.getText().substring(0, 12));
 				}
@@ -287,6 +299,7 @@ public class AppConfigAutomaton extends JFrame {
 		txtEstado3.addKeyListener(new KeyAdapter() {
 			@Override
 			public void keyTyped(KeyEvent arg0) {
+				// checa se o nome não é maior que o tamanho limite
 				if (txtEstado3.getText().length() > maxStateNameSize) {
 					txtEstado3.setText(txtEstado3.getText().substring(0, 12));
 				}
@@ -302,6 +315,7 @@ public class AppConfigAutomaton extends JFrame {
 		txtEstado4.addKeyListener(new KeyAdapter() {
 			@Override
 			public void keyTyped(KeyEvent e) {
+				// checa se o nome não é maior que o tamanho limite
 				if (txtEstado4.getText().length() > maxStateNameSize) {
 					txtEstado4.setText(txtEstado4.getText().substring(0, 12));
 				}
@@ -317,6 +331,7 @@ public class AppConfigAutomaton extends JFrame {
 		txtEstado5.addKeyListener(new KeyAdapter() {
 			@Override
 			public void keyTyped(KeyEvent e) {
+				// checa se o nome não é maior que o tamanho limite
 				if (txtEstado5.getText().length() > maxStateNameSize) {
 					txtEstado5.setText(txtEstado5.getText().substring(0, 12));
 				}
@@ -332,6 +347,7 @@ public class AppConfigAutomaton extends JFrame {
 		txtEstado6.addKeyListener(new KeyAdapter() {
 			@Override
 			public void keyTyped(KeyEvent e) {
+				// checa se o nome não é maior que o tamanho limite
 				if (txtEstado6.getText().length() > maxStateNameSize) {
 					txtEstado6.setText(txtEstado6.getText().substring(0, 12));
 				}
@@ -347,6 +363,7 @@ public class AppConfigAutomaton extends JFrame {
 		txtEstado7.addKeyListener(new KeyAdapter() {
 			@Override
 			public void keyTyped(KeyEvent e) {
+				// checa se o nome não é maior que o tamanho limite
 				if (txtEstado7.getText().length() > maxStateNameSize) {
 					txtEstado7.setText(txtEstado7.getText().substring(0, 12));
 				}
@@ -362,6 +379,7 @@ public class AppConfigAutomaton extends JFrame {
 		txtEstado8.addKeyListener(new KeyAdapter() {
 			@Override
 			public void keyTyped(KeyEvent arg0) {
+				// checa se o nome não é maior que o tamanho limite
 				if (txtEstado8.getText().length() > maxStateNameSize) {
 					txtEstado8.setText(txtEstado8.getText().substring(0, 12));
 				}
@@ -383,6 +401,8 @@ public class AppConfigAutomaton extends JFrame {
 		dirPanel.add(dimensoesComboBox);
 		dimensoesComboBox.setModel(new DefaultComboBoxModel<String>(new String[] { "10x10", "20x20", "40x40" }));
 		dimensoesComboBox.setFocusable(false);
+		// seleciona o item no dimensoesComboBox de acordo com o configurado no
+		// controller
 		int indiceTamanho = 0;
 		if (controller.getTamVector() == 20) {
 			indiceTamanho = 1;
@@ -392,6 +412,7 @@ public class AppConfigAutomaton extends JFrame {
 		dimensoesComboBox.setSelectedIndex(indiceTamanho);
 		dimensoesComboBox.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
+				// altera o tamanho da matriz de acordo com a opção escolhida
 				int index = dimensoesComboBox.getSelectedIndex();
 				int tamanho = 10;
 				if (index == 1) {
@@ -399,7 +420,9 @@ public class AppConfigAutomaton extends JFrame {
 				} else if (index == 2) {
 					tamanho = 40;
 				}
+				// realiza a alteração no controller
 				controller.setTamVector(tamanho);
+				// redesenha a matriz
 				controller.fillPanel(matrizPanel);
 			}
 		});
@@ -407,6 +430,8 @@ public class AppConfigAutomaton extends JFrame {
 		estadosPossiveisComboBox = new JComboBox<String>();
 		estadosPossiveisComboBox.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
+				// altera quais estados estão ativos, habilitando ou
+				// desabilitando os componentes a estes relacionados
 				int ativos = Integer.parseInt((String) estadosPossiveisComboBox.getSelectedItem());
 				updateActiveStates(ativos);
 				controller.setActiveStates(ativos);
@@ -488,6 +513,7 @@ public class AppConfigAutomaton extends JFrame {
 		btnImportar.setHorizontalTextPosition(SwingConstants.CENTER);
 		btnImportar.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
+				//TODO implementar a opção Importar
 			}
 		});
 		btnImportar.setPreferredSize(new Dimension(120, 20));
@@ -553,7 +579,7 @@ public class AppConfigAutomaton extends JFrame {
 					// salva o vetor atual
 					controller.setVector(vetorEstadosIniciais);
 					// instancia a janela de regras
-					AppConfigRules rules = new AppConfigRules(controller);
+					AppConfigRules_Nova_Versao rules = new AppConfigRules_Nova_Versao(controller);
 					// torna a janela de regras visível
 					rules.setVisible(true);
 					// encerra a janela atual

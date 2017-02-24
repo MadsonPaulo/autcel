@@ -56,11 +56,27 @@ public class AppRun extends JFrame {
 	private Timer timer;
 	private int[][] copyVector;
 
-	private void atualizarCiclo(AppController controller) {
+	/**
+	 * Atualiza o label que indica o ciclo atual
+	 * 
+	 * Author: Madson
+	 * 
+	 * @param controller
+	 */
+	private void updateCycle(AppController controller) {
 		lblCiclo.setText("  Ciclo: " + controller.getCiclo());
 	}
 
-	private void setAvancoAutomatico(boolean iniciar, AppController controller) {
+	/**
+	 * Inicia ou para o avanço automático a cada intervalo de tempo determinado
+	 * 
+	 * Author: Madson
+	 * 
+	 * @param iniciar
+	 *            booleano para iniciar ou para o avanço automático
+	 * @param controller
+	 */
+	private void setAutoAdvance(boolean iniciar, AppController controller) {
 		if (iniciar) {
 			callNextCycle(delay, controller);
 			btnAvancoAutomatico.setText("Parar");
@@ -70,18 +86,31 @@ public class AppRun extends JFrame {
 		}
 	}
 
+	/**
+	 * Inicializa o timer de avanço automático
+	 * 
+	 * Author: Madson
+	 * 
+	 * @param delay
+	 *            intervalo em milissegundos entre cada avanço de ciclo
+	 * @param contr
+	 */
 	private void callNextCycle(int delay, AppController contr) {
+		// cria a tarefa que irá se repetir de acordo com o delay
 		ActionListener task = new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				// chama o próximo ciclo no controller
 				contr.nextCycle();
-				contr.draw(matrizPanel);
-				atualizarCiclo(contr);
+				// ordena que o controller redezenhe a matriz
+				contr.fillPanel(matrizPanel);
+				// atualiza o label de ciclo atual
+				updateCycle(contr);
 			}
 		};
 
 		// inicializa timer
 		timer = new Timer(delay, task);
-		// define o tempo de espera inicial
+		// define o tempo de espera antes da primeira execução da tarefa
 		timer.setInitialDelay(0);
 		// inicia o timer
 		timer.start();
@@ -122,12 +151,16 @@ public class AppRun extends JFrame {
 			public void actionPerformed(ActionEvent arg0) {
 				// se já estiver avançando automaticamente
 				if (avancoAutomatico) {
-					setAvancoAutomatico(false, controller);
+					// para o avanço automático
+					setAutoAdvance(false, controller);
 					avancoAutomatico = false;
 				}
+				// chama o próximo ciclo no controller
 				controller.nextCycle();
-				controller.draw(matrizPanel);
-				atualizarCiclo(controller);
+				// ordena que o controller redezenhe a matriz
+				controller.fillPanel(matrizPanel);
+				// atualiza o label de ciclo atual
+				updateCycle(controller);
 			}
 		});
 		btnPrximo.setBounds(91, 46, 85, 20);
@@ -143,13 +176,18 @@ public class AppRun extends JFrame {
 			public void actionPerformed(ActionEvent e) {
 				// se já estiver avançando automaticamente
 				if (avancoAutomatico) {
-					setAvancoAutomatico(false, controller);
+					// para o avanço automático
+					setAutoAdvance(false, controller);
 					avancoAutomatico = false;
 				}
+				// se não estiver no ciclo 0
 				if (controller.getCiclo() > 0) {
+					// retorna ao ciclo anterior
 					controller.previousCycle();
-					controller.draw(matrizPanel);
-					atualizarCiclo(controller);
+					// ordena que o controller redezenhe a matriz
+					controller.fillPanel(matrizPanel);
+					// atualiza o label de ciclo atual
+					updateCycle(controller);
 				}
 			}
 		});
@@ -177,7 +215,7 @@ public class AppRun extends JFrame {
 		btnAvancoAutomatico.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				// Define o valor em milissegundos de intervalo entre as
-				// repetições de acordo com indice em comboBox_Intervalo
+				// repetições de acordo com índice de comboBox_Intervalo
 				if (comboBoxVelocidade.getSelectedIndex() == 0) {
 					delay = 200;
 				} else if (comboBoxVelocidade.getSelectedIndex() == 1) {
@@ -187,12 +225,12 @@ public class AppRun extends JFrame {
 				} else if (comboBoxVelocidade.getSelectedIndex() == 3) {
 					delay = 2000;
 				}
-				// se já estiver avançando automaticamente
+				// se já estiver avançando automaticamente, cancela o avanço
 				if (avancoAutomatico) {
-					setAvancoAutomatico(false, controller);
+					setAutoAdvance(false, controller);
 					avancoAutomatico = false;
-				} else {
-					setAvancoAutomatico(true, controller);
+				} else {// senão, habilita o avanço automático
+					setAutoAdvance(true, controller);
 					avancoAutomatico = true;
 				}
 			}
@@ -367,13 +405,14 @@ public class AppRun extends JFrame {
 		JButton btnVoltar = new JButton("Voltar");
 		btnVoltar.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-
-				// se já estiver avançando automaticamente
+				// se já estiver avançando automaticamente, cancela o avanço
+				// automático
 				if (avancoAutomatico) {
-					setAvancoAutomatico(false, controller);
+					setAutoAdvance(false, controller);
 					avancoAutomatico = false;
 				}
-
+				// abre um JOptionPane pedindo para confirmar ou cancelar a
+				// voltar para tela anterior
 				Object[] options = { "Confirmar", "Cancelar" };
 				int option = JOptionPane.showOptionDialog(null,
 						"Voltar para a tela de confuguração e apagar os ciclos percorridos?", "Atenção",
@@ -386,7 +425,7 @@ public class AppRun extends JFrame {
 					controller.resetVectorSaver();
 					controller.setCiclo(0);
 					// instancia a janela de regras
-					AppConfigRules rules = new AppConfigRules(controller);
+					AppConfigRules_Nova_Versao rules = new AppConfigRules_Nova_Versao(controller);
 					// torna a janela de regras visível
 					rules.setVisible(true);
 					// encerra a janela atual
@@ -428,19 +467,20 @@ public class AppRun extends JFrame {
 		btnReiniciar = new JButton("Reiniciar");
 		btnReiniciar.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				// se já estiver avançando automaticamente
+				// se já estiver avançando automaticamente, cancela o avanço
+				// automático
 				if (avancoAutomatico) {
-					setAvancoAutomatico(false, controller);
+					setAutoAdvance(false, controller);
 					avancoAutomatico = false;
 				}
 
 				// reseta o vetor atual e o ciclo
-				controller.copiarVetor(controller.getVector(), copyVector);
+				controller.copyVector(controller.getVector(), copyVector);
 				controller.resetVectorSaver();
 				controller.setCiclo(0);
 				// atualiza a parte visual
-				controller.draw(matrizPanel);
-				atualizarCiclo(controller);
+				controller.fillPanel(matrizPanel);
+				updateCycle(controller);
 			}
 		});
 		btnReiniciar.setToolTipText("Reiniciar aut\u00F4mato para o ciclo 0");
@@ -467,6 +507,6 @@ public class AppRun extends JFrame {
 		controller.fillPanel(matrizPanel);
 		// Copia o vetor em seu estado inicial
 		copyVector = new int[controller.getTamVector()][controller.getTamVector()];
-		controller.copiarVetor(copyVector, controller.getVector());
+		controller.copyVector(copyVector, controller.getVector());
 	}
 }

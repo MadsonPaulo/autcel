@@ -23,6 +23,12 @@ package model;
 import java.awt.Color;
 import java.awt.Font;
 
+/**
+ * Guarda configurações básicas
+ * 
+ * @author Madson
+ *
+ */
 public class AppConfig {
 
 	public Color color1;

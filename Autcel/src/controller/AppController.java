@@ -24,6 +24,7 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Font;
 import java.awt.event.MouseEvent;
+import java.util.ArrayList;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -32,6 +33,8 @@ import model.AppConfig;
 import view.AppConfigAutomaton;
 
 /**
+ * Controller das 3 views, sendo sua única instância repassada entre as views
+ * 
  * @author Madson
  *
  */
@@ -47,11 +50,13 @@ public class AppController {
 		view.setVisible(true);
 	}
 
-	// TODO estava implementando a passagem de ciclos
 	/**
+	 * Retorna a cor referente a um estado
+	 * 
 	 * Author: Madson
 	 * 
 	 * @param number
+	 *            número referente ao estado de uma célula
 	 * @return cor do estado passado como argumento
 	 */
 	public Color getDefaultCollor(int number) {
@@ -78,14 +83,16 @@ public class AppController {
 	}
 
 	/**
+	 * Altera a cor da célula clicada, para a cor referente ao próximo estado
+	 * possível
+	 * 
 	 * Author: Madson
 	 * 
 	 * @param frame
 	 * @param mouseEvent
+	 *            evento de click de mouse
 	 * @param estadosPossiveis
-	 * 
-	 *            Altera a cor de um componente, após um click, para a cor do
-	 *            próximo estado possível
+	 *            quantidade de estados possíveis
 	 */
 	public void setNextColor(JFrame frame, MouseEvent mouseEvent, int estadosPossiveis) {
 		try {
@@ -99,18 +106,19 @@ public class AppController {
 			comp.setBackground(getNextColor(corAtual, estadosPossiveis));
 		} catch (Exception e) {
 		}
-
 	}
 
 	/**
+	 * Retorna a cor do próximo estado possível, de acordo com a quantidade de
+	 * estados possíveis
+	 * 
 	 * Author: Madson
 	 * 
 	 * @param current
-	 *            estado atual de um componente(célula)
+	 *            cor do componente clicado
 	 * @param states
 	 *            quantidade de estados possíveis
-	 * @return cor do próximo estado possível, de acordo com quantos estados
-	 *         forem possíveis
+	 * @return cor do próximo estado possível
 	 */
 	public Color getNextColor(Color current, int states) {
 		if (current == config.color1) {
@@ -167,7 +175,11 @@ public class AppController {
 	 *            posição y da célula no JPanel
 	 */
 	private void drawCube(int state, int x, int y, JPanel panel) {
+		// cria um vetor que recebe a matriz vazia de tamanho pre-determinado,
+		// salva em config
 		int[][] vector = config.vector;
+		// cria um JLabel e configura-o com as características visuais da célula
+		// e a cor referente ao estado do mesmo
 		JLabel label = new JLabel("");
 		label.setOpaque(true);
 		label.setBorder(new LineBorder(new Color(0, 0, 0), 1));
@@ -190,40 +202,24 @@ public class AppController {
 		} else {// Estado 8
 			label.setBackground(config.color8);
 		}
+		// Adiciona o label ao JPanel
 		panel.add(label);
 	}
 
 	/**
-	 * Remove todos os componentes do JPanel. Desenha a matriz no JPanel
-	 */
-	public void draw(JPanel panel) {
-		panel.removeAll();
-		int posX = 0;
-		int posY = 0;
-		for (int i = 0; i < config.vector.length; i++) {
-			for (int y = 0; y < config.vector[i].length; y++) {
-				drawCube(config.vector[i][y], posX, posY, panel);
-				posX += panel.getBounds().width / config.vector.length;
-			}
-			posX = 0;
-			posY += panel.getBounds().width / config.vector.length;
-		}
-		panel.repaint();
-	}
-
-	/**
+	 * Desenha a matriz de células com suas respectivas cores
+	 * 
 	 * Author: Madson
 	 * 
 	 * @param panel
-	 * 
-	 *            Remove todos os componentes do JPanel. Desenha a matriz no
-	 *            JPanel
 	 */
 	public void fillPanel(JPanel panel) {
+		// limpa o panel
 		panel.removeAll();
 		int[][] vector = config.vector;
 		int posX = 0;
 		int posY = 0;
+		// prossegue lendo a matriz e desenhando as células no JPanel
 		for (int i = 0; i < vector.length; i++) {
 			for (int y = 0; y < vector[i].length; y++) {
 				drawCube(vector[i][y], posX, posY, panel);
@@ -232,6 +228,8 @@ public class AppController {
 			posX = 0;
 			posY += panel.getBounds().width / vector.length;
 		}
+		// é necessário utilizar o método repaint() para as mudanças gráficas
+		// serem notadas
 		panel.repaint();
 	}
 
@@ -239,8 +237,11 @@ public class AppController {
 	 * Percorre os componentes(JLabel) do JPanel e através da cor de cada
 	 * componente identifica seu estado e grava o estado em posição equivalente
 	 * na matriz
+	 *
+	 * Author: Madson
 	 * 
-	 * @return matriz
+	 * @param panel
+	 * @return
 	 */
 	public int[][] getVectorFromPanel(JPanel panel) {
 		int vector[][] = config.vector;
@@ -271,6 +272,10 @@ public class AppController {
 	}
 
 	/**
+	 * Checa se todos os estados da matriz são estados possíveis
+	 * 
+	 * Author: Madson
+	 * 
 	 * @param vetor
 	 *            matriz do autômato
 	 * @return 'false' caso exista somente um estado ou existam estados além dos
@@ -278,18 +283,22 @@ public class AppController {
 	 */
 	public boolean areStatesValid(int[][] vetor) {
 		boolean value = true;
-		int state = 0;
+		boolean twoStates = false;
+		int state = vetor[0][0];
 		for (int i = 0; i < vetor.length; i++) {
 			for (int y = 0; y < vetor[i].length; y++) {
+				// se uma célula está em estado que não é possível
 				if ((vetor[i][y] + 1) > config.activeStates) {
 					value = false;
 				}
-				if (vetor[i][y] > 0) {
-					state = vetor[i][y];
+				// checa se existem pelo menos 2 estados diferentes
+				if (twoStates == false && vetor[i][y] != state) {
+					twoStates = true;
 				}
 			}
 		}
-		if (state == 0) {
+		// se todas as células estiverem no mesmo estado, retorna falso
+		if (twoStates == false) {
 			value = false;
 		}
 		return value;
@@ -297,6 +306,8 @@ public class AppController {
 
 	/**
 	 * Avança um ciclo de acordo com as regras definidas
+	 * 
+	 * Author: Madson
 	 */
 	public void nextCycle() {
 		// copia a matriz original para fazer alterações
@@ -309,7 +320,7 @@ public class AppController {
 
 		for (int i = 0; i < config.vector.length; i++) {
 			for (int y = 0; y < config.vector[i].length; y++) {
-				// contadores de vizinhos com estado x
+				// contadores de quantidade de vizinhos em cada estado
 				int state1 = 0, state2 = 0, state3 = 0, state4 = 0, state5 = 0, state6 = 0, state7 = 0, state8 = 0;
 				// recebe uma lista com o estado dos 8 vizinhos da célula
 				int[] neighbors = getNeighborhood(i, y);
@@ -344,20 +355,26 @@ public class AppController {
 				 * para uma célula x num ciclo y
 				 */
 				boolean validou = false;
-				// config.regras[j][0] == ativo(1) ou inativo(0)
-				// config.regras[j][1] == estado ao qual a regra se refere
-				// config.regras[j][2] == operador, ">="(0), ">"(1), "=="(2),
-				// "<"(3), "<="(4)
-				// config.regras[j][3] == quantidade de vizinhos
-				// config.regras[j][4] == estado do vizinho
-				// config.regras[j][5] == novo estado
-
+				/*
+				 * [0] = ativo(1) ou inativo(0)
+				 * 
+				 * [1] = estado ao qual a regra se refere
+				 * 
+				 * [2] = operador: ">="(0), ">"(1), "=="(2), "<"(3), "<="(4)
+				 * 
+				 * [3] = quantidade de vizinhos
+				 * 
+				 * [4] = estado do vizinho
+				 * 
+				 * [5] = novo estado
+				 */
 				for (int j = 0; j < config.regras.length; j++) {
 					// prossegue validando as regras caso nenhuma tenha sido
 					// validada para esta célula nesse ciclo
 					if (validou == false && config.regras[j][0] == 1) {
 						validou = passRule(config.vector[i][y], vizinhos, config.regras[j][1], config.regras[j][2],
 								config.regras[j][3], config.regras[j][4]);
+						// se validar, muda o estado da célula
 						if (validou) {
 							tempVector[i][y] = config.regras[j][5];
 						}
@@ -383,9 +400,51 @@ public class AppController {
 	}
 
 	/**
-	 * carrega a matriz anteriormente salva do ciclo passado
+	 * Troca a posição dos itens de um ArrayList
+	 * 
+	 * Author: Madson
+	 * 
+	 * @param index
+	 *            posição a ser trocada
+	 * @param newIndex
+	 *            nova posição
+	 * @param array
+	 *            O ArrayList em questão
+	 */
+	public void swapAt(int index, int newIndex, ArrayList<Integer[]> array) {
+		Integer[] temp = array.get(newIndex).clone();
+		array.set(newIndex, array.get(index).clone());
+		array.set(index, temp.clone());
+	}
+
+	/**
+	 * Converte um ArrayList em um array de int e retorna-o
+	 * 
+	 * Author: Madson
+	 * 
+	 * @param array
+	 * @return
+	 */
+	public int[][] convertArrayList(ArrayList<Integer[]> array) {
+		int[][] novoArray = new int[18][6];
+
+		for (int i = 0; i < array.size(); i++) {
+			for (int j = 0; j < array.get(0).length; j++) {
+				novoArray[i][j] = array.get(i)[j];
+			}
+		}
+
+		return novoArray;
+	}
+
+	/**
+	 * Retorna um ciclo
+	 * 
+	 * Author: Madson
 	 */
 	public void previousCycle() {
+		// carrega o valor salvo do ciclo anterior em vectorSaver na matriz
+		// atual
 		for (int i = 0; i < config.vector.length; i++) {
 			for (int y = 0; y < config.vector[i].length; y++) {
 				config.vector[i][y] = config.vectorSaver[i][y][config.cicloAtual - 1];
@@ -397,8 +456,8 @@ public class AppController {
 
 	/**
 	 * Lê uma célula e através de seu estado e de um array com 8 posições
-	 * contendo a quantidade de vizinhos de cada estado possível, verifica a
-	 * regra através dos dados também passados em argumento
+	 * contendo a quantidade de vizinhos de cada estado possível e verifica a
+	 * regra
 	 * 
 	 * @param estadoAtual
 	 *            estado da célula atual
@@ -408,16 +467,15 @@ public class AppController {
 	 *            vizinhos em estado 1, a segunda posição a contagem de vizinhos
 	 *            em estado 2 e assim sucessivamente
 	 * @param regraReferese
-	 *            estado à qual a regra se refere
+	 *            estado ao qual a regra se refere
 	 * @param regraVizinho
-	 *            estado o qual a validação de quantidade de vizinhos irá
-	 *            considerar
+	 *            estado ao qual a quantidade de vizinhos irá considerar
 	 * @param regraOperador
-	 *            operador lógico, recebendo valores e correspondentes em
-	 *            parênteses como adiante: 0(>=), 1(>), 2(==), 3(<) e 4(<=)
+	 *            operador relacional, de acordo com o seguinte dicionário:
+	 *            0(>=), 1(>), 2(==), 3(<) e 4(<=)
 	 * @param regraQuant
-	 *            quantidade de vizinhos da célula atual de estado
-	 *            correspondente ao determinado em tipo
+	 *            quantidade de vizinhos da célula atual de estado igual ao
+	 *            determinado em regraVizinho
 	 * @return caso os argumentos validem a regra, retorna verdadeiro
 	 */
 	public boolean passRule(int estadoAtual, int[] vizinhos, int regraReferese, int regraOperador, int regraQuant,
@@ -428,12 +486,12 @@ public class AppController {
 		if (estadoAtual == regraReferese) {
 			switch (regraOperador) {
 			case 0:
-				if (vizinhos[regraVizinho - 1] >= regraQuant) {
+				if (vizinhos[regraVizinho] >= regraQuant) {
 					return true;
 				}
 				break;
 			case 1:
-				if (vizinhos[regraVizinho - 1] > regraQuant) {
+				if (vizinhos[regraVizinho] > regraQuant) {
 					return true;
 				}
 				break;
@@ -443,12 +501,12 @@ public class AppController {
 				}
 				break;
 			case 3:
-				if (vizinhos[regraVizinho - 1] < regraQuant) {
+				if (vizinhos[regraVizinho] < regraQuant) {
 					return true;
 				}
 				break;
 			case 4:
-				if (vizinhos[regraVizinho - 1] <= regraQuant) {
+				if (vizinhos[regraVizinho] <= regraQuant) {
 					return true;
 				}
 				break;
@@ -458,7 +516,9 @@ public class AppController {
 	}
 
 	/**
-	 * Retorna um array contendo o estado dos 8 vizinhos de uma célula
+	 * Retorna um array contendo o estado dos 8 vizinhos da célula
+	 * 
+	 * Author: Madson
 	 * 
 	 * @param x
 	 *            correspondente à posição no array de vizinhos da posição X
@@ -483,7 +543,17 @@ public class AppController {
 		return neighborhood;
 	}
 
-	public void copiarVetor(int[][] vetor1, int[][] vetor2) {
+	/**
+	 * Copia um vetor
+	 * 
+	 * Author: Madson
+	 * 
+	 * @param vetor1
+	 *            vetor a receber a cópia
+	 * @param vetor2
+	 *            vetor a ser copiado
+	 */
+	public void copyVector(int[][] vetor1, int[][] vetor2) {
 		for (int i = 0; i < vetor1.length; i++) {
 			for (int y = 0; y < vetor1[i].length; y++) {
 				vetor1[i][y] = vetor2[i][y];
@@ -491,6 +561,11 @@ public class AppController {
 		}
 	}
 
+	/**
+	 * Reseta o vectorSaver
+	 * 
+	 * Author: Madson
+	 */
 	public void resetVectorSaver() {
 		config.vectorSaver = new int[config.tamVector][config.tamVector][config.maxSavedVectors];
 	}
@@ -509,21 +584,6 @@ public class AppController {
 
 	public int[][] getVector() {
 		return config.vector;
-	}
-
-	public void printVector(int[][] vector) {
-		for (int i = 0; i < vector.length; i++) {
-			for (int y = 0; y < vector[i].length; y++) {
-				if (y == 0) {
-					System.out.print("{" + vector[i][y] + ", ");
-				} else if (y == vector[i].length - 1) {
-					System.out.print(vector[i][y] + "}");
-				} else {
-					System.out.print(vector[i][y] + ", ");
-				}
-			}
-			System.out.println();
-		}
 	}
 
 	public void setRegras(int[][] newVector) {
@@ -558,6 +618,13 @@ public class AppController {
 		config.activeStates = ativos;
 	}
 
+	/**
+	 * Define o tamanho da matriz
+	 * 
+	 * Author: Madson
+	 * 
+	 * @param tamanho
+	 */
 	public void setTamVector(int tamanho) {
 		config.tamVector = tamanho;
 		config.vector = new int[tamanho][tamanho];
