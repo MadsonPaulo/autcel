@@ -24,11 +24,25 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Font;
 import java.awt.event.MouseEvent;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.PrintWriter;
 import java.util.ArrayList;
+
+import javax.swing.ImageIcon;
+import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JTextArea;
 import javax.swing.border.LineBorder;
+
 import model.AppConfig;
 import view.AppConfigAutomaton;
 
@@ -631,6 +645,308 @@ public class AppController {
 		config.vectorSaver = new int[tamanho][tamanho][config.maxSavedVectors];
 	}
 
+	/**
+	 * JOptionPane a ser exibido ao clicar em "Sobre"
+	 * 
+	 * Author: Madson
+	 */
+	public void showAboutPopUp() {
+		String sobre = "AUTCEL: Editor e Simulador de Autômatos Celulares"
+				+ "\n\nAutor: Madson Paulo Alexandre da Silva.\nE-mail: madson-paulo@hotmail.com"
+				+ "\n\nEste projeto usa a licença AGPL v3.0. Você pode encontrá-lo em: https://github.com/MadsonPaulo/autcel"
+				+ "\nSinta-se livre para contribuir com o projeto.";
+		ImageIcon icon = new ImageIcon(AppController.class.getResource("/img/main64x64.png"));
+		JOptionPane.showMessageDialog(null, sobre, "Sobre o Autcel", JOptionPane.INFORMATION_MESSAGE, icon);
+
+	}
+
+	/**
+	 * Importa configurações de um arquivo externo
+	 * 
+	 * Author: Madson
+	 * 
+	 * @param textArea
+	 *            terá seu texto alterado em caso de erro
+	 * @return
+	 */
+	public boolean importData(JTextArea textArea) {
+		// explorador de arquivos para definir o destino/arquivo
+		JFileChooser abrindoArquivo = new JFileChooser();
+		int resultado = abrindoArquivo.showOpenDialog(null);
+		// se o usuário não aprovar o acesso aos arquivos, retorna falso
+		if (resultado != JFileChooser.APPROVE_OPTION) {
+			textArea.setText("Você precisa aprovar o acesso aos arquivos do seu computador para importar um arquivo.");
+			return false;
+		}
+		// recebe a localização/arquivo selecionada
+		File abrirArquivoEscolhido = abrindoArquivo.getSelectedFile();
+		try {
+			// necessários para ler o arquivo
+			FileInputStream fis = new FileInputStream(abrirArquivoEscolhido);
+			BufferedReader reader = new BufferedReader(new InputStreamReader(fis));
+			// arrayList que receberá todas as linhas do arquivo
+			ArrayList<String> data = new ArrayList<String>();
+			// linha a ser lida
+			String line = reader.readLine();
+			while (line != null) {
+				// adiciona a linha ao arrayList
+				data.add(line);
+				// prepara a próxima linha
+				line = reader.readLine();
+			}
+			// fecha-os
+			reader.close();
+			fis.close();
+
+			// se o arquivo não estiver corrompido, devido a modificações
+			// manuais pelo usuário
+			if (checkData(data)) {
+				// atualiza as informações importadas
+				updateConfigs(data);
+				return true;
+			} else {
+				textArea.setText("Não foi possível importar as configurações. O arquivo está corrompido.");
+				return false;
+			}
+		} catch (FileNotFoundException ex) {
+			textArea.setText("Não foi possível localizar o arquivo.");
+			ex.printStackTrace();
+			return false;
+		} catch (IOException e) {
+			e.printStackTrace();
+			return false;
+		}
+	}
+
+	/**
+	 * Substitui as configurações atuais pelas importadas
+	 * 
+	 * Author: Madson
+	 * 
+	 * @param data
+	 */
+	private void updateConfigs(ArrayList<String> data) {
+		// nome dos estados
+		config.nameState1 = data.get(4);
+		config.nameState2 = data.get(5);
+		config.nameState3 = data.get(6);
+		config.nameState4 = data.get(7);
+		config.nameState5 = data.get(8);
+		config.nameState6 = data.get(9);
+		config.nameState7 = data.get(10);
+		config.nameState8 = data.get(11);
+
+		// quantidade de estados possíveis
+		config.activeStates = Integer.parseInt(data.get(12));
+
+		// tamanho do vetor
+		setTamVector(Integer.parseInt(data.get(13)));
+
+		// vetor
+		int pos0 = 0;
+		for (int i = 0; i < config.vector.length; i++) {
+			for (int j = 0; j < config.vector[0].length; j++) {
+				config.vector[i][j] = Character.getNumericValue(data.get(14).charAt(pos0));
+				pos0++;
+			}
+		}
+
+		// regras
+		int pos = 0;
+		for (int i = 0; i < 18; i++) {
+			for (int j = 0; j < 6; j++) {
+				config.regras[i][j] = Character.getNumericValue(data.get(3).charAt(pos));
+				pos++;
+			}
+		}
+	}
+
+	/**
+	 * Checa se há alguma irregularidade no arquivo importado
+	 * 
+	 * Author: Madson
+	 * 
+	 * @param data
+	 *            ArrayList com as linhas do arquivo importado
+	 * @return
+	 */
+	public boolean checkData(ArrayList<String> data) {
+
+		// quantidade de linhas
+		if (data.size() != 15) {
+			return false;
+		}
+
+		// cada regra ocupa 6 espaços
+		if (data.get(3).length() % 6 != 0) {
+			return false;
+		}
+
+		// checa se o nome do estado não é vazio nem maior que o tamanho limite
+		for (int i = 4; i < 12; i++) {
+			if (data.get(i).length() > config.maxStateNameSize || data.get(i).isEmpty()
+					|| data.get(i).trim().length() == 0) {
+				return false;
+			}
+		}
+
+		// garante que hajam somente números onde esperam-se apenas números
+		try {
+			// percorre a regra e verifica se todos os caracteres são números
+			for (int i = 0; i < data.get(3).length(); i++) {
+				Character.getNumericValue(data.get(3).charAt(i));
+			}
+			Integer.parseInt(data.get(12));
+			Integer.parseInt(data.get(13));
+			// percorre a matriz e verifica se todos os caracteres são números
+			for (int i = 0; i < data.get(14).length(); i++) {
+				Character.getNumericValue(data.get(14).charAt(i));
+			}
+		} catch (Exception e) {
+			return false;
+		}
+
+		// quantidade de estados possíveis
+		if (Integer.parseInt(data.get(12)) < 2 || Integer.parseInt(data.get(12)) > 8) {
+			return false;
+		}
+
+		// tamanho do vetor
+		if (Integer.parseInt(data.get(13)) != 10 && Integer.parseInt(data.get(13)) != 20
+				&& Integer.parseInt(data.get(13)) != 40) {
+			return false;
+		}
+
+		// tamanho da matriz
+		if (data.get(14).length() != 100 && data.get(14).length() != 400 && data.get(14).length() != 1600) {
+			return false;
+		}
+
+		// combinação entre tamanho do vetor e matriz
+		if ((Integer.parseInt(data.get(13)) == 10 && data.get(14).length() != 100)
+				|| (Integer.parseInt(data.get(13)) == 20 && data.get(14).length() != 400)
+				|| (Integer.parseInt(data.get(13)) == 40 && data.get(14).length() != 1600)) {
+			return false;
+		}
+
+		// checa cada grupo de 6 numeros, referentes às regras, com os limites:
+		// 174777
+		int pos = 0;
+		for (int i = 0; i < data.get(3).length(); i++) {
+			int num = Character.getNumericValue(data.get(3).charAt(i));
+			switch (pos) {
+			case 0:
+				if (num != 0 && num != 1) {
+					return false;
+				}
+				pos++;
+				break;
+			case 1:
+				if (num < 0 || num > 7) {
+					return false;
+				}
+				pos++;
+				break;
+			case 2:
+				if (num < 0 || num > 4) {
+					return false;
+				}
+				pos++;
+				break;
+			case 3:
+				if (num < 0 || num > 7) {
+					return false;
+				}
+				pos++;
+				break;
+			case 4:
+				if (num < 0 || num > 7) {
+					return false;
+				}
+				pos++;
+				break;
+			case 5:
+				if (num < 0 || num > 7) {
+					return false;
+				}
+				pos = 0;
+				break;
+			}
+		}
+
+		// checa se algum estado na matriz é maior que a quantidade de estados
+		// possíveis
+		// lê a linha da quantidade de estados possíveis
+		int estadosPossiveis = Integer.valueOf(data.get(12)) - 1;
+		// linha da matriz
+		for (int i = 0; i < data.get(14).length(); i++) {
+			int num = Character.getNumericValue(data.get(14).charAt(i));
+			if (num > estadosPossiveis) {
+				return false;
+			}
+		}
+
+		return true;
+	}
+
+	/**
+	 * Exporta as configurações do autômato.
+	 * 
+	 * Author: Madson
+	 */
+	public boolean exportData() {
+		// explorador de arquivos para definir o destino/arquivo
+		JFileChooser salvandoArquivo = new JFileChooser();
+		int resultado = salvandoArquivo.showSaveDialog(null);
+		// se o usuário não aprovar o acesso aos arquivos, retorna falso
+		if (resultado != JFileChooser.APPROVE_OPTION) {
+			return false;
+		}
+		// recebe a localização/arquivo selecionada
+		File salvarArquivoEscolhido = salvandoArquivo.getSelectedFile();
+		try {
+			// necessários para escrever no arquivo
+			FileWriter arq = new FileWriter(salvarArquivoEscolhido, false);
+			PrintWriter gravarArq = new PrintWriter(arq);
+			// aviso para quem abrir o arquivo como de texto
+			String aviso = "Arquivo de configurações do Autcel.\nAVISO: alterações neste arquivo podem invalidá-lo.\n\n";
+			// aviso e configurações
+			String data = aviso + arrayToLine(config.regras) + "\n" + config.nameState1 + "\n" + config.nameState2
+					+ "\n" + config.nameState3 + "\n" + config.nameState4 + "\n" + config.nameState5 + "\n"
+					+ config.nameState6 + "\n" + config.nameState7 + "\n" + config.nameState8 + "\n"
+					+ config.activeStates + "\n" + config.tamVector + "\n" + arrayToLine(config.vector);
+			// aviso e configurações são gravadas no arquivo
+			gravarArq.printf(data);
+			// fecha o arquivo
+			arq.close();
+			return true;
+		} catch (IOException e) {
+			e.printStackTrace();
+			return false;
+		}
+	}
+
+	/**
+	 * Converte um array de inteiros em string, com a finalidade de exportá-la
+	 * 
+	 * Author: Madson
+	 * 
+	 * @param array
+	 *            a ser convertido
+	 * @return string como todos os números em sequência e sem separadores
+	 */
+	public String arrayToLine(int[][] array) {
+		String text = "";
+
+		for (int i = 0; i < array.length; i++) {
+			for (int j = 0; j < array[0].length; j++) {
+				text += array[i][j];
+			}
+		}
+
+		return text;
+	}
+
 	public int getLastSelected() {
 		return config.lastSelected;
 	}
@@ -705,6 +1021,10 @@ public class AppController {
 
 	public void setNameState8(String newName) {
 		config.nameState8 = newName;
+	}
+
+	public int getMaxStateNameSize() {
+		return config.maxStateNameSize;
 	}
 
 }

@@ -37,14 +37,20 @@ import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
+import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.LineBorder;
 
 import controller.AppController;
+import javax.swing.ImageIcon;
+import java.awt.Toolkit;
 
 /**
  * @author Madson
@@ -75,7 +81,6 @@ public class AppConfigAutomaton extends JFrame {
 	private JPanel matrizPanel;
 	private JTextArea infoTxtArea;
 	private final String mensagemInicialTxtArea = "Por favor, defina a quantidade e o nome dos estados poss\u00EDveis, assim como as dimens\u00F4es da matriz e o estado inicial de cada célula.";
-	private final int maxStateNameSize = 12;
 
 	/**
 	 * Author: Madson
@@ -212,10 +217,29 @@ public class AppConfigAutomaton extends JFrame {
 	 * Cria o frame
 	 */
 	public AppConfigAutomaton(AppController controller) {
+		setIconImage(Toolkit.getDefaultToolkit().getImage(AppConfigAutomaton.class.getResource("/img/main16x16.png")));
 		setResizable(false);
 		setTitle("Autcel: Configura\u00E7\u00E3o");
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setBounds(100, 100, 865, 685);
+		setBounds(100, 100, 865, 710);
+
+		JMenuBar menuBar = new JMenuBar();
+		setJMenuBar(menuBar);
+
+		JMenu menuAjuda = new JMenu("Ajuda");
+		menuAjuda.setBorder(new EmptyBorder(0, 0, 0, 0));
+		menuBar.add(menuAjuda);
+
+		JMenuItem mntmSobre = new JMenuItem("Sobre");
+		mntmSobre.setIcon(new ImageIcon(AppConfigAutomaton.class.getResource("/img/main16x16.png")));
+		mntmSobre.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				controller.showAboutPopUp();
+			}
+		});
+		mntmSobre.setBorder(new CompoundBorder());
+		menuAjuda.add(mntmSobre);
+
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		setContentPane(contentPane);
@@ -268,8 +292,8 @@ public class AppConfigAutomaton extends JFrame {
 			@Override
 			public void keyTyped(KeyEvent e) {
 				// checa se o nome não é maior que o tamanho limite
-				if (txtEstado1.getText().length() > maxStateNameSize) {
-					txtEstado1.setText(txtEstado1.getText().substring(0, 12));
+				if (txtEstado1.getText().length() >= controller.getMaxStateNameSize()) {
+					txtEstado1.setText(txtEstado1.getText().substring(0, 11));
 				}
 			}
 		});
@@ -284,8 +308,8 @@ public class AppConfigAutomaton extends JFrame {
 			@Override
 			public void keyTyped(KeyEvent e) {
 				// checa se o nome não é maior que o tamanho limite
-				if (txtEstado2.getText().length() > maxStateNameSize) {
-					txtEstado2.setText(txtEstado2.getText().substring(0, 12));
+				if (txtEstado2.getText().length() >= controller.getMaxStateNameSize()) {
+					txtEstado2.setText(txtEstado2.getText().substring(0, 11));
 				}
 			}
 		});
@@ -300,8 +324,8 @@ public class AppConfigAutomaton extends JFrame {
 			@Override
 			public void keyTyped(KeyEvent arg0) {
 				// checa se o nome não é maior que o tamanho limite
-				if (txtEstado3.getText().length() > maxStateNameSize) {
-					txtEstado3.setText(txtEstado3.getText().substring(0, 12));
+				if (txtEstado3.getText().length() >= controller.getMaxStateNameSize()) {
+					txtEstado3.setText(txtEstado3.getText().substring(0, 11));
 				}
 			}
 		});
@@ -316,8 +340,8 @@ public class AppConfigAutomaton extends JFrame {
 			@Override
 			public void keyTyped(KeyEvent e) {
 				// checa se o nome não é maior que o tamanho limite
-				if (txtEstado4.getText().length() > maxStateNameSize) {
-					txtEstado4.setText(txtEstado4.getText().substring(0, 12));
+				if (txtEstado4.getText().length() >= controller.getMaxStateNameSize()) {
+					txtEstado4.setText(txtEstado4.getText().substring(0, 11));
 				}
 			}
 		});
@@ -332,8 +356,8 @@ public class AppConfigAutomaton extends JFrame {
 			@Override
 			public void keyTyped(KeyEvent e) {
 				// checa se o nome não é maior que o tamanho limite
-				if (txtEstado5.getText().length() > maxStateNameSize) {
-					txtEstado5.setText(txtEstado5.getText().substring(0, 12));
+				if (txtEstado5.getText().length() >= controller.getMaxStateNameSize()) {
+					txtEstado5.setText(txtEstado5.getText().substring(0, 11));
 				}
 			}
 		});
@@ -348,8 +372,8 @@ public class AppConfigAutomaton extends JFrame {
 			@Override
 			public void keyTyped(KeyEvent e) {
 				// checa se o nome não é maior que o tamanho limite
-				if (txtEstado6.getText().length() > maxStateNameSize) {
-					txtEstado6.setText(txtEstado6.getText().substring(0, 12));
+				if (txtEstado6.getText().length() >= controller.getMaxStateNameSize()) {
+					txtEstado6.setText(txtEstado6.getText().substring(0, 11));
 				}
 			}
 		});
@@ -364,8 +388,8 @@ public class AppConfigAutomaton extends JFrame {
 			@Override
 			public void keyTyped(KeyEvent e) {
 				// checa se o nome não é maior que o tamanho limite
-				if (txtEstado7.getText().length() > maxStateNameSize) {
-					txtEstado7.setText(txtEstado7.getText().substring(0, 12));
+				if (txtEstado7.getText().length() >= controller.getMaxStateNameSize()) {
+					txtEstado7.setText(txtEstado7.getText().substring(0, 11));
 				}
 			}
 		});
@@ -380,8 +404,8 @@ public class AppConfigAutomaton extends JFrame {
 			@Override
 			public void keyTyped(KeyEvent arg0) {
 				// checa se o nome não é maior que o tamanho limite
-				if (txtEstado8.getText().length() > maxStateNameSize) {
-					txtEstado8.setText(txtEstado8.getText().substring(0, 12));
+				if (txtEstado8.getText().length() >= controller.getMaxStateNameSize()) {
+					txtEstado8.setText(txtEstado8.getText().substring(0, 11));
 				}
 			}
 		});
@@ -513,7 +537,16 @@ public class AppConfigAutomaton extends JFrame {
 		btnImportar.setHorizontalTextPosition(SwingConstants.CENTER);
 		btnImportar.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				//TODO implementar a opção Importar
+				// se obtiver sucesso em importar as configurações do autômato
+				if (controller.importData(infoTxtArea)) {
+					// cria uma nova instância de AppConfigAutomaton com as
+					// novas configurações
+					AppConfigAutomaton configAutomaton = new AppConfigAutomaton(controller);
+					// torna a nova instância visível
+					configAutomaton.setVisible(true);
+					// encerra a instância atual
+					dispose();
+				}
 			}
 		});
 		btnImportar.setPreferredSize(new Dimension(120, 20));

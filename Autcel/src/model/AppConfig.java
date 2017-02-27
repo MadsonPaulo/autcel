@@ -58,6 +58,7 @@ public class AppConfig {
 	public String nameState6;
 	public String nameState7;
 	public String nameState8;
+	public int maxStateNameSize;
 	public int lastSelected;
 
 	public AppConfig() {
@@ -88,6 +89,7 @@ public class AppConfig {
 		this.nameState8 = "Estado 08";
 		this.regras = new int[18][6];
 		this.lastSelected = 0;
+		this.maxStateNameSize = 12;
 
 		this.regrasJogoDaVida = new int[][] { { 1, 0, 2, 2, 1, 1 }, { 1, 1, 3, 1, 1, 0 }, { 1, 1, 2, 1, 1, 1 },
 				{ 1, 1, 2, 2, 1, 1 }, { 1, 1, 1, 2, 1, 0 }, { 0, 0, 0, 0, 0, 0 }, { 0, 0, 0, 0, 0, 0 },

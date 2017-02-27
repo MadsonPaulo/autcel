@@ -28,18 +28,24 @@ import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.DefaultListModel;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JList;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JTextArea;
 import javax.swing.ListSelectionModel;
 import javax.swing.SwingConstants;
+import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.LineBorder;
 import controller.AppController;
+import java.awt.Toolkit;
 
 public class AppConfigRules_Nova_Versao extends JFrame {
 	private static final long serialVersionUID = 1L;
@@ -154,24 +160,37 @@ public class AppConfigRules_Nova_Versao extends JFrame {
 		quantidade.setModel(new DefaultComboBoxModel<String>(quantidades));
 	}
 
-	public static void main(String[] args) {
-		AppConfigRules_Nova_Versao rules = new AppConfigRules_Nova_Versao(new AppController());
-		rules.setVisible(true);
-	}
-
 	/**
 	 * Create the frame.
 	 */
 	public AppConfigRules_Nova_Versao(AppController controller) {
+		setIconImage(Toolkit.getDefaultToolkit().getImage(AppConfigRules_Nova_Versao.class.getResource("/img/main16x16.png")));
 		setResizable(false);
 		setTitle("Autcel: Regras");
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setBounds(100, 100, 900, 685);
+		setBounds(100, 100, 900, 710);
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		setContentPane(contentPane);
 		contentPane.setLayout(null);
 
+		JMenuBar menuBar = new JMenuBar();
+		setJMenuBar(menuBar);
+
+		JMenu menuAjuda = new JMenu("Ajuda");
+		menuAjuda.setBorder(new EmptyBorder(0, 0, 0, 0));
+		menuBar.add(menuAjuda);
+
+		JMenuItem mntmSobre = new JMenuItem("Sobre");
+		mntmSobre.setIcon(new ImageIcon(AppConfigAutomaton.class.getResource("/img/main16x16.png")));
+		mntmSobre.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				controller.showAboutPopUp();
+			}
+		});
+		mntmSobre.setBorder(new CompoundBorder());
+		menuAjuda.add(mntmSobre);
+		
 		JPanel panelRegras = new JPanel();
 		panelRegras.setBorder(new LineBorder(new Color(0, 0, 0)));
 		panelRegras.setBounds(10, 59, 874, 530);

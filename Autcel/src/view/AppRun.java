@@ -24,19 +24,25 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
 import javax.swing.DefaultComboBoxModel;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 import javax.swing.Timer;
+import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.LineBorder;
 import controller.AppController;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+import java.awt.Toolkit;
 
 public class AppRun extends JFrame {
 
@@ -120,14 +126,32 @@ public class AppRun extends JFrame {
 	 * Create the frame.
 	 */
 	public AppRun(AppController controller) {
+		setIconImage(Toolkit.getDefaultToolkit().getImage(AppRun.class.getResource("/img/main16x16.png")));
 		setResizable(false);
 		setTitle("Autcel: Execução");
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setBounds(100, 100, 865, 685);
+		setBounds(100, 100, 865, 710);
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		setContentPane(contentPane);
 		contentPane.setLayout(null);
+
+		JMenuBar menuBar = new JMenuBar();
+		setJMenuBar(menuBar);
+
+		JMenu menuAjuda = new JMenu("Ajuda");
+		menuAjuda.setBorder(new EmptyBorder(0, 0, 0, 0));
+		menuBar.add(menuAjuda);
+
+		JMenuItem mntmSobre = new JMenuItem("Sobre");
+		mntmSobre.setIcon(new ImageIcon(AppConfigAutomaton.class.getResource("/img/main16x16.png")));
+		mntmSobre.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				controller.showAboutPopUp();
+			}
+		});
+		mntmSobre.setBorder(new CompoundBorder());
+		menuAjuda.add(mntmSobre);
 
 		matrizPanel = new JPanel();
 		matrizPanel.setLayout(null);
@@ -454,6 +478,12 @@ public class AppRun extends JFrame {
 		arquivoPanel.add(btnImportar);
 
 		btnExportar = new JButton("Exportar");
+		btnExportar.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				// exporta configurações atuais
+				controller.exportData();
+			}
+		});
 		btnExportar.setToolTipText("Exportar configura\u00E7\u00F5es para um arquivo externo");
 		btnExportar.setPreferredSize(new Dimension(120, 20));
 		btnExportar.setMinimumSize(new Dimension(95, 25));
