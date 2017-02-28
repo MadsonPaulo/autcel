@@ -1,13 +1,28 @@
 # autcel
-AUTCEL: editor e simulador de autômatos celulares
+AUTCEL is a software tool for desktop plataform. This tool was developed as part of the bachelor's degree completion thesis in Computer Science of Madson Silva, student at Federal University of Alagoas - campus Arapiraca.
 
-Ferramenta capaz de criar autômatos celulares e acompanhar seu desenvolvimento.
+Title
 
-Projeto desenvolvido para obtenção do grau de Bacharel em Ciência da
-Computação da Universidade Federal de Alagoas - UFAL, Campus de Arapiraca.
+The degree completion thesis currently has the title:
 
-Autor: Madson Paulo Alexandre da Silva.
+    Editor and Simulator of Cellular Automatons
 
-E-mail: madson-paulo@hotmail.com
+Author of the thesis work
 
-Orientador: Prof. Dr. Elthon Allex da Silva Oliveira
+    Madson Paulo Alexandre da Silva, (http://lattes.cnpq.br/6412270327836702)
+
+Developers
+
+    Madson Paulo Alexandre da Silva
+
+Thesis advisor
+
+    Elthon Allex da Silva Oliveira, D.Sc. (http://lattes.cnpq.br/7627571580413875)
+
+Abstract
+
+    Autcel is a desktop tool capable of creating and simulating two-dimentional cellular automatons.
+
+Contact
+
+    E-mail: madson-paulo@hotmail.com
