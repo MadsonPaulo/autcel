@@ -1,13 +1,13 @@
 # autcel
-AUTCEL is a software tool for desktop plataform. This tool was developed as part of the bachelor's degree completion thesis in Computer Science of Madson Silva, student at Federal University of Alagoas - campus Arapiraca.
+AUTCEL is a software tool for desktop plataform. This tool was developed as part of the bachelor's degree completion work in Computer Science of Madson P. A. Silva, student at Federal University of Alagoas - campus Arapiraca.
 
 Title
 
-The degree completion thesis currently has the title:
+The degree completion work currently has the title:
 
 - Editor and Simulator of Cellular Automatons
 
-Author of the thesis work
+Author of the work
 
 - Madson Paulo Alexandre da Silva, (http://lattes.cnpq.br/6412270327836702)
 
@@ -15,7 +15,7 @@ Developers
 
 - Madson Paulo Alexandre da Silva
 
-Thesis advisor
+Advisor
 
 - Elthon Allex da Silva Oliveira, D.Sc. (http://lattes.cnpq.br/7627571580413875)
 
