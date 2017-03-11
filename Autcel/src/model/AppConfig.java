@@ -22,6 +22,7 @@ package model;
 
 import java.awt.Color;
 import java.awt.Font;
+import java.util.ArrayList;
 
 /**
  * Guarda configurações básicas
@@ -39,15 +40,14 @@ public class AppConfig {
 	public Color color6;
 	public Color color7;
 	public Color color8;
-	public Font buttonFont;
-	public Font labelFont;
+	public Font boldFont;
+	public Font normalFont;
 	public int tamVector;
-	public int maxSavedVectors;
 	public int vector[][];
-	public int vectorSaver[][][];
-	public int regras[][];
-	public int regrasJogoDaVida[][];
-	public int regrasCristaisDeUlam[][];
+	public ArrayList<int[][]> vectorSaver;
+	public ArrayList<int[]> regras;
+	public ArrayList<int[]> regrasJogoDaVida;
+	public ArrayList<int[]> regrasCristaisDeUlam;
 	public int activeStates;
 	public int cicloAtual;
 	public String nameState1;
@@ -59,7 +59,6 @@ public class AppConfig {
 	public String nameState7;
 	public String nameState8;
 	public int maxStateNameSize;
-	public int lastSelected;
 
 	public AppConfig() {
 		super();
@@ -71,12 +70,11 @@ public class AppConfig {
 		this.color6 = Color.CYAN;
 		this.color7 = Color.MAGENTA;
 		this.color8 = Color.LIGHT_GRAY;
-		this.buttonFont = new Font("Tahoma", Font.BOLD, 11);
-		this.labelFont = new Font("Tahoma", Font.PLAIN, 11);
-		this.tamVector = 20;
-		this.maxSavedVectors = 500;
+		this.boldFont = new Font("Tahoma", Font.BOLD, 11);
+		this.normalFont = new Font("Tahoma", Font.PLAIN, 11);
+		this.tamVector = 80;
 		this.vector = new int[tamVector][tamVector];
-		this.vectorSaver = new int[tamVector][tamVector][maxSavedVectors];
+		this.vectorSaver = new ArrayList<>();
 		this.activeStates = 2;
 		this.cicloAtual = 0;
 		this.nameState1 = "Estado 01";
@@ -87,21 +85,18 @@ public class AppConfig {
 		this.nameState6 = "Estado 06";
 		this.nameState7 = "Estado 07";
 		this.nameState8 = "Estado 08";
-		this.regras = new int[18][6];
-		this.lastSelected = 0;
+		this.regras = new ArrayList<>();
 		this.maxStateNameSize = 12;
 
-		this.regrasJogoDaVida = new int[][] { { 1, 0, 2, 2, 1, 1 }, { 1, 1, 3, 1, 1, 0 }, { 1, 1, 2, 1, 1, 1 },
-				{ 1, 1, 2, 2, 1, 1 }, { 1, 1, 1, 2, 1, 0 }, { 0, 0, 0, 0, 0, 0 }, { 0, 0, 0, 0, 0, 0 },
-				{ 0, 0, 0, 0, 0, 0 }, { 0, 0, 0, 0, 0, 0 }, { 0, 0, 0, 0, 0, 0 }, { 0, 0, 0, 0, 0, 0 },
-				{ 0, 0, 0, 0, 0, 0 }, { 0, 0, 0, 0, 0, 0 }, { 0, 0, 0, 0, 0, 0 }, { 0, 0, 0, 0, 0, 0 },
-				{ 0, 0, 0, 0, 0, 0 }, { 0, 0, 0, 0, 0, 0 }, { 0, 0, 0, 0, 0, 0 } };
+		this.regrasJogoDaVida = new ArrayList<>();
+		this.regrasJogoDaVida.add(new int[] { 0, 2, 2, 1, 1 });
+		this.regrasJogoDaVida.add(new int[] { 1, 3, 1, 1, 0 });
+		this.regrasJogoDaVida.add(new int[] { 1, 2, 1, 1, 1 });
+		this.regrasJogoDaVida.add(new int[] { 1, 2, 2, 1, 1 });
+		this.regrasJogoDaVida.add(new int[] { 1, 1, 2, 1, 0 });
 
-		this.regrasCristaisDeUlam = new int[][] { { 1, 0, 2, 0, 1, 1 }, { 0, 0, 0, 0, 0, 0 }, { 0, 0, 0, 0, 0, 0 },
-				{ 0, 0, 0, 0, 0, 0 }, { 0, 0, 0, 0, 0, 0 }, { 0, 0, 0, 0, 0, 0 }, { 0, 0, 0, 0, 0, 0 },
-				{ 0, 0, 0, 0, 0, 0 }, { 0, 0, 0, 0, 0, 0 }, { 0, 0, 0, 0, 0, 0 }, { 0, 0, 0, 0, 0, 0 },
-				{ 0, 0, 0, 0, 0, 0 }, { 0, 0, 0, 0, 0, 0 }, { 0, 0, 0, 0, 0, 0 }, { 0, 0, 0, 0, 0, 0 },
-				{ 0, 0, 0, 0, 0, 0 }, { 0, 0, 0, 0, 0, 0 }, { 0, 0, 0, 0, 0, 0 } };
+		this.regrasCristaisDeUlam = new ArrayList<>();
+		this.regrasCristaisDeUlam.add(new int[] { 0, 2, 0, 1, 1 });
 	}
 
 }

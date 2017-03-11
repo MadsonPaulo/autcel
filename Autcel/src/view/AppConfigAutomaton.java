@@ -24,8 +24,11 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Font;
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
@@ -33,6 +36,7 @@ import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 
 import javax.swing.DefaultComboBoxModel;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
@@ -49,8 +53,7 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.border.LineBorder;
 
 import controller.AppController;
-import javax.swing.ImageIcon;
-import java.awt.Toolkit;
+import model.DrawSquare;
 
 /**
  * @author Madson
@@ -76,11 +79,10 @@ public class AppConfigAutomaton extends JFrame {
 	private JLabel lblCor6;
 	private JLabel lblCor7;
 	private JLabel lblCor8;
-	private JComboBox<String> dimensoesComboBox;
 	private JComboBox<String> estadosPossiveisComboBox;
-	private JPanel matrizPanel;
 	private JTextArea infoTxtArea;
 	private final String mensagemInicialTxtArea = "Por favor, defina a quantidade e o nome dos estados poss\u00EDveis, assim como as dimens\u00F4es da matriz e o estado inicial de cada célula.";
+	private DrawSquare squares2;
 
 	/**
 	 * Author: Madson
@@ -213,10 +215,31 @@ public class AppConfigAutomaton extends JFrame {
 		}
 	}
 
-	/**
-	 * Cria o frame
-	 */
+	private void drawMatriz(DrawSquare square, int size, AppController contr) {
+		Color[] configColors = contr.getArrayOfCollors();
+		int posX = 0;
+		int posY = 0;
+		for (int i = 0; i < contr.getTamVector(); i++) {
+			for (int j = 0; j < contr.getTamVector(); j++) {
+				square.addSquare(posX, posY, size, size, configColors[contr.getVector()[i][j]]);
+				posX += size;
+			}
+			posX = 0;
+			posY += size;
+		}
+		repaint();
+	}
+
 	public AppConfigAutomaton(AppController controller) {
+		addComponentListener(new ComponentAdapter() {
+			@Override
+			public void componentMoved(ComponentEvent arg0) {
+				try {
+					drawMatriz(squares2, (squares2.getBounds().width / controller.getVector().length), controller);
+				} catch (NullPointerException n) {
+				}
+			}
+		});
 		setIconImage(Toolkit.getDefaultToolkit().getImage(AppConfigAutomaton.class.getResource("/img/main16x16.png")));
 		setResizable(false);
 		setTitle("Autcel: Configura\u00E7\u00E3o");
@@ -241,25 +264,10 @@ public class AppConfigAutomaton extends JFrame {
 		menuAjuda.add(mntmSobre);
 
 		contentPane = new JPanel();
+		contentPane.setBackground(new Color(248, 248, 255));
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		setContentPane(contentPane);
 		contentPane.setLayout(null);
-
-		matrizPanel = new JPanel();
-		matrizPanel.addMouseListener(new MouseAdapter() {
-			@Override
-			public void mouseClicked(MouseEvent arg0) {
-				// Detecta onde o click ocorreu, verifica os estados possíveis e
-				// altera a cor da célula para a correspondente à do próximo
-				// estado possível
-				int estadosPossiveis = Integer.parseInt(estadosPossiveisComboBox.getSelectedItem().toString());
-				controller.setNextColor(AppConfigAutomaton.this, arg0, estadosPossiveis);
-			}
-		});
-		matrizPanel.setBounds(209, 11, 640, 640);
-		matrizPanel.setBorder(new LineBorder(new Color(0, 0, 0)));
-		contentPane.add(matrizPanel);
-		matrizPanel.setLayout(null);
 
 		JPanel configPanel = new JPanel();
 		configPanel.setBounds(10, 11, 189, 640);
@@ -267,25 +275,20 @@ public class AppConfigAutomaton extends JFrame {
 		configPanel.setLayout(null);
 
 		JPanel estadosPanel = new JPanel();
-		estadosPanel.setBounds(4, 113, 181, 317);
+		estadosPanel.setBounds(4, 160, 181, 284);
 		configPanel.add(estadosPanel);
 		estadosPanel.setBorder(new LineBorder(new Color(0, 0, 0)));
 		estadosPanel.setLayout(null);
 
 		JPanel esqPanel = new JPanel();
-		esqPanel.setBounds(1, 1, 100, 314);
+		esqPanel.setBounds(1, 2, 100, 280);
 		estadosPanel.add(esqPanel);
 		esqPanel.setLayout(null);
 
-		JLabel lblDimensoes = new JLabel("Dimens\u00F5es");
-		lblDimensoes.setFont(controller.getLabelFont());
-		lblDimensoes.setBounds(8, 10, 84, 20);
-		esqPanel.add(lblDimensoes);
-
 		JLabel lblEstadosPossveis = new JLabel("Estados Poss\u00EDveis");
-		lblEstadosPossveis.setBounds(8, 40, 84, 20);
+		lblEstadosPossveis.setBounds(8, 10, 84, 20);
 		esqPanel.add(lblEstadosPossveis);
-		lblEstadosPossveis.setFont(controller.getLabelFont());
+		lblEstadosPossveis.setFont(controller.getNormalFont());
 
 		txtEstado1 = new JTextField();
 		txtEstado1.addKeyListener(new KeyAdapter() {
@@ -297,10 +300,10 @@ public class AppConfigAutomaton extends JFrame {
 				}
 			}
 		});
-		txtEstado1.setFont(controller.getLabelFont());
+		txtEstado1.setFont(controller.getNormalFont());
 		txtEstado1.setHorizontalAlignment(SwingConstants.CENTER);
 		txtEstado1.setText(controller.getNameState1());
-		txtEstado1.setBounds(8, 70, 84, 20);
+		txtEstado1.setBounds(8, 40, 84, 20);
 		esqPanel.add(txtEstado1);
 
 		txtEstado2 = new JTextField();
@@ -313,10 +316,10 @@ public class AppConfigAutomaton extends JFrame {
 				}
 			}
 		});
-		txtEstado2.setFont(controller.getLabelFont());
+		txtEstado2.setFont(controller.getNormalFont());
 		txtEstado2.setText(controller.getNameState2());
 		txtEstado2.setHorizontalAlignment(SwingConstants.CENTER);
-		txtEstado2.setBounds(8, 100, 84, 20);
+		txtEstado2.setBounds(8, 70, 84, 20);
 		esqPanel.add(txtEstado2);
 
 		txtEstado3 = new JTextField();
@@ -330,9 +333,9 @@ public class AppConfigAutomaton extends JFrame {
 			}
 		});
 		txtEstado3.setText(controller.getNameState3());
-		txtEstado3.setFont(controller.getLabelFont());
+		txtEstado3.setFont(controller.getNormalFont());
 		txtEstado3.setHorizontalAlignment(SwingConstants.CENTER);
-		txtEstado3.setBounds(8, 130, 84, 20);
+		txtEstado3.setBounds(8, 100, 84, 20);
 		esqPanel.add(txtEstado3);
 
 		txtEstado4 = new JTextField();
@@ -345,10 +348,10 @@ public class AppConfigAutomaton extends JFrame {
 				}
 			}
 		});
-		txtEstado4.setFont(controller.getLabelFont());
+		txtEstado4.setFont(controller.getNormalFont());
 		txtEstado4.setText(controller.getNameState4());
 		txtEstado4.setHorizontalAlignment(SwingConstants.CENTER);
-		txtEstado4.setBounds(8, 160, 84, 20);
+		txtEstado4.setBounds(8, 130, 84, 20);
 		esqPanel.add(txtEstado4);
 
 		txtEstado5 = new JTextField();
@@ -361,10 +364,10 @@ public class AppConfigAutomaton extends JFrame {
 				}
 			}
 		});
-		txtEstado5.setFont(controller.getLabelFont());
+		txtEstado5.setFont(controller.getNormalFont());
 		txtEstado5.setText(controller.getNameState5());
 		txtEstado5.setHorizontalAlignment(SwingConstants.CENTER);
-		txtEstado5.setBounds(8, 190, 84, 20);
+		txtEstado5.setBounds(8, 160, 84, 20);
 		esqPanel.add(txtEstado5);
 
 		txtEstado6 = new JTextField();
@@ -377,10 +380,10 @@ public class AppConfigAutomaton extends JFrame {
 				}
 			}
 		});
-		txtEstado6.setFont(controller.getLabelFont());
+		txtEstado6.setFont(controller.getNormalFont());
 		txtEstado6.setText(controller.getNameState6());
 		txtEstado6.setHorizontalAlignment(SwingConstants.CENTER);
-		txtEstado6.setBounds(8, 220, 84, 20);
+		txtEstado6.setBounds(8, 190, 84, 20);
 		esqPanel.add(txtEstado6);
 
 		txtEstado7 = new JTextField();
@@ -393,10 +396,10 @@ public class AppConfigAutomaton extends JFrame {
 				}
 			}
 		});
-		txtEstado7.setFont(controller.getLabelFont());
+		txtEstado7.setFont(controller.getNormalFont());
 		txtEstado7.setText(controller.getNameState7());
 		txtEstado7.setHorizontalAlignment(SwingConstants.CENTER);
-		txtEstado7.setBounds(8, 250, 84, 20);
+		txtEstado7.setBounds(8, 220, 84, 20);
 		esqPanel.add(txtEstado7);
 
 		txtEstado8 = new JTextField();
@@ -409,47 +412,16 @@ public class AppConfigAutomaton extends JFrame {
 				}
 			}
 		});
-		txtEstado8.setFont(controller.getLabelFont());
+		txtEstado8.setFont(controller.getNormalFont());
 		txtEstado8.setText(controller.getNameState8());
 		txtEstado8.setHorizontalAlignment(SwingConstants.CENTER);
-		txtEstado8.setBounds(8, 280, 84, 20);
+		txtEstado8.setBounds(8, 250, 84, 20);
 		esqPanel.add(txtEstado8);
 
 		JPanel dirPanel = new JPanel();
-		dirPanel.setBounds(102, 1, 78, 314);
+		dirPanel.setBounds(102, 2, 78, 280);
 		estadosPanel.add(dirPanel);
 		dirPanel.setLayout(null);
-
-		dimensoesComboBox = new JComboBox<String>();
-		dimensoesComboBox.setBounds(4, 10, 70, 20);
-		dirPanel.add(dimensoesComboBox);
-		dimensoesComboBox.setModel(new DefaultComboBoxModel<String>(new String[] { "10x10", "20x20", "40x40" }));
-		dimensoesComboBox.setFocusable(false);
-		// seleciona o item no dimensoesComboBox de acordo com o configurado no
-		// controller
-		int indiceTamanho = 0;
-		if (controller.getTamVector() == 20) {
-			indiceTamanho = 1;
-		} else if (controller.getTamVector() == 40) {
-			indiceTamanho = 2;
-		}
-		dimensoesComboBox.setSelectedIndex(indiceTamanho);
-		dimensoesComboBox.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-				// altera o tamanho da matriz de acordo com a opção escolhida
-				int index = dimensoesComboBox.getSelectedIndex();
-				int tamanho = 10;
-				if (index == 1) {
-					tamanho = 20;
-				} else if (index == 2) {
-					tamanho = 40;
-				}
-				// realiza a alteração no controller
-				controller.setTamVector(tamanho);
-				// redesenha a matriz
-				controller.fillPanel(matrizPanel);
-			}
-		});
 
 		estadosPossiveisComboBox = new JComboBox<String>();
 		estadosPossiveisComboBox.addActionListener(new ActionListener() {
@@ -461,7 +433,7 @@ public class AppConfigAutomaton extends JFrame {
 				controller.setActiveStates(ativos);
 			}
 		});
-		estadosPossiveisComboBox.setBounds(4, 40, 70, 20);
+		estadosPossiveisComboBox.setBounds(4, 10, 70, 20);
 		dirPanel.add(estadosPossiveisComboBox);
 		estadosPossiveisComboBox
 				.setModel(new DefaultComboBoxModel<String>(new String[] { "2", "3", "4", "5", "6", "7", "8" }));
@@ -469,70 +441,69 @@ public class AppConfigAutomaton extends JFrame {
 
 		lblCor1 = new JLabel("");
 		lblCor1.setToolTipText("");
-		lblCor1.setBounds(4, 70, 70, 20);
+		lblCor1.setBounds(4, 40, 70, 20);
 		dirPanel.add(lblCor1);
 		lblCor1.setOpaque(true);
 		lblCor1.setBorder(new LineBorder(new Color(0, 0, 0)));
 		lblCor1.setBackground(controller.getDefaultCollor(1));
 
 		lblCor2 = new JLabel("");
-		lblCor2.setBounds(4, 100, 70, 20);
+		lblCor2.setBounds(4, 70, 70, 20);
 		dirPanel.add(lblCor2);
 		lblCor2.setOpaque(true);
 		lblCor2.setBorder(new LineBorder(new Color(0, 0, 0)));
 		lblCor2.setBackground(controller.getDefaultCollor(2));
 
 		lblCor3 = new JLabel("");
-		lblCor3.setBounds(4, 130, 70, 20);
+		lblCor3.setBounds(4, 100, 70, 20);
 		dirPanel.add(lblCor3);
 		lblCor3.setOpaque(true);
 		lblCor3.setBorder(new LineBorder(new Color(0, 0, 0)));
 		lblCor3.setBackground(controller.getDefaultCollor(3));
 
 		lblCor4 = new JLabel("");
-		lblCor4.setBounds(4, 160, 70, 20);
+		lblCor4.setBounds(4, 130, 70, 20);
 		dirPanel.add(lblCor4);
 		lblCor4.setOpaque(true);
 		lblCor4.setBorder(new LineBorder(new Color(0, 0, 0)));
 		lblCor4.setBackground(controller.getDefaultCollor(4));
 
 		lblCor5 = new JLabel("");
-		lblCor5.setBounds(4, 190, 70, 20);
+		lblCor5.setBounds(4, 160, 70, 20);
 		dirPanel.add(lblCor5);
 		lblCor5.setOpaque(true);
 		lblCor5.setBackground(controller.getDefaultCollor(5));
 		lblCor5.setBorder(new LineBorder(new Color(0, 0, 0)));
 
 		lblCor6 = new JLabel("");
-		lblCor6.setBounds(4, 220, 70, 20);
+		lblCor6.setBounds(4, 190, 70, 20);
 		dirPanel.add(lblCor6);
 		lblCor6.setOpaque(true);
 		lblCor6.setBorder(new LineBorder(new Color(0, 0, 0)));
 		lblCor6.setBackground(controller.getDefaultCollor(6));
 
 		lblCor7 = new JLabel("");
-		lblCor7.setBounds(4, 250, 70, 20);
+		lblCor7.setBounds(4, 220, 70, 20);
 		dirPanel.add(lblCor7);
 		lblCor7.setOpaque(true);
 		lblCor7.setBorder(new LineBorder(new Color(0, 0, 0)));
 		lblCor7.setBackground(controller.getDefaultCollor(7));
 
 		lblCor8 = new JLabel("");
-		lblCor8.setBounds(4, 280, 70, 20);
+		lblCor8.setBounds(4, 250, 70, 20);
 		dirPanel.add(lblCor8);
 		lblCor8.setOpaque(true);
 		lblCor8.setBorder(new LineBorder(new Color(0, 0, 0)));
 		lblCor8.setBackground(controller.getDefaultCollor(8));
 
 		JPanel arquivoPanel = new JPanel();
-		arquivoPanel.setBounds(4, 0, 181, 80);
+		arquivoPanel.setBounds(4, 11, 181, 80);
 		configPanel.add(arquivoPanel);
 		arquivoPanel.setBorder(new LineBorder(new Color(0, 0, 0)));
 
 		JButton btnImportar = new JButton("Importar");
-		btnImportar.setToolTipText("Importar configura\u00E7\u00F5es atrav\u00E9s de um arquivo externo");
 		arquivoPanel.add(btnImportar);
-		btnImportar.setFont(controller.getButtonFont());
+		btnImportar.setFont(controller.getBoldFont());
 		btnImportar.setFocusable(false);
 		btnImportar.setHorizontalTextPosition(SwingConstants.CENTER);
 		btnImportar.addActionListener(new ActionListener() {
@@ -555,7 +526,7 @@ public class AppConfigAutomaton extends JFrame {
 		JButton btnExportar = new JButton("Exportar");
 		btnExportar.setEnabled(false);
 		arquivoPanel.add(btnExportar);
-		btnExportar.setFont(controller.getButtonFont());
+		btnExportar.setFont(controller.getBoldFont());
 		btnExportar.setFocusable(false);
 		btnExportar.setHorizontalTextPosition(SwingConstants.CENTER);
 		btnExportar.setMaximumSize(new Dimension(120, 25));
@@ -575,10 +546,10 @@ public class AppConfigAutomaton extends JFrame {
 				txtEstado6.setText(controller.getNameState6());
 				txtEstado7.setText(controller.getNameState7());
 				txtEstado8.setText(controller.getNameState8());
-				// reseta dimensão
-				dimensoesComboBox.setSelectedIndex(1);
-				controller.setTamVector(20);
-				controller.fillPanel(matrizPanel);
+				// reseta a matriz
+				controller.resetVector();
+				// desenha a matriz
+				drawMatriz(squares2, (squares2.getBounds().width / controller.getVector().length), controller);
 				// reseta estados possiveis
 				estadosPossiveisComboBox.setSelectedIndex(0);
 				int ativos = Integer.parseInt((String) estadosPossiveisComboBox.getSelectedItem());
@@ -588,10 +559,9 @@ public class AppConfigAutomaton extends JFrame {
 				infoTxtArea.setText(mensagemInicialTxtArea);
 			}
 		});
-		btnLimpar.setToolTipText("Limpar todas as configura\u00E7\u00F5es atuais");
 		arquivoPanel.add(btnLimpar);
 		btnLimpar.setFocusable(false);
-		btnLimpar.setFont(controller.getButtonFont());
+		btnLimpar.setFont(controller.getBoldFont());
 		btnLimpar.setHorizontalTextPosition(SwingConstants.CENTER);
 		btnLimpar.setPreferredSize(new Dimension(120, 20));
 		btnLimpar.setAlignmentX(0.5f);
@@ -599,20 +569,16 @@ public class AppConfigAutomaton extends JFrame {
 		JButton btnAvancar = new JButton("Avan\u00E7ar");
 		btnAvancar.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				// convertel o JPanel em uma matriz
-				int[][] vetorEstadosIniciais = controller.getVectorFromPanel(matrizPanel);
 				if (areTxtEstadosValid() == false) {
 					infoTxtArea.setText("Não podem haver estados com nome vazio.");
-				} else if (controller.areStatesValid(vetorEstadosIniciais) == false) {
+				} else if (controller.areStatesValid(controller.getVector()) == false) {
 					infoTxtArea.setText(
 							"São necessários pelo menos dois estados diferentes para continuar. Caso hajam estados inválidos, remova-os.");
 				} else {
 					// salva o nome atual dos estados
 					saveStateNames(controller);
-					// salva o vetor atual
-					controller.setVector(vetorEstadosIniciais);
 					// instancia a janela de regras
-					AppConfigRules_Nova_Versao rules = new AppConfigRules_Nova_Versao(controller);
+					AppConfigRules rules = new AppConfigRules(controller);
 					// torna a janela de regras visível
 					rules.setVisible(true);
 					// encerra a janela atual
@@ -621,15 +587,15 @@ public class AppConfigAutomaton extends JFrame {
 
 			}
 		});
-		btnAvancar.setFont(controller.getButtonFont());
-		btnAvancar.setBounds(14, 609, 160, 20);
+		btnAvancar.setFont(controller.getBoldFont());
+		btnAvancar.setBounds(14, 606, 160, 20);
 		configPanel.add(btnAvancar);
 		btnAvancar.setPreferredSize(new Dimension(90, 20));
 		btnAvancar.setFocusable(false);
 
 		JPanel infoPanel = new JPanel();
 		infoPanel.setBorder(new LineBorder(new Color(0, 0, 0)));
-		infoPanel.setBounds(4, 463, 181, 140);
+		infoPanel.setBounds(4, 455, 181, 140);
 		configPanel.add(infoPanel);
 		infoPanel.setLayout(null);
 
@@ -643,8 +609,57 @@ public class AppConfigAutomaton extends JFrame {
 		infoTxtArea.setBounds(10, 11, 161, 118);
 		infoPanel.add(infoTxtArea);
 
-		// Desenha a matriz
-		controller.fillPanel(matrizPanel);
+		JPanel ZoomPanel = new JPanel();
+		ZoomPanel.setBounds(4, 102, 181, 47);
+		configPanel.add(ZoomPanel);
+		ZoomPanel.setLayout(null);
+
+		JButton btnZoomIn = new JButton("");
+		btnZoomIn.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+			}
+		});
+		btnZoomIn.setFocusable(false);
+		btnZoomIn.setIcon(new ImageIcon(AppConfigAutomaton.class.getResource("/img/zoom-in.gif")));
+		btnZoomIn.setBounds(20, 8, 60, 30);
+		ZoomPanel.add(btnZoomIn);
+
+		JButton btnZoomOut = new JButton("");
+		btnZoomOut.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				repaint();
+			}
+		});
+		btnZoomOut.setFocusable(false);
+		btnZoomOut.setBounds(100, 8, 60, 30);
+		btnZoomOut.setIcon(new ImageIcon(AppConfigAutomaton.class.getResource("/img/zoom-out.gif")));
+		ZoomPanel.add(btnZoomOut);
+
+		squares2 = new DrawSquare();
+		squares2.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent arg0) {
+				// razão entre a largura de squares2 e tamanho da matriz
+				double value = (squares2.getWidth() * 1.0) / controller.getTamVector();
+				// posição x e y do local clicado
+				int posX = (int) Math.ceil(arg0.getX() / value) - 1;
+				int posY = (int) Math.ceil(arg0.getY() / value) - 1;
+				// quantidade de estados ativos
+				int ativos = Integer.parseInt((String) estadosPossiveisComboBox.getSelectedItem());
+				// altera o vetor na posição clicada
+				controller.getVector()[posY][posX] = controller.getNextStateValue(controller.getVector()[posY][posX],
+						ativos);
+				// redesenha a matriz
+				drawMatriz(squares2, (squares2.getBounds().width / controller.getVector().length), controller);
+			}
+		});
+		squares2.setBorder(new LineBorder(new Color(0, 0, 0)));
+		squares2.setBounds(209, 11, 641, 641);
+		getContentPane().add(squares2);
+		squares2.setLayout(null);
+
+		// desenha a matriz
+		drawMatriz(squares2, (squares2.getBounds().width / controller.getVector().length), controller);
 		updateActiveStates(controller.getActiveStates());
 
 	}

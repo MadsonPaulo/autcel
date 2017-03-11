@@ -22,7 +22,12 @@ package view;
 
 import java.awt.Color;
 import java.awt.Dimension;
-import java.awt.Font;
+import java.awt.Toolkit;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
+
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -39,16 +44,14 @@ import javax.swing.Timer;
 import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.LineBorder;
+
 import controller.AppController;
-import java.awt.event.ActionListener;
-import java.awt.event.ActionEvent;
-import java.awt.Toolkit;
+import model.DrawSquare;
 
 public class AppRun extends JFrame {
 
 	private static final long serialVersionUID = 1L;
 	private JPanel contentPane;
-	private JPanel matrizPanel;
 	private JButton btnExportar;
 	private JButton btnReiniciar;
 	private JButton btnImportar;
@@ -60,7 +63,8 @@ public class AppRun extends JFrame {
 	private JComboBox<String> comboBoxVelocidade;
 	private int delay = 1000;
 	private Timer timer;
-	private int[][] copyVector;
+	private boolean firstCycleRan = false;
+	private DrawSquare squares;
 
 	/**
 	 * Atualiza o label que indica o ciclo atual
@@ -107,8 +111,8 @@ public class AppRun extends JFrame {
 			public void actionPerformed(ActionEvent e) {
 				// chama o próximo ciclo no controller
 				contr.nextCycle();
-				// ordena que o controller redezenhe a matriz
-				contr.fillPanel(matrizPanel);
+				// desenha a matriz
+				drawMatriz(contr.getVector(), squares, (squares.getBounds().width / contr.getVector().length), contr);
 				// atualiza o label de ciclo atual
 				updateCycle(contr);
 			}
@@ -122,16 +126,37 @@ public class AppRun extends JFrame {
 		timer.start();
 	}
 
-	/**
-	 * Create the frame.
-	 */
+	private void drawMatriz(int[][] array, DrawSquare square, int size, AppController contr) {
+		Color[] configColors = contr.getArrayOfCollors();
+		int posX = 0;
+		int posY = 0;
+		for (int i = 0; i < array.length; i++) {
+			for (int j = 0; j < array[0].length; j++) {
+				square.addSquare(posX, posY, size, size, configColors[array[i][j]]);
+				posX += size;
+			}
+			posX = 0;
+			posY += size;
+		}
+		repaint();
+	}
+
 	public AppRun(AppController controller) {
+		addComponentListener(new ComponentAdapter() {
+			@Override
+			public void componentMoved(ComponentEvent arg0) {
+				drawMatriz(controller.getVector(), squares, (squares.getBounds().width / controller.getVector().length),
+						controller);
+			}
+		});
 		setIconImage(Toolkit.getDefaultToolkit().getImage(AppRun.class.getResource("/img/main16x16.png")));
 		setResizable(false);
 		setTitle("Autcel: Execução");
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 865, 710);
+		setPreferredSize(new Dimension(865, 710));
 		contentPane = new JPanel();
+		contentPane.setBackground(new Color(248, 248, 255));
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		setContentPane(contentPane);
 		contentPane.setLayout(null);
@@ -153,12 +178,6 @@ public class AppRun extends JFrame {
 		mntmSobre.setBorder(new CompoundBorder());
 		menuAjuda.add(mntmSobre);
 
-		matrizPanel = new JPanel();
-		matrizPanel.setLayout(null);
-		matrizPanel.setBorder(new LineBorder(new Color(0, 0, 0)));
-		matrizPanel.setBounds(209, 11, 640, 640);
-		contentPane.add(matrizPanel);
-
 		JPanel panelMenu = new JPanel();
 		panelMenu.setLayout(null);
 		panelMenu.setBounds(10, 11, 189, 640);
@@ -173,6 +192,10 @@ public class AppRun extends JFrame {
 		btnPrximo = new JButton("Pr\u00F3ximo");
 		btnPrximo.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
+				// caso nenhum ciclo tenha sido avançado
+				if (firstCycleRan == false) {
+					firstCycleRan = true;
+				}
 				// se já estiver avançando automaticamente
 				if (avancoAutomatico) {
 					// para o avanço automático
@@ -181,8 +204,9 @@ public class AppRun extends JFrame {
 				}
 				// chama o próximo ciclo no controller
 				controller.nextCycle();
-				// ordena que o controller redezenhe a matriz
-				controller.fillPanel(matrizPanel);
+				// desenha a matriz
+				drawMatriz(controller.getVector(), squares, (squares.getBounds().width / controller.getVector().length),
+						controller);
 				// atualiza o label de ciclo atual
 				updateCycle(controller);
 			}
@@ -190,7 +214,7 @@ public class AppRun extends JFrame {
 		btnPrximo.setBounds(91, 46, 85, 20);
 		btnPrximo.setPreferredSize(new Dimension(120, 20));
 		btnPrximo.setHorizontalTextPosition(SwingConstants.CENTER);
-		btnPrximo.setFont(controller.getButtonFont());
+		btnPrximo.setFont(controller.getBoldFont());
 		btnPrximo.setFocusable(false);
 		btnPrximo.setAlignmentX(0.5f);
 		panelManual.add(btnPrximo);
@@ -208,8 +232,9 @@ public class AppRun extends JFrame {
 				if (controller.getCiclo() > 0) {
 					// retorna ao ciclo anterior
 					controller.previousCycle();
-					// ordena que o controller redezenhe a matriz
-					controller.fillPanel(matrizPanel);
+					// desenha a matriz
+					drawMatriz(controller.getVector(), squares,
+							(squares.getBounds().width / controller.getVector().length), controller);
 					// atualiza o label de ciclo atual
 					updateCycle(controller);
 				}
@@ -218,13 +243,13 @@ public class AppRun extends JFrame {
 		btnAnterior.setBounds(3, 46, 85, 20);
 		btnAnterior.setPreferredSize(new Dimension(120, 20));
 		btnAnterior.setHorizontalTextPosition(SwingConstants.CENTER);
-		btnAnterior.setFont(controller.getButtonFont());
+		btnAnterior.setFont(controller.getBoldFont());
 		btnAnterior.setFocusable(false);
 		btnAnterior.setAlignmentX(0.5f);
 		panelManual.add(btnAnterior);
 
 		JLabel lblAvanoManual = new JLabel("Avan\u00E7o Manual");
-		lblAvanoManual.setFont(new Font("Tahoma", Font.BOLD, 12));
+		lblAvanoManual.setFont(controller.getBoldFont());
 		lblAvanoManual.setHorizontalAlignment(SwingConstants.CENTER);
 		lblAvanoManual.setBounds(32, 13, 117, 20);
 		panelManual.add(lblAvanoManual);
@@ -238,15 +263,21 @@ public class AppRun extends JFrame {
 		btnAvancoAutomatico = new JButton("Iniciar");
 		btnAvancoAutomatico.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
+				// caso nenhum ciclo tenha sido avançado
+				if (firstCycleRan == false) {
+					firstCycleRan = true;
+				}
 				// Define o valor em milissegundos de intervalo entre as
 				// repetições de acordo com índice de comboBox_Intervalo
 				if (comboBoxVelocidade.getSelectedIndex() == 0) {
-					delay = 200;
+					delay = 50;
 				} else if (comboBoxVelocidade.getSelectedIndex() == 1) {
-					delay = 500;
+					delay = 200;
 				} else if (comboBoxVelocidade.getSelectedIndex() == 2) {
-					delay = 1000;
+					delay = 500;
 				} else if (comboBoxVelocidade.getSelectedIndex() == 3) {
+					delay = 1000;
+				}else if (comboBoxVelocidade.getSelectedIndex() == 4) {
 					delay = 2000;
 				}
 				// se já estiver avançando automaticamente, cancela o avanço
@@ -261,7 +292,7 @@ public class AppRun extends JFrame {
 		});
 		btnAvancoAutomatico.setPreferredSize(new Dimension(120, 20));
 		btnAvancoAutomatico.setHorizontalTextPosition(SwingConstants.CENTER);
-		btnAvancoAutomatico.setFont(controller.getButtonFont());
+		btnAvancoAutomatico.setFont(controller.getBoldFont());
 		btnAvancoAutomatico.setFocusable(false);
 		btnAvancoAutomatico.setAlignmentX(0.5f);
 		btnAvancoAutomatico.setBounds(3, 46, 85, 20);
@@ -269,14 +300,14 @@ public class AppRun extends JFrame {
 
 		JLabel lblAvanoAutomtico = new JLabel("Avan\u00E7o Autom\u00E1tico");
 		lblAvanoAutomtico.setHorizontalAlignment(SwingConstants.CENTER);
-		lblAvanoAutomtico.setFont(new Font("Tahoma", Font.BOLD, 12));
+		lblAvanoAutomtico.setFont(controller.getBoldFont());
 		lblAvanoAutomtico.setBounds(18, 13, 144, 20);
 		panelAutomatico.add(lblAvanoAutomtico);
 
 		comboBoxVelocidade = new JComboBox<String>();
 		comboBoxVelocidade.setFocusable(false);
 		comboBoxVelocidade.setModel(
-				new DefaultComboBoxModel<String>(new String[] { "   200 ms", "   500 ms", " 1000 ms", " 2000 ms" }));
+				new DefaultComboBoxModel<String>(new String[] { "     50 ms", "   200 ms", "   500 ms", " 1000 ms", " 2000 ms" }));
 		comboBoxVelocidade.setBounds(91, 46, 85, 20);
 		comboBoxVelocidade.setSelectedIndex(2);
 		panelAutomatico.add(comboBoxVelocidade);
@@ -294,7 +325,7 @@ public class AppRun extends JFrame {
 
 		JLabel nomeEstado1 = new JLabel("");
 		nomeEstado1.setOpaque(true);
-		nomeEstado1.setFont(controller.getLabelFont());
+		nomeEstado1.setFont(controller.getNormalFont());
 		nomeEstado1.setText(" " + controller.getNameState1());
 		nomeEstado1.setBorder(new LineBorder(new Color(0, 0, 0)));
 		nomeEstado1.setBackground(Color.WHITE);
@@ -303,7 +334,7 @@ public class AppRun extends JFrame {
 
 		JLabel nomeEstado2 = new JLabel("");
 		nomeEstado2.setOpaque(true);
-		nomeEstado2.setFont(controller.getLabelFont());
+		nomeEstado2.setFont(controller.getNormalFont());
 		nomeEstado2.setText(" " + controller.getNameState2());
 		nomeEstado2.setBorder(new LineBorder(new Color(0, 0, 0)));
 		nomeEstado2.setBackground(Color.WHITE);
@@ -312,7 +343,7 @@ public class AppRun extends JFrame {
 
 		JLabel nomeEstado3 = new JLabel("");
 		nomeEstado3.setOpaque(true);
-		nomeEstado3.setFont(controller.getLabelFont());
+		nomeEstado3.setFont(controller.getNormalFont());
 		nomeEstado3.setText(" " + controller.getNameState3());
 		nomeEstado3.setBorder(new LineBorder(new Color(0, 0, 0)));
 		nomeEstado3.setBackground(Color.WHITE);
@@ -321,7 +352,7 @@ public class AppRun extends JFrame {
 
 		JLabel nomeEstado4 = new JLabel("");
 		nomeEstado4.setOpaque(true);
-		nomeEstado4.setFont(controller.getLabelFont());
+		nomeEstado4.setFont(controller.getNormalFont());
 		nomeEstado4.setText(" " + controller.getNameState4());
 		nomeEstado4.setBorder(new LineBorder(new Color(0, 0, 0)));
 		nomeEstado4.setBackground(Color.WHITE);
@@ -332,14 +363,14 @@ public class AppRun extends JFrame {
 		nomeEstado5.setBounds(7, 99, 85, 16);
 		panelNomes.add(nomeEstado5);
 		nomeEstado5.setOpaque(true);
-		nomeEstado5.setFont(controller.getLabelFont());
+		nomeEstado5.setFont(controller.getNormalFont());
 		nomeEstado5.setText(" " + controller.getNameState5());
 		nomeEstado5.setBorder(new LineBorder(new Color(0, 0, 0)));
 		nomeEstado5.setBackground(Color.WHITE);
 
 		JLabel nomeEstado6 = new JLabel("");
 		nomeEstado6.setOpaque(true);
-		nomeEstado6.setFont(controller.getLabelFont());
+		nomeEstado6.setFont(controller.getNormalFont());
 		nomeEstado6.setText(" " + controller.getNameState6());
 		nomeEstado6.setBorder(new LineBorder(new Color(0, 0, 0)));
 		nomeEstado6.setBackground(Color.WHITE);
@@ -348,7 +379,7 @@ public class AppRun extends JFrame {
 
 		JLabel nomeEstado7 = new JLabel("");
 		nomeEstado7.setOpaque(true);
-		nomeEstado7.setFont(controller.getLabelFont());
+		nomeEstado7.setFont(controller.getNormalFont());
 		nomeEstado7.setText(" " + controller.getNameState7());
 		nomeEstado7.setBorder(new LineBorder(new Color(0, 0, 0)));
 		nomeEstado7.setBackground(Color.WHITE);
@@ -357,7 +388,7 @@ public class AppRun extends JFrame {
 
 		JLabel nomeEstado8 = new JLabel("");
 		nomeEstado8.setOpaque(true);
-		nomeEstado8.setFont(controller.getLabelFont());
+		nomeEstado8.setFont(controller.getNormalFont());
 		nomeEstado8.setText(" " + controller.getNameState8());
 		nomeEstado8.setBorder(new LineBorder(new Color(0, 0, 0)));
 		nomeEstado8.setBackground(Color.WHITE);
@@ -444,12 +475,16 @@ public class AppRun extends JFrame {
 
 				// confirma
 				if (option == 0) {
-					// reseta o vetor atual e o ciclo
-					controller.setVector(copyVector);
-					controller.resetVectorSaver();
+					// se já tiver avançado ao menos 1 ciclo
+					if (firstCycleRan) {
+						// reseta o vetor atual e vectorSaver
+						controller.setVector(controller.getInitialCycle());
+						controller.resetVectorSaver();
+					}
+					// reseta o ciclo
 					controller.setCiclo(0);
 					// instancia a janela de regras
-					AppConfigRules_Nova_Versao rules = new AppConfigRules_Nova_Versao(controller);
+					AppConfigRules rules = new AppConfigRules(controller);
 					// torna a janela de regras visível
 					rules.setVisible(true);
 					// encerra a janela atual
@@ -458,7 +493,7 @@ public class AppRun extends JFrame {
 			}
 		});
 		btnVoltar.setPreferredSize(new Dimension(90, 20));
-		btnVoltar.setFont(controller.getButtonFont());
+		btnVoltar.setFont(controller.getBoldFont());
 		btnVoltar.setFocusable(false);
 		btnVoltar.setBounds(14, 609, 160, 20);
 		panelMenu.add(btnVoltar);
@@ -472,7 +507,7 @@ public class AppRun extends JFrame {
 		btnImportar.setEnabled(false);
 		btnImportar.setPreferredSize(new Dimension(120, 20));
 		btnImportar.setHorizontalTextPosition(SwingConstants.CENTER);
-		btnImportar.setFont(controller.getButtonFont());
+		btnImportar.setFont(controller.getBoldFont());
 		btnImportar.setFocusable(false);
 		btnImportar.setAlignmentX(0.5f);
 		arquivoPanel.add(btnImportar);
@@ -484,12 +519,11 @@ public class AppRun extends JFrame {
 				controller.exportData();
 			}
 		});
-		btnExportar.setToolTipText("Exportar configura\u00E7\u00F5es para um arquivo externo");
 		btnExportar.setPreferredSize(new Dimension(120, 20));
 		btnExportar.setMinimumSize(new Dimension(95, 25));
 		btnExportar.setMaximumSize(new Dimension(120, 25));
 		btnExportar.setHorizontalTextPosition(SwingConstants.CENTER);
-		btnExportar.setFont(controller.getButtonFont());
+		btnExportar.setFont(controller.getBoldFont());
 		btnExportar.setFocusable(false);
 		btnExportar.setAlignmentX(0.5f);
 		arquivoPanel.add(btnExportar);
@@ -503,20 +537,24 @@ public class AppRun extends JFrame {
 					setAutoAdvance(false, controller);
 					avancoAutomatico = false;
 				}
-
-				// reseta o vetor atual e o ciclo
-				controller.copyVector(controller.getVector(), copyVector);
-				controller.resetVectorSaver();
+				// se já tiver avançado ao menos 1 ciclo
+				if (firstCycleRan) {
+					// copia o vetor inicial no vetor
+					controller.copyVector(controller.getVector(), controller.getInitialCycle());
+					// reseta o vectorSaver
+					controller.resetVectorSaver();
+				}
+				// reseta o ciclo
 				controller.setCiclo(0);
 				// atualiza a parte visual
-				controller.fillPanel(matrizPanel);
+				drawMatriz(controller.getVector(), squares, (squares.getBounds().width / controller.getVector().length),
+						controller);
 				updateCycle(controller);
 			}
 		});
-		btnReiniciar.setToolTipText("Reiniciar aut\u00F4mato para o ciclo 0");
 		btnReiniciar.setPreferredSize(new Dimension(120, 20));
 		btnReiniciar.setHorizontalTextPosition(SwingConstants.CENTER);
-		btnReiniciar.setFont(controller.getButtonFont());
+		btnReiniciar.setFont(controller.getBoldFont());
 		btnReiniciar.setFocusable(false);
 		btnReiniciar.setAlignmentX(0.5f);
 		arquivoPanel.add(btnReiniciar);
@@ -529,14 +567,19 @@ public class AppRun extends JFrame {
 
 		lblCiclo = new JLabel("  Ciclo: 0");
 		lblCiclo.setBorder(new LineBorder(new Color(0, 0, 0)));
-		lblCiclo.setFont(new Font("Dialog", Font.BOLD, 12));
+		lblCiclo.setFont(controller.getBoldFont());
 		lblCiclo.setBounds(4, 26, 173, 27);
 		panel.add(lblCiclo);
 
-		// Desenha a matriz
-		controller.fillPanel(matrizPanel);
-		// Copia o vetor em seu estado inicial
-		copyVector = new int[controller.getTamVector()][controller.getTamVector()];
-		controller.copyVector(copyVector, controller.getVector());
+		squares = new DrawSquare();
+		squares.setBorder(new LineBorder(new Color(0, 0, 0)));
+		squares.setBounds(209, 11, 641, 641);
+		getContentPane().add(squares);
+		squares.setLayout(null);
+
+		// desenha a matriz
+		drawMatriz(controller.getVector(), squares, (squares.getBounds().width / controller.getVector().length),
+				controller);
+
 	}
 }
