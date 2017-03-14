@@ -59,9 +59,12 @@ public class AppConfig {
 	public String nameState7;
 	public String nameState8;
 	public int maxStateNameSize;
+	public int sqrSize;
+	public int language;
 
 	public AppConfig() {
 		super();
+		// cor dos estados
 		this.color1 = Color.WHITE;
 		this.color2 = Color.GRAY;
 		this.color3 = Color.BLUE;
@@ -70,13 +73,18 @@ public class AppConfig {
 		this.color6 = Color.CYAN;
 		this.color7 = Color.MAGENTA;
 		this.color8 = Color.LIGHT_GRAY;
-		this.boldFont = new Font("Tahoma", Font.BOLD, 11);
-		this.normalFont = new Font("Tahoma", Font.PLAIN, 11);
-		this.tamVector = 80;
+		// fontes padrão
+		this.boldFont = new Font("Calibri", Font.BOLD, 14);
+		this.normalFont = new Font("Calibri", Font.PLAIN, 14);
+		// tamanho do vetor, grid
+		this.tamVector = 320;
 		this.vector = new int[tamVector][tamVector];
+		// salva o grid a cada ciclo, permitindo voltar para ciclo anterior
 		this.vectorSaver = new ArrayList<>();
+		// por padrão, inicia com 2 estados possíveis
 		this.activeStates = 2;
 		this.cicloAtual = 0;
+		// nome padrão dos estados
 		this.nameState1 = "Estado 01";
 		this.nameState2 = "Estado 02";
 		this.nameState3 = "Estado 03";
@@ -85,18 +93,23 @@ public class AppConfig {
 		this.nameState6 = "Estado 06";
 		this.nameState7 = "Estado 07";
 		this.nameState8 = "Estado 08";
+		// guardará as regras do autômato
 		this.regras = new ArrayList<>();
+		// tamanho máximo do nome de um estado
 		this.maxStateNameSize = 12;
-
+		// escala inicial padrão
+		this.sqrSize = 32;
+		// idioma inicial padrão
+		this.language = 0;// 0: Português, 1: Inglês
+		// regras do jogo da vida
 		this.regrasJogoDaVida = new ArrayList<>();
 		this.regrasJogoDaVida.add(new int[] { 0, 2, 2, 1, 1 });
 		this.regrasJogoDaVida.add(new int[] { 1, 3, 1, 1, 0 });
 		this.regrasJogoDaVida.add(new int[] { 1, 2, 1, 1, 1 });
 		this.regrasJogoDaVida.add(new int[] { 1, 2, 2, 1, 1 });
 		this.regrasJogoDaVida.add(new int[] { 1, 1, 2, 1, 0 });
-
+		// regras de cristais de ulam
 		this.regrasCristaisDeUlam = new ArrayList<>();
 		this.regrasCristaisDeUlam.add(new int[] { 0, 2, 0, 1, 1 });
 	}
-
 }

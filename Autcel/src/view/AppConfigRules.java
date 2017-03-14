@@ -27,7 +27,6 @@ import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
-
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.DefaultListModel;
 import javax.swing.ImageIcon;
@@ -40,31 +39,58 @@ import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
+import javax.swing.JSeparator;
 import javax.swing.JTextArea;
 import javax.swing.ListSelectionModel;
 import javax.swing.SwingConstants;
-import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.LineBorder;
-
 import controller.AppController;
 
 public class AppConfigRules extends JFrame {
 	private static final long serialVersionUID = 1L;
 	private JPanel contentPane;
+	private DefaultListModel<String> model = new DefaultListModel<>();
+	private JList<String> listaRegras = new JList<>(model);
+	private ArrayList<int[]> regras = new ArrayList<>();
 	private JComboBox<String> refere = new JComboBox<>();
 	private JComboBox<String> operador = new JComboBox<>();
 	private JComboBox<String> quantidade = new JComboBox<>();
 	private JComboBox<String> estadoVizinho = new JComboBox<>();
 	private JComboBox<String> novoEstado = new JComboBox<>();
-	private JButton btnAvancar;
-	private JButton btnVoltar;
-	private JTextArea infoTxtArea;
-	private JTextArea textRegra;
-	private DefaultListModel<String> model = new DefaultListModel<>();
-	private JList<String> listaRegras = new JList<>(model);
-	private JLabel lblErro;
-	private ArrayList<int[]> regras = new ArrayList<>();
+	private JTextArea infoTxtArea = new JTextArea();
+	private JTextArea textRegra = new JTextArea();
+	private JMenu mnArquivo = new JMenu();
+	private JMenu mnImportar = new JMenu();
+	private JMenu mnModelos = new JMenu();
+	private JMenu mnPrerncias = new JMenu();
+	private JMenu mnIdioma = new JMenu();
+	private JMenu menuAjuda = new JMenu();
+	private JMenuItem mntmExportar = new JMenuItem();
+	private JMenuItem mntmProcurar = new JMenuItem();
+	private JMenuItem mntmManual = new JMenuItem();
+	private JMenuItem mntmSobre = new JMenuItem();
+	private JMenuItem mntmPortugus = new JMenuItem();
+	private JMenuItem mntmEnglish = new JMenuItem();
+	private JMenuItem mntmSair = new JMenuItem();
+	private JButton btnDefinirParaJogo = new JButton();
+	private JButton btnDefinirParaCristais = new JButton();
+	private JButton btnNovaRegra = new JButton();
+	private JButton btnCriarRegra = new JButton();
+	private JButton btnRemoverRegra = new JButton();
+	private JButton btnAcima = new JButton();
+	private JButton btnAbaixo = new JButton();
+	private JButton btnAvancar = new JButton();
+	private JButton btnVoltar = new JButton();
+	private JLabel lblDefinirRegras = new JLabel();
+	private JLabel lblRegrasAtivas = new JLabel();
+	private JLabel lblRefereseAo = new JLabel();
+	private JLabel lblVizinho = new JLabel();
+	private JLabel lblOperador = new JLabel();
+	private JLabel lblQtd = new JLabel();
+	private JLabel lblNovoEstado = new JLabel();
+	private JLabel lblRegraEmProduo = new JLabel();
+	private JLabel lblErro = new JLabel();
 
 	/**
 	 * Preenche textRegra com a regra em linguagem formal de acordo com o estado
@@ -72,11 +98,18 @@ public class AppConfigRules extends JFrame {
 	 * 
 	 * Author: Madson
 	 */
-	private void updateRuleInProduction() {
-		textRegra.setText("Se no estado " + refere.getSelectedItem().toString()
-				+ " e com quantidade de vizinhos no estado " + estadoVizinho.getSelectedItem().toString() + " "
-				+ operador.getSelectedItem().toString() + " " + quantidade.getSelectedItem().toString()
-				+ ", então mude para o estado " + novoEstado.getSelectedItem().toString() + ";");
+	private void updateRuleInProduction(AppController contr) {
+		if (contr.getLanguage() == 0) {
+			textRegra.setText("Se no estado " + refere.getSelectedItem().toString()
+					+ " e com quantidade de vizinhos no estado " + estadoVizinho.getSelectedItem().toString() + " "
+					+ operador.getSelectedItem().toString() + " " + quantidade.getSelectedItem().toString()
+					+ ", então mude para o estado " + novoEstado.getSelectedItem().toString() + ";");
+		} else if (contr.getLanguage() == 1) {
+			textRegra.setText("If in state " + refere.getSelectedItem().toString()
+					+ " and with amount of neighbors in state " + estadoVizinho.getSelectedItem().toString() + " "
+					+ operador.getSelectedItem().toString() + " " + quantidade.getSelectedItem().toString()
+					+ ", then change to the state " + novoEstado.getSelectedItem().toString() + ";");
+		}
 	}
 
 	/**
@@ -89,12 +122,40 @@ public class AppConfigRules extends JFrame {
 	 *            array de 6 inteiros, que representa uma regra
 	 * @return regra em linguagem formal
 	 */
-	private String getRuleTextByCode(int[] code) {
-		String text = "Se no estado " + refere.getItemAt(code[0]).toString()
-				+ " e com quantidade de vizinhos no estado " + estadoVizinho.getItemAt(code[3]).toString() + " "
-				+ operador.getItemAt(code[1]).toString() + " " + quantidade.getItemAt(code[2]).toString()
-				+ ", então mude para o estado " + novoEstado.getItemAt(code[4]).toString() + ";";
+	private String getRuleTextByCode(int[] code, AppController contr) {
+		String text = "";
+		if (contr.getLanguage() == 0) {
+			text = "Se no estado " + refere.getItemAt(code[0]).toString() + " e com quantidade de vizinhos no estado "
+					+ estadoVizinho.getItemAt(code[3]).toString() + " " + operador.getItemAt(code[1]).toString() + " "
+					+ quantidade.getItemAt(code[2]).toString() + ", então mude para o estado "
+					+ novoEstado.getItemAt(code[4]).toString() + ";";
+		} else if (contr.getLanguage() == 1) {
+			text = "If in state " + refere.getItemAt(code[0]).toString() + " and with amount of neighbors in state "
+					+ estadoVizinho.getItemAt(code[3]).toString() + " " + operador.getItemAt(code[1]).toString() + " "
+					+ quantidade.getItemAt(code[2]).toString() + ", then change to the state "
+					+ novoEstado.getItemAt(code[4]).toString() + ";";
+		}
 		return text;
+	}
+
+	/**
+	 * Atualiza as regras já criadas
+	 * 
+	 * Author: Madson
+	 * 
+	 * @param controller
+	 */
+	private void updateCreatedRules(AppController controller) {
+		// se houver alguma regra criada
+		if (regras.size() > 0) {
+			// limpa o model da JList
+			model.removeAllElements();
+			// percorre regras, adicionando-as ao model
+			for (int i = 0; i < regras.size(); i++) {
+				model.addElement(getRuleTextByCode(regras.get(i), controller));
+			}
+			listaRegras.setModel(model);
+		}
 	}
 
 	/**
@@ -113,8 +174,126 @@ public class AppConfigRules extends JFrame {
 			// preenche o ArrayList regras
 			regras.add(controller.getRegras().get(i));
 			// preenche o model da JList e atualiza a JList
-			model.addElement(getRuleTextByCode(controller.getRegras().get(i)));
-			listaRegras.setModel(model);
+			model.addElement(getRuleTextByCode(controller.getRegras().get(i), controller));
+		}
+		listaRegras.setModel(model);
+	}
+
+	/**
+	 * Altera o idioma
+	 * 
+	 * Author: Madson
+	 * 
+	 * @param value
+	 *            0:Português, 1 Inglês
+	 * @param contr
+	 */
+	private void setLanguage(int value, AppController contr) {
+		if (value == 0) {
+			// título
+			setTitle("Autcel: Regras");
+			// menus
+			mnArquivo.setText("Arquivo");
+			mnImportar.setText("Importar");
+			mnModelos.setText("Modelos");
+			mnPrerncias.setText("Preferências");
+			mnIdioma.setText("Idioma");
+			mntmProcurar.setText("Procurar");
+			mntmExportar.setText("Exportar");
+			mntmSair.setText("Sair");
+			mntmPortugus.setText("Português");
+			mntmEnglish.setText("English");
+			mntmManual.setText("Manual de Uso");
+			mntmSobre.setText("Sobre o Autcel");
+			menuAjuda.setText("Ajuda");
+			// botões
+			btnDefinirParaJogo.setText("Jogo da Vida");
+			btnDefinirParaCristais.setText("Cristais de Ulam");
+			btnNovaRegra.setText("Nova Regra");
+			btnCriarRegra.setText("Criar Regra");
+			btnRemoverRegra.setText("Excluir");
+			btnAcima.setText("Acima");
+			btnAbaixo.setText("Abaixo");
+			btnAvancar.setText("Avançar");
+			btnVoltar.setText("Voltar");
+			// labels
+			lblDefinirRegras.setText("Definir Regras");
+			lblRegrasAtivas.setText("Regras Ativas");
+			lblRefereseAo.setText("Refere-se ao");
+			lblVizinho.setText("Vizinho");
+			lblOperador.setText("Operador");
+			lblQtd.setText("Quantidade");
+			lblNovoEstado.setText("Novo Estado");
+			lblRegraEmProduo.setText("Regra em Produção");
+			// textArea
+			infoTxtArea.setText(
+					"Defina as regras do aut\u00F4mato. As regras seguem ordem de preced\u00EAncia de cima para baixo, logo, uma vez que uma regra seja validada para uma c\u00E9lula em um ciclo, as demais regras ser\u00E3o ignoradas para esta c\u00E9lula neste ciclo.");
+		} else if (value == 1) {
+			// título
+			setTitle("Autcel: Rules");
+			// menus
+			mnArquivo.setText("File");
+			mnImportar.setText("Import");
+			mnModelos.setText("Templates");
+			mnPrerncias.setText("Settings");
+			mnIdioma.setText("Language");
+			mntmProcurar.setText("Search");
+			mntmExportar.setText("Export");
+			mntmSair.setText("Exit");
+			mntmPortugus.setText("Português");
+			mntmEnglish.setText("English");
+			mntmManual.setText("User Manual");
+			mntmSobre.setText("About Autcel");
+			menuAjuda.setText("Help");
+			// botões
+			btnDefinirParaJogo.setText("Game of Life");
+			btnDefinirParaCristais.setText("Ulam Crystals");
+			btnNovaRegra.setText("New Rule");
+			btnCriarRegra.setText("Create Rule");
+			btnRemoverRegra.setText("Delete");
+			btnAcima.setText("Up");
+			btnAbaixo.setText("Down");
+			btnAvancar.setText("Next");
+			btnVoltar.setText("Back");
+			// labels
+			lblDefinirRegras.setText("Set Rules");
+			lblRegrasAtivas.setText("Active Rules");
+			lblRefereseAo.setText("Refers to");
+			lblVizinho.setText("Neighbor");
+			lblOperador.setText("Operator");
+			lblQtd.setText("Amount");
+			lblNovoEstado.setText("New State");
+			lblRegraEmProduo.setText("Rule in Production");
+			// textArea
+			infoTxtArea.setText(
+					"Define the rules of the automaton. The rules follow precedence order from top to bottom, so once a rule is validated for a cell in a cycle, the other rules are ignored for this cell in this cycle.");
+		}
+		// se houver alguma regra em produção, atualiza-a
+		if (textRegra.getText().length() > 0) {
+			updateRuleInProduction(contr);
+		}
+		// atualiza as regras já criadas
+		updateCreatedRules(contr);
+	}
+
+	/**
+	 * Tenta importar configurações. Se obtiver sucesso, fecha a tela atual e
+	 * abre a tela de execução
+	 * 
+	 * Author: Madson
+	 * 
+	 * @param contr
+	 *            controller
+	 */
+	private void importData(AppController contr) {
+		// se obtiver sucesso em importar as configurações do autômato
+		if (contr.importData()) {
+			// cria uma nova instância de execução
+			AppRun run = new AppRun(contr);
+			// torna a nova instância visível
+			run.setVisible(true);
+			// encerra a instância atual
+			dispose();
 		}
 	}
 
@@ -155,53 +334,113 @@ public class AppConfigRules extends JFrame {
 		quantidade.setModel(new DefaultComboBoxModel<String>(quantidades));
 	}
 
-	/**
-	 * Create the frame.
-	 */
 	public AppConfigRules(AppController controller) {
 		setIconImage(Toolkit.getDefaultToolkit().getImage(AppConfigRules.class.getResource("/img/main16x16.png")));
 		setResizable(false);
-		setTitle("Autcel: Regras");
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setBounds(100, 100, 900, 710);
+		setBounds(100, 100, 891, 700);
 		contentPane = new JPanel();
 		contentPane.setBackground(new Color(248, 248, 255));
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		setContentPane(contentPane);
 		contentPane.setLayout(null);
 
+		// cria a barra de menu
 		JMenuBar menuBar = new JMenuBar();
 		setJMenuBar(menuBar);
-
-		JMenu menuAjuda = new JMenu("Ajuda");
-		menuAjuda.setBorder(new EmptyBorder(0, 0, 0, 0));
+		// separator
+		JSeparator separator = new JSeparator();
+		// inclusões
+		menuBar.add(mnArquivo);
+		mnArquivo.add(mnImportar);
+		mnImportar.add(mntmProcurar);
+		mnImportar.add(mnModelos);
+		mnArquivo.add(mntmExportar);
+		mnArquivo.add(separator);
+		mnArquivo.add(mntmSair);
+		menuBar.add(mnPrerncias);
+		mnPrerncias.add(mnIdioma);
+		mnIdioma.add(mntmPortugus);
+		mnIdioma.add(mntmEnglish);
 		menuBar.add(menuAjuda);
-
-		JMenuItem mntmSobre = new JMenuItem("Sobre");
+		menuAjuda.add(mntmManual);
+		menuAjuda.add(mntmSobre);
+		// ícones
+		mnImportar.setIcon(new ImageIcon(AppConfigAutomaton.class.getResource("/img/import.gif")));
+		mntmExportar.setIcon(new ImageIcon(AppConfigAutomaton.class.getResource("/img/export.png")));
+		mntmSair.setIcon(new ImageIcon(AppConfigAutomaton.class.getResource("/img/exit.png")));
+		mnIdioma.setIcon(new ImageIcon(AppConfigAutomaton.class.getResource("/img/config.png")));
+		mntmPortugus.setIcon(new ImageIcon(AppConfigAutomaton.class.getResource("/img/brasil.png")));
+		mntmEnglish.setIcon(new ImageIcon(AppConfigAutomaton.class.getResource("/img/United-States.png")));
 		mntmSobre.setIcon(new ImageIcon(AppConfigAutomaton.class.getResource("/img/main16x16.png")));
+		mntmManual.setIcon(new ImageIcon(AppConfigAutomaton.class.getResource("/img/manual.png")));
+		// fonte dos menus
+		mnArquivo.setFont(controller.getBoldFont());
+		mnImportar.setFont(controller.getBoldFont());
+		mnModelos.setFont(controller.getBoldFont());
+		mnPrerncias.setFont(controller.getBoldFont());
+		mnIdioma.setFont(controller.getBoldFont());
+		menuAjuda.setFont(controller.getBoldFont());
+		mntmExportar.setFont(controller.getBoldFont());
+		mntmProcurar.setFont(controller.getBoldFont());
+		mntmManual.setFont(controller.getBoldFont());
+		mntmSobre.setFont(controller.getBoldFont());
+		mntmPortugus.setFont(controller.getBoldFont());
+		mntmEnglish.setFont(controller.getBoldFont());
+		mntmSair.setFont(controller.getBoldFont());
+		// desabilita um menu
+		mntmExportar.setEnabled(false);
+		// ações
+		mntmProcurar.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				importData(controller);
+			}
+		});
+		mntmSair.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				dispose();
+			}
+		});
+		mntmPortugus.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				if (controller.getLanguage() == 1) {
+					controller.setLanguage(0);
+					setLanguage(0, controller);
+				}
+			}
+		});
+		mntmEnglish.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				if (controller.getLanguage() == 0) {
+					controller.setLanguage(1);
+					setLanguage(1, controller);
+				}
+			}
+		});
 		mntmSobre.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				controller.showAboutPopUp();
 			}
 		});
-		mntmSobre.setBorder(new CompoundBorder());
-		menuAjuda.add(mntmSobre);
+		mntmManual.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				controller.showManualPopUp();
+			}
+		});
 
 		JPanel panelRegras = new JPanel();
 		panelRegras.setBorder(new LineBorder(new Color(0, 0, 0)));
-		panelRegras.setBounds(10, 59, 874, 530);
+		panelRegras.setBounds(5, 57, 874, 530);
 		contentPane.add(panelRegras);
 		panelRegras.setLayout(null);
 
-		textRegra = new JTextArea();
-		textRegra.setFont(new Font("Tahoma", Font.PLAIN, 12));
+		textRegra.setFont(controller.getNormalFont());
 		textRegra.setEditable(false);
 		textRegra.setText("");
 		textRegra.setBorder(new LineBorder(new Color(0, 0, 0)));
 		textRegra.setBounds(123, 29, 745, 20);
 		panelRegras.add(textRegra);
 
-		JLabel lblRegraEmProduo = new JLabel("Regra em Produ\u00E7\u00E3o");
 		lblRegraEmProduo.setHorizontalAlignment(SwingConstants.CENTER);
 		lblRegraEmProduo.setFont(controller.getBoldFont());
 		lblRegraEmProduo.setBounds(123, 7, 745, 17);
@@ -215,7 +454,6 @@ public class AppConfigRules extends JFrame {
 		refere.setBounds(30, 26, 120, 20);
 		panelCombos.add(refere);
 
-		JLabel lblRefereseAo = new JLabel("Refere-se ao");
 		lblRefereseAo.setBounds(40, 3, 100, 20);
 		panelCombos.add(lblRefereseAo);
 		lblRefereseAo.setHorizontalTextPosition(SwingConstants.CENTER);
@@ -225,7 +463,6 @@ public class AppConfigRules extends JFrame {
 		operador.setBounds(330, 26, 100, 20);
 		panelCombos.add(operador);
 
-		JLabel lblOperador = new JLabel("Operador");
 		lblOperador.setBounds(330, 3, 100, 20);
 		panelCombos.add(lblOperador);
 		lblOperador.setHorizontalTextPosition(SwingConstants.CENTER);
@@ -235,7 +472,6 @@ public class AppConfigRules extends JFrame {
 		quantidade.setBounds(460, 26, 100, 20);
 		panelCombos.add(quantidade);
 
-		JLabel lblQtd = new JLabel("Quantidade");
 		lblQtd.setBounds(460, 3, 100, 20);
 		panelCombos.add(lblQtd);
 		lblQtd.setHorizontalTextPosition(SwingConstants.CENTER);
@@ -245,7 +481,6 @@ public class AppConfigRules extends JFrame {
 		estadoVizinho.setBounds(180, 26, 120, 20);
 		panelCombos.add(estadoVizinho);
 
-		JLabel lblVizinho = new JLabel("Vizinho");
 		lblVizinho.setBounds(190, 3, 100, 20);
 		panelCombos.add(lblVizinho);
 		lblVizinho.setHorizontalTextPosition(SwingConstants.CENTER);
@@ -255,7 +490,6 @@ public class AppConfigRules extends JFrame {
 		novoEstado.setBounds(590, 26, 120, 20);
 		panelCombos.add(novoEstado);
 
-		JLabel lblNovoEstado = new JLabel("Novo Estado");
 		lblNovoEstado.setBounds(600, 3, 100, 20);
 		panelCombos.add(lblNovoEstado);
 		lblNovoEstado.setHorizontalTextPosition(SwingConstants.CENTER);
@@ -263,11 +497,10 @@ public class AppConfigRules extends JFrame {
 		lblNovoEstado.setFont(controller.getBoldFont());
 		lblNovoEstado.setFocusable(false);
 
-		JButton btnNovaRegra = new JButton("Nova Regra");
 		btnNovaRegra.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				// atualiza a regra que está sendo criada
-				updateRuleInProduction();
+				updateRuleInProduction(controller);
 			}
 		});
 		btnNovaRegra.setPreferredSize(new Dimension(90, 20));
@@ -276,7 +509,6 @@ public class AppConfigRules extends JFrame {
 		btnNovaRegra.setBounds(4, 29, 115, 20);
 		panelRegras.add(btnNovaRegra);
 
-		JButton btnCriarRegra = new JButton("Criar Regra");
 		btnCriarRegra.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				// checa se há algum texto no campo de regra em produção
@@ -301,21 +533,21 @@ public class AppConfigRules extends JFrame {
 
 		listaRegras = new JList<String>();
 		listaRegras.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		listaRegras.setFont(controller.getBoldFont());
 		listaRegras.setBorder(new LineBorder(new Color(0, 0, 0)));
 		listaRegras.setBounds(123, 175, 745, 326);
 		panelRegras.add(listaRegras);
 
-		JLabel lblRegrasAtivas = new JLabel("Regras Ativas");
 		lblRegrasAtivas.setHorizontalAlignment(SwingConstants.CENTER);
-		lblRegrasAtivas.setFont(controller.getNormalFont());
+		lblRegrasAtivas.setFont(controller.getBoldFont());
 		lblRegrasAtivas.setBounds(123, 151, 745, 17);
 		panelRegras.add(lblRegrasAtivas);
 
-		JButton btnRemoverRegra = new JButton("Excluir");
 		btnRemoverRegra.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				// pos recebe a posição da regra selecionada
 				int pos = listaRegras.getSelectedIndex();
+				// se há alguma selecionada
 				if (pos > -1) {
 					// remove do model e atualiza o JList
 					model.remove(pos);
@@ -331,7 +563,6 @@ public class AppConfigRules extends JFrame {
 		btnRemoverRegra.setBounds(4, 175, 115, 20);
 		panelRegras.add(btnRemoverRegra);
 
-		JButton btnAcima = new JButton("Acima");
 		btnAcima.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				// pos recebe a posição da regra selecionada
@@ -355,7 +586,6 @@ public class AppConfigRules extends JFrame {
 		btnAcima.setBounds(4, 199, 115, 20);
 		panelRegras.add(btnAcima);
 
-		JButton btnAbaixo = new JButton("Abaixo");
 		btnAbaixo.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				// pos recebe a posição da regra selecionada
@@ -379,25 +609,22 @@ public class AppConfigRules extends JFrame {
 		btnAbaixo.setBounds(4, 223, 115, 20);
 		panelRegras.add(btnAbaixo);
 
-		lblErro = new JLabel("");
-		lblErro.setFont(controller.getNormalFont());
+		lblErro.setFont(controller.getBoldFont());
 		lblErro.setForeground(Color.RED);
 		lblErro.setBounds(123, 506, 745, 18);
 		panelRegras.add(lblErro);
 
 		JPanel panelModelos = new JPanel();
 		panelModelos.setBorder(new LineBorder(new Color(0, 0, 0)));
-		panelModelos.setBounds(10, 6, 874, 51);
+		panelModelos.setBounds(5, 3, 874, 51);
 		contentPane.add(panelModelos);
 		panelModelos.setLayout(null);
 
-		JLabel lblDefinirRegras = new JLabel("Definir Regras");
 		lblDefinirRegras.setBounds(379, 6, 115, 17);
 		panelModelos.add(lblDefinirRegras);
 		lblDefinirRegras.setHorizontalAlignment(SwingConstants.CENTER);
 		lblDefinirRegras.setFont(controller.getBoldFont());
 
-		JButton btnDefinirParaJogo = new JButton("Jogo da Vida");
 		btnDefinirParaJogo.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				// define as regras para o Jogo da Vida
@@ -414,7 +641,6 @@ public class AppConfigRules extends JFrame {
 		btnDefinirParaJogo.setBounds(204, 22, 130, 20);
 		panelModelos.add(btnDefinirParaJogo);
 
-		JButton btnDefinirParaCristais = new JButton("Cristais de Ulam");
 		btnDefinirParaCristais.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				// define as regras para os Cristais de Ulam
@@ -433,11 +659,10 @@ public class AppConfigRules extends JFrame {
 
 		JPanel panelMenu = new JPanel();
 		panelMenu.setBorder(new LineBorder(new Color(0, 0, 0)));
-		panelMenu.setBounds(10, 595, 874, 54);
+		panelMenu.setBounds(5, 590, 874, 54);
 		contentPane.add(panelMenu);
 		panelMenu.setLayout(null);
 
-		btnAvancar = new JButton("Avan\u00E7ar");
 		btnAvancar.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				// Se houver pelo menos uma regra
@@ -451,7 +676,11 @@ public class AppConfigRules extends JFrame {
 					// encerra a janela atual
 					dispose();
 				} else {
-					lblErro.setText("É necessário ter pelo menos uma regra ativa para continuar.");
+					if (controller.getLanguage() == 0) {
+						lblErro.setText("É necessário ter pelo menos uma regra ativa para continuar.");
+					} else if (controller.getLanguage() == 1) {
+						lblErro.setText("You must have at least one active rule to continue.");
+					}
 				}
 			}
 		});
@@ -461,7 +690,6 @@ public class AppConfigRules extends JFrame {
 		btnAvancar.setBounds(714, 17, 155, 20);
 		panelMenu.add(btnAvancar);
 
-		btnVoltar = new JButton("Voltar");
 		btnVoltar.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				// Salva as regras se existir ao menos uma
@@ -482,11 +710,8 @@ public class AppConfigRules extends JFrame {
 		btnVoltar.setBounds(5, 17, 155, 20);
 		panelMenu.add(btnVoltar);
 
-		infoTxtArea = new JTextArea();
 		infoTxtArea.setBorder(new LineBorder(new Color(0, 0, 0), 1, true));
 		infoTxtArea.setWrapStyleWord(true);
-		infoTxtArea.setText(
-				"Defina as regras do aut\u00F4mato. As regras seguem ordem de preced\u00EAncia de cima para baixo, logo, uma vez que uma regra seja validada para uma c\u00E9lula em um ciclo, as demais regras ser\u00E3o ignoradas para esta c\u00E9lula.");
 		infoTxtArea.setOpaque(false);
 		infoTxtArea.setLineWrap(true);
 		infoTxtArea.setFont(new Font("Monospaced", Font.PLAIN, 11));
@@ -497,31 +722,31 @@ public class AppConfigRules extends JFrame {
 		// altera o texto da regra em produção, caso o JComboBox seja alterado
 		refere.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				updateRuleInProduction();
+				updateRuleInProduction(controller);
 			}
 		});
 		// altera o texto da regra em produção, caso o JComboBox seja alterado
 		quantidade.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				updateRuleInProduction();
+				updateRuleInProduction(controller);
 			}
 		});
 		// altera o texto da regra em produção, caso o JComboBox seja alterado
 		estadoVizinho.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				updateRuleInProduction();
+				updateRuleInProduction(controller);
 			}
 		});
 		// altera o texto da regra em produção, caso o JComboBox seja alterado
 		novoEstado.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				updateRuleInProduction();
+				updateRuleInProduction(controller);
 			}
 		});
 		// altera o texto da regra em produção, caso o JComboBox seja alterado
 		operador.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				updateRuleInProduction();
+				updateRuleInProduction(controller);
 			}
 		});
 
@@ -529,5 +754,7 @@ public class AppConfigRules extends JFrame {
 		configureModels(controller);
 		// configura o model da JList
 		configureJList(controller);
+		// determina o idioma
+		setLanguage(controller.getLanguage(), controller);
 	}
 }

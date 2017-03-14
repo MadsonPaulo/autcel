@@ -12,20 +12,29 @@ import javax.swing.JPanel;
 
 public class DrawSquare extends JPanel {
 	private static final long serialVersionUID = 1L;
-	private static final int PREF_W = 400;
-	private static final int PREF_H = PREF_W;
 	private List<Rectangle> squares = new ArrayList<Rectangle>();
 	private List<Color> colors = new ArrayList<Color>();
+	private int prefSize;;
+	
+	public DrawSquare(int size){
+		prefSize = size;
+		setPrefSize(size);
+	}
 
-	public void addSquare(int x, int y, int width, int height, Color color) {
-		Rectangle rect = new Rectangle(x, y, width, height);
+	public void addSquare(int x, int y, int size, Color color) {
+		Rectangle rect = new Rectangle(x, y, size, size);
 		squares.add(rect);
 		colors.add(color);
 	}
 
+	public void setPrefSize(int value) {
+		this.prefSize = value;
+		this.setSize(new Dimension(prefSize, prefSize));
+	}
+
 	@Override
 	public Dimension getPreferredSize() {
-		return new Dimension(PREF_W, PREF_H);
+		return new Dimension(prefSize, prefSize);
 	}
 
 	@Override
@@ -41,7 +50,11 @@ public class DrawSquare extends JPanel {
 		}
 
 		g2.dispose();
+	}
+
+	public void cleanSquare() {
 		squares.clear();
 		colors.clear();
 	}
+
 }

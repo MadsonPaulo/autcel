@@ -31,14 +31,13 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.util.ArrayList;
-
 import javax.swing.ImageIcon;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
-import javax.swing.JTextArea;
-
 import model.AppConfig;
+import model.DrawSquare;
 import view.AppConfigAutomaton;
+import view.Manual;
 
 /**
  * Controller das 3 views, sendo sua única instância repassada entre as views
@@ -51,7 +50,9 @@ public class AppController {
 	private AppConfig config = new AppConfig();
 
 	/**
-	 * Inicializa a GUI
+	 * Inicia a aplicação
+	 * 
+	 * Author: Madson
 	 */
 	public void startApplication() {
 		AppConfigAutomaton view = new AppConfigAutomaton(this);
@@ -89,13 +90,17 @@ public class AppController {
 			return config.color1;
 		}
 	}
-	
+
 	/**
-	 * Retorna o valor do próximo estado possível, de acordo com a quantidade de estados possíveis
+	 * Retorna o valor do próximo estado possível, de acordo com a quantidade de
+	 * estados possíveis
 	 * 
 	 * Author: Madson
-	 * @param current estado atual
-	 * @param states quantidade de estados possíveis
+	 * 
+	 * @param current
+	 *            estado atual
+	 * @param states
+	 *            quantidade de estados possíveis
 	 * @return valor do próximo estado possível
 	 */
 	public int getNextStateValue(int current, int states) {
@@ -180,7 +185,9 @@ public class AppController {
 	 * 
 	 * Author: Madson
 	 */
-	public void nextCycle() {
+	public int[] nextCycle() {
+		// quantidade de células em cada estado
+		int[] states = { 0, 0, 0, 0, 0, 0, 0, 0 };
 		// copia a matriz original para fazer alterações
 		int[][] tempVector = new int[config.vector.length][config.vector.length];
 		for (int i = 0; i < config.vector.length; i++) {
@@ -239,13 +246,33 @@ public class AppController {
 				newSave[i][y] = config.vector[i][y];
 				// grava as alterações na matriz final
 				config.vector[i][y] = tempVector[i][y];
+				// incrementa states
+				if (tempVector[i][y] == 0) {
+					states[0]++;
+				} else if (tempVector[i][y] == 1) {
+					states[1]++;
+				} else if (tempVector[i][y] == 2) {
+					states[2]++;
+				} else if (tempVector[i][y] == 3) {
+					states[3]++;
+				} else if (tempVector[i][y] == 4) {
+					states[4]++;
+				} else if (tempVector[i][y] == 5) {
+					states[5]++;
+				} else if (tempVector[i][y] == 6) {
+					states[6]++;
+				} else if (tempVector[i][y] == 7) {
+					states[7]++;
+				}
 			}
 		}
-		// ciclo atual salvo em vectorSaver
-		config.vectorSaver.add(newSave);
-
+		if ((config.cicloAtual + 1) > config.vectorSaver.size()) {
+			// ciclo atual salvo em vectorSaver
+			config.vectorSaver.add(newSave);
+		}
 		// avança 1 ciclo
 		config.cicloAtual++;
+		return states;
 	}
 
 	/**
@@ -253,16 +280,94 @@ public class AppController {
 	 * 
 	 * Author: Madson
 	 */
-	public void previousCycle() {
+	public int[] previousCycle() {
+		// quantidade de células em cada estado
+		int[] states = { 0, 0, 0, 0, 0, 0, 0, 0 };
 		// carrega o valor salvo do ciclo anterior em vectorSaver na matriz
 		// atual
 		for (int i = 0; i < config.vector.length; i++) {
 			for (int y = 0; y < config.vector[i].length; y++) {
 				config.vector[i][y] = config.vectorSaver.get(config.cicloAtual - 1)[i][y];
+				// incrementa states
+				if (config.vector[i][y] == 0) {
+					states[0]++;
+				} else if (config.vector[i][y] == 1) {
+					states[1]++;
+				} else if (config.vector[i][y] == 2) {
+					states[2]++;
+				} else if (config.vector[i][y] == 3) {
+					states[3]++;
+				} else if (config.vector[i][y] == 4) {
+					states[4]++;
+				} else if (config.vector[i][y] == 5) {
+					states[5]++;
+				} else if (config.vector[i][y] == 6) {
+					states[6]++;
+				} else if (config.vector[i][y] == 7) {
+					states[7]++;
+				}
 			}
 		}
 		// retorna 1 ciclo
 		config.cicloAtual--;
+		return states;
+	}
+
+	public int[] countStates() {
+		// quantidade de células em cada estado
+		int[] states = { 0, 0, 0, 0, 0, 0, 0, 0 };
+
+		for (int i = 0; i < config.vector.length; i++) {
+			for (int y = 0; y < config.vector[i].length; y++) {
+				// incrementa states
+				if (config.vector[i][y] == 0) {
+					states[0]++;
+				} else if (config.vector[i][y] == 1) {
+					states[1]++;
+				} else if (config.vector[i][y] == 2) {
+					states[2]++;
+				} else if (config.vector[i][y] == 3) {
+					states[3]++;
+				} else if (config.vector[i][y] == 4) {
+					states[4]++;
+				} else if (config.vector[i][y] == 5) {
+					states[5]++;
+				} else if (config.vector[i][y] == 6) {
+					states[6]++;
+				} else if (config.vector[i][y] == 7) {
+					states[7]++;
+				}
+			}
+		}
+		return states;
+	}
+
+	/**
+	 * Desenha o grid
+	 * 
+	 * Author: Madson
+	 * 
+	 * @param square
+	 */
+	public void drawMatriz(DrawSquare square) {
+		// array com a cor dos 8 estados em ordem crescente
+		Color[] configColors = getArrayOfCollors();
+		// coordenadas dos quadrados a serem desenhados
+		int posX = 0;
+		int posY = 0;
+		// tamanho do quadrado
+		int size = getSqrSize();
+		// limpa o array em DrawSquare
+		square.cleanSquare();
+		for (int i = 0; i < getTamVector(); i++) {
+			for (int j = 0; j < getTamVector(); j++) {
+				// adiciona um quadrado ao array de quadrados de DrawSquare
+				square.addSquare(posX, posY, size, configColors[getVector()[i][j]]);
+				posX += size;
+			}
+			posX = 0;
+			posY += size;
+		}
 	}
 
 	// TODO apagar quando finalizar
@@ -286,19 +391,6 @@ public class AppController {
 		texto += "]";
 
 		System.out.println(texto);
-	}
-
-	// TODO usar para contar população
-	public int getEstados(int estado) {
-		int num = 0;
-		for (int i = 0; i < config.vectorSaver.get(estado).length; i++) {
-			for (int y = 0; y < config.vectorSaver.get(estado)[i].length; y++) {
-				if (config.vectorSaver.get(estado)[i][y] == 1) {
-					num++;
-				}
-			}
-		}
-		return num;
 	}
 
 	/**
@@ -513,13 +605,32 @@ public class AppController {
 	 * Author: Madson
 	 */
 	public void showAboutPopUp() {
-		String sobre = "AUTCEL: Editor e Simulador de Autômatos Celulares"
-				+ "\n\nAutor: Madson Paulo Alexandre da Silva.\nE-mail: madson-paulo@hotmail.com"
-				+ "\n\nEste projeto usa a licença AGPL v3.0. Você pode encontrá-lo em: https://github.com/MadsonPaulo/autcel"
-				+ "\nSinta-se livre para contribuir com o projeto.";
+		String about = "";
+		String title = "";
+		String version = "2.0";
+		String date = "20/03/2017";
 		ImageIcon icon = new ImageIcon(AppController.class.getResource("/img/main64x64.png"));
-		JOptionPane.showMessageDialog(null, sobre, "Sobre o Autcel", JOptionPane.INFORMATION_MESSAGE, icon);
+		if (config.language == 0) {// Português
+			title = "Sobre o Autcel";
+			about = "AUTCEL: Editor e Simulador de Autômatos Celulares" + "\nVersão: " + version + ". Publicado em: "
+					+ date + "." + "\n\nAutor: Madson Paulo Alexandre da Silva.\nE-mail: madson-paulo@hotmail.com";
+		} else if (config.language == 1) {// Inglês
+			title = "About Autcel";
+			about = "AUTCEL: Editor and Simulator of Cellular Automatons" + "\nVersion: " + version + ". Published in: "
+					+ date + "." + "\n\nAuthor: Madson Paulo Alexandre da Silva.\nE-mail: madson-paulo@hotmail.com";
+		}
 
+		JOptionPane.showMessageDialog(null, about, title, JOptionPane.INFORMATION_MESSAGE, icon);
+	}
+
+	/**
+	 * Exibe o JFrame do manual de uso
+	 * 
+	 * Author: Madson
+	 */
+	public void showManualPopUp() {
+		Manual manual = new Manual(config.language);
+		manual.setVisible(true);
 	}
 
 	/**
@@ -531,13 +642,24 @@ public class AppController {
 	 *            terá seu texto alterado em caso de erro
 	 * @return
 	 */
-	public boolean importData(JTextArea textArea) {
+	public boolean importData() {
+		ImageIcon icon = new ImageIcon(AppController.class.getResource("/img/warning.png"));
+		String[] messages = { "Aviso",
+				"Você precisa aprovar o acesso aos arquivos do\nseu computador para importar um arquivo.",
+				"Não foi possível importar as configurações.\nO arquivo está corrompido.",
+				"Não foi possível localizar o arquivo." };
+		if (config.language == 1) {
+			messages[0] = "Warning";
+			messages[1] = "You need to approve the access to the\nfiles of your computer to import a file.";
+			messages[2] = "The settings could not be imported.\nThe file is corrupted.";
+			messages[3] = "The file could not be located.";
+		}
 		// explorador de arquivos para definir o destino/arquivo
 		JFileChooser abrindoArquivo = new JFileChooser();
 		int resultado = abrindoArquivo.showOpenDialog(null);
 		// se o usuário não aprovar o acesso aos arquivos, retorna falso
 		if (resultado != JFileChooser.APPROVE_OPTION) {
-			textArea.setText("Você precisa aprovar o acesso aos arquivos do seu computador para importar um arquivo.");
+			JOptionPane.showMessageDialog(null, messages[1], messages[0], JOptionPane.INFORMATION_MESSAGE, icon);
 			return false;
 		}
 		// recebe a localização/arquivo selecionada
@@ -567,11 +689,11 @@ public class AppController {
 				updateConfigs(data);
 				return true;
 			} else {
-				textArea.setText("Não foi possível importar as configurações. O arquivo está corrompido.");
+				JOptionPane.showMessageDialog(null, messages[2], messages[0], JOptionPane.INFORMATION_MESSAGE, icon);
 				return false;
 			}
 		} catch (FileNotFoundException ex) {
-			textArea.setText("Não foi possível localizar o arquivo.");
+			JOptionPane.showMessageDialog(null, messages[3], messages[0], JOptionPane.INFORMATION_MESSAGE, icon);
 			ex.printStackTrace();
 			return false;
 		} catch (IOException e) {
@@ -629,7 +751,7 @@ public class AppController {
 	 *            ArrayList com as linhas do arquivo importado
 	 * @return
 	 */
-	public boolean checkData(ArrayList<String> data) {
+	private boolean checkData(ArrayList<String> data) {
 
 		// quantidade de linhas
 		if (data.size() != 15) {
@@ -754,6 +876,11 @@ public class AppController {
 	 * Author: Madson
 	 */
 	public boolean exportData() {
+		// aviso para quem abrir o arquivo como de texto e editá-lo
+		String warning = "Arquivo de configurações do Autcel.\nAVISO: alterações neste arquivo podem invalidá-lo.\n\n";
+		if (config.language == 1) {
+			warning = "Autcel settings file.\nNOTE: Changes in this file can invalidate it.\n\n";
+		}
 		// explorador de arquivos para definir o destino/arquivo
 		JFileChooser salvandoArquivo = new JFileChooser();
 		int resultado = salvandoArquivo.showSaveDialog(null);
@@ -767,10 +894,8 @@ public class AppController {
 			// necessários para escrever no arquivo
 			FileWriter arq = new FileWriter(salvarArquivoEscolhido, false);
 			PrintWriter gravarArq = new PrintWriter(arq);
-			// aviso para quem abrir o arquivo como de texto
-			String aviso = "Arquivo de configurações do Autcel.\nAVISO: alterações neste arquivo podem invalidá-lo.\n\n";
 			// aviso e configurações
-			String data = aviso + arrayListToLine(config.regras) + "\n" + config.nameState1 + "\n" + config.nameState2
+			String data = warning + arrayListToLine(config.regras) + "\n" + config.nameState1 + "\n" + config.nameState2
 					+ "\n" + config.nameState3 + "\n" + config.nameState4 + "\n" + config.nameState5 + "\n"
 					+ config.nameState6 + "\n" + config.nameState7 + "\n" + config.nameState8 + "\n"
 					+ config.activeStates + "\n" + config.tamVector + "\n" + arrayToLine(config.vector);
@@ -795,7 +920,7 @@ public class AppController {
 	 *            a ser convertido
 	 * @return string como todos os números em sequência e sem separadores
 	 */
-	public String arrayListToLine(ArrayList<int[]> array) {
+	private String arrayListToLine(ArrayList<int[]> array) {
 		String text = "";
 
 		for (int i = 0; i < array.size(); i++) {
@@ -803,7 +928,6 @@ public class AppController {
 				text += array.get(i)[j];
 			}
 		}
-
 		return text;
 	}
 
@@ -816,7 +940,7 @@ public class AppController {
 	 *            a ser convertido
 	 * @return string como todos os números em sequência e sem separadores
 	 */
-	public String arrayToLine(int[][] array) {
+	private String arrayToLine(int[][] array) {
 		String text = "";
 
 		for (int i = 0; i < array.length; i++) {
@@ -824,11 +948,10 @@ public class AppController {
 				text += array[i][j];
 			}
 		}
-
 		return text;
 	}
 
-	public Color[] getArrayOfCollors() {
+	private Color[] getArrayOfCollors() {
 		return new Color[] { config.color1, config.color2, config.color3, config.color4, config.color5, config.color6,
 				config.color7, config.color8 };
 	}
@@ -905,4 +1028,19 @@ public class AppController {
 		return config.maxStateNameSize;
 	}
 
+	public int getSqrSize() {
+		return config.sqrSize;
+	}
+
+	public void setSqrSize(int value) {
+		config.sqrSize = value;
+	}
+
+	public int getLanguage() {
+		return config.language;
+	}
+
+	public void setLanguage(int value) {
+		config.language = value;
+	}
 }
