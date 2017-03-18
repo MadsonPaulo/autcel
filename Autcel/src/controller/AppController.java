@@ -68,7 +68,7 @@ public class AppController {
 	 *            número referente ao estado de uma célula
 	 * @return cor do estado passado como argumento
 	 */
-	public Color getDefaultCollor(int number) {
+	public Color getColor(int number) {
 		switch (number) {
 		case 1:
 			return config.color1;
@@ -469,6 +469,25 @@ public class AppController {
 				break;
 			}
 		}
+		return false;
+	}
+
+	// TODO nova regra http://psoup.math.wisc.edu/mcell/rullex_rtab.html
+	public boolean passFamilyRulesTables(int x, int y, int neighborwoodType, int center, int bitPlane, int[] neighbors,
+			int[] rule) {
+		int currentState = config.vector[x][y];
+		// Vizinhança de Moore
+		if (neighborwoodType == 1) {
+			// se a regra refere-se ao estado atual da célula
+			if (currentState == rule[0]) {
+
+			}
+
+			// Vizinhança de Von Neumann
+		} else if (neighborwoodType == 2) {
+
+		}
+
 		return false;
 	}
 
@@ -951,9 +970,46 @@ public class AppController {
 		return text;
 	}
 
-	private Color[] getArrayOfCollors() {
+	/**
+	 * Retorna um array com as 8 cores atuais
+	 * 
+	 * Author: Madson
+	 * 
+	 * @return
+	 */
+	public Color[] getArrayOfCollors() {
 		return new Color[] { config.color1, config.color2, config.color3, config.color4, config.color5, config.color6,
 				config.color7, config.color8 };
+	}
+
+	/**
+	 * Altera uma cor de estado específica
+	 * 
+	 * Author: Madson
+	 * 
+	 * @param color
+	 *            nova cor
+	 * @param position
+	 *            posição da nova cor
+	 */
+	public void setColor(Color color, int position) {
+		if (position == 0) {
+			config.color1 = color;
+		} else if (position == 1) {
+			config.color2 = color;
+		} else if (position == 2) {
+			config.color3 = color;
+		} else if (position == 3) {
+			config.color4 = color;
+		} else if (position == 4) {
+			config.color5 = color;
+		} else if (position == 5) {
+			config.color6 = color;
+		} else if (position == 6) {
+			config.color7 = color;
+		} else if (position == 7) {
+			config.color8 = color;
+		}
 	}
 
 	public int getTamVector() {

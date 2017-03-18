@@ -214,8 +214,8 @@ public class AppConfigRules extends JFrame {
 			btnRemoverRegra.setText("Excluir");
 			btnAcima.setText("Acima");
 			btnAbaixo.setText("Abaixo");
-			btnAvancar.setText("Avançar");
-			btnVoltar.setText("Voltar");
+			btnAvancar.setText("Execução");
+			btnVoltar.setText("Configuração");
 			// labels
 			lblDefinirRegras.setText("Definir Regras");
 			lblRegrasAtivas.setText("Regras Ativas");
@@ -253,8 +253,8 @@ public class AppConfigRules extends JFrame {
 			btnRemoverRegra.setText("Delete");
 			btnAcima.setText("Up");
 			btnAbaixo.setText("Down");
-			btnAvancar.setText("Next");
-			btnVoltar.setText("Back");
+			btnAvancar.setText("Execution");
+			btnVoltar.setText("Configuration");
 			// labels
 			lblDefinirRegras.setText("Set Rules");
 			lblRegrasAtivas.setText("Active Rules");

@@ -22,6 +22,7 @@ package view;
 
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Point;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -41,7 +42,6 @@ import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSeparator;
@@ -53,12 +53,17 @@ import javax.swing.border.LineBorder;
 
 import controller.AppController;
 import model.DrawSquare;
+import java.awt.event.MouseWheelListener;
+import java.awt.event.MouseWheelEvent;
+import javax.swing.border.EtchedBorder;
 
 public class AppRun extends JFrame {
 
 	private static final long serialVersionUID = 1L;
 	private JPanel contentPane;
+	private JPanel infoPanel;
 	private DrawSquare squares;
+	private JScrollPane scrollPane;
 	private Timer timer;
 	private int[] statesAmount;
 	private int delay = 1000;
@@ -70,8 +75,9 @@ public class AppRun extends JFrame {
 	private JButton btnImportar = new JButton();
 	private JButton btnAnterior = new JButton();
 	private JButton btnPrximo = new JButton();
-	private JButton btnVoltar = new JButton();
+	private JButton btnRules = new JButton();
 	private JButton btnAvancoAutomatico = new JButton();
+	private JButton btnConfiguration = new JButton();
 	private JLabel corEstado1;
 	private JLabel corEstado2;
 	private JLabel corEstado3;
@@ -92,6 +98,12 @@ public class AppRun extends JFrame {
 	private JMenu mnPrerncias = new JMenu();
 	private JMenu mnIdioma = new JMenu();
 	private JMenu menuAjuda = new JMenu();
+	private JMenu mnNavigation = new JMenu();
+	private JMenuItem mntmCenter = new JMenuItem();
+	private JMenuItem mntmNEast = new JMenuItem();
+	private JMenuItem mntmNWest = new JMenuItem();
+	private JMenuItem mntmSEast = new JMenuItem();
+	private JMenuItem mntmSWest = new JMenuItem();
 	private JMenuItem mntmExportar = new JMenuItem();
 	private JMenuItem mntmProcurar = new JMenuItem();
 	private JMenuItem mntmManual = new JMenuItem();
@@ -102,8 +114,6 @@ public class AppRun extends JFrame {
 	private JMenuItem mntmAvançar = new JMenuItem();
 	private JMenuItem mntmVoltar = new JMenuItem();
 	private JMenuItem mntmAuto = new JMenuItem();
-	private JMenuItem mntmZoomIn = new JMenuItem();
-	private JMenuItem mntmZoomOut = new JMenuItem();
 	private JMenuItem mntmRestart = new JMenuItem();
 
 	/**
@@ -254,7 +264,7 @@ public class AppRun extends JFrame {
 	}
 
 	/**
-	 * Atualiza o label que indica o ciclo atual
+	 * Atualiza o label que indica o ciclo atual e os contadores de população
 	 * 
 	 * Author: Madson
 	 * 
@@ -267,6 +277,8 @@ public class AppRun extends JFrame {
 		} else if (controller.getLanguage() == 1) {
 			cycle = "  Cycle: ";
 		}
+		lblCiclo.setBounds(4, 12, 173, 27);
+		infoPanel.add(lblCiclo);
 		lblCiclo.setText(cycle + controller.getCiclo());
 		corEstado1.setText(NumberFormat.getIntegerInstance().format(statesAmount[0]));
 		corEstado2.setText(NumberFormat.getIntegerInstance().format(statesAmount[1]));
@@ -279,46 +291,22 @@ public class AppRun extends JFrame {
 	}
 
 	/**
-	 * Altera a escala, aumentando o tamanho das células
+	 * Atualiza a cor da fonte dos contadores de população
 	 * 
 	 * Author: Madson
 	 * 
-	 * @param controller
+	 * @param contr
 	 */
-	private void zoomIn(AppController controller) {
-		// checa a escala
-		if (controller.getSqrSize() < 64) {
-			// altera a escala, tamanho dos quadrados
-			controller.setSqrSize(controller.getSqrSize() * 2);
-			// atualiza as barras de scroll de squares
-			squares.setPrefSize(controller.getSqrSize() * controller.getTamVector());
-			// atualiza o texto de escala
-			updateScale(controller);
-			// redesenha o grid
-			controller.drawMatriz(squares);
-			repaint();
-		}
-	}
-
-	/**
-	 * Altera a escala, diminuindo o tamanho das células
-	 * 
-	 * Author: Madson
-	 * 
-	 * @param controller
-	 */
-	private void zoomOut(AppController controller) {
-		// checa a escala
-		if (controller.getSqrSize() > 2) {
-			// altera a escala, tamanho dos quadrados
-			controller.setSqrSize(controller.getSqrSize() / 2);
-			// atualiza as barras de scroll de squares
-			squares.setPrefSize(controller.getSqrSize() * controller.getTamVector());
-			// atualiza o texto de escala
-			updateScale(controller);
-			// redesenha o grid
-			controller.drawMatriz(squares);
-			repaint();
+	private void updatePopBackground(AppController contr) {
+		Color[] colors = contr.getArrayOfCollors();
+		JLabel[] labels = { corEstado1, corEstado2, corEstado3, corEstado4, corEstado5, corEstado6, corEstado7,
+				corEstado8 };
+		for (int i = 0; i < colors.length; i++) {
+			if (colors[i] == Color.GRAY || colors[i] == Color.BLUE || colors[i] == Color.RED) {
+				labels[i].setForeground(Color.WHITE);
+			} else {
+				labels[i].setForeground(Color.BLACK);
+			}
 		}
 	}
 
@@ -386,8 +374,40 @@ public class AppRun extends JFrame {
 		contr.drawMatriz(squares);
 		repaint();
 		updateTexts(contr);
+
+		firstCycleRan = false;
 	}
 
+	/**
+	 * Altera o foco dos scrolls para uma região específica
+	 * 
+	 * Author: Madson
+	 * 
+	 * @param area
+	 */
+	private void setFocus(int area) {
+		// limite da borda - extensão, ou seja, a distância que pode dar scroll
+		int maxLessExtent = scrollPane.getHorizontalScrollBar().getMaximum()
+				- scrollPane.getHorizontalScrollBar().getModel().getExtent();
+
+		if (area == 0) {// cetro
+			scrollPane.getHorizontalScrollBar().setValue(maxLessExtent / 2);
+			scrollPane.getVerticalScrollBar().setValue(maxLessExtent / 2);
+		} else if (area == 1) {// nordeste
+			scrollPane.getHorizontalScrollBar().setValue((int) (maxLessExtent * 0.75));
+			scrollPane.getVerticalScrollBar().setValue((int) (maxLessExtent * 0.25));
+		} else if (area == 2) {// noroeste
+			scrollPane.getHorizontalScrollBar().setValue((int) (maxLessExtent * 0.25));
+			scrollPane.getVerticalScrollBar().setValue((int) (maxLessExtent * 0.25));
+		} else if (area == 3) {// sudeste
+			scrollPane.getHorizontalScrollBar().setValue((int) (maxLessExtent * 0.75));
+			scrollPane.getVerticalScrollBar().setValue((int) (maxLessExtent * 0.75));
+		} else if (area == 4) {// sudoeste
+			scrollPane.getHorizontalScrollBar().setValue((int) (maxLessExtent * 0.25));
+			scrollPane.getVerticalScrollBar().setValue((int) (maxLessExtent * 0.75));
+		}
+	}
+	
 	/**
 	 * Altera o idioma
 	 * 
@@ -419,9 +439,13 @@ public class AppRun extends JFrame {
 			mntmAvançar.setText("Próximo Ciclo");
 			mntmVoltar.setText("Ciclo Anterior");
 			mntmAuto.setText("Avanço Automático");
-			mntmZoomIn.setText("Aumentar Zoom");
-			mntmZoomOut.setText("Diminuir Zoom");
 			mntmRestart.setText("Reiniciar");
+			mnNavigation.setText("Navegação");
+			mntmCenter.setText("Centro");
+			mntmNEast.setText("Nordeste");
+			mntmNWest.setText("Noroeste");
+			mntmSEast.setText("Sudeste");
+			mntmSWest.setText("Sudoeste");
 			// botões
 			btnImportar.setText("Importar");
 			btnExportar.setText("Exportar");
@@ -429,7 +453,8 @@ public class AppRun extends JFrame {
 			btnAnterior.setText("Anterior");
 			btnPrximo.setText("Próximo");
 			btnAvancoAutomatico.setText("Iniciar");
-			btnVoltar.setText("Voltar");
+			btnRules.setText("Regras");
+			btnConfiguration.setText("Configuração");
 			// labels
 			lblCiclo.setText("  Ciclo: 0");
 			lblAvanoManual.setText("Avanço Manual");
@@ -456,9 +481,13 @@ public class AppRun extends JFrame {
 			mntmAvançar.setText("Next Cycle");
 			mntmVoltar.setText("Previous Cycle");
 			mntmAuto.setText("Auto Advance");
-			mntmZoomIn.setText("Zoom In");
-			mntmZoomOut.setText("Zoom Out");
 			mntmRestart.setText("Restart");
+			mnNavigation.setText("Navigation");
+			mntmCenter.setText("Center");
+			mntmNEast.setText("North-East");
+			mntmNWest.setText("North-West");
+			mntmSEast.setText("South-East");
+			mntmSWest.setText("South-West");
 			// botões
 			btnImportar.setText("Import");
 			btnExportar.setText("Export");
@@ -466,7 +495,8 @@ public class AppRun extends JFrame {
 			btnAnterior.setText("Previous");
 			btnPrximo.setText("Next");
 			btnAvancoAutomatico.setText("Start");
-			btnVoltar.setText("Back");
+			btnRules.setText("Rules");
+			btnConfiguration.setText("Configuration");
 			// labels
 			lblCiclo.setText("  Cycle: 0");
 			lblAvanoManual.setText("Manual Advance");
@@ -512,9 +542,13 @@ public class AppRun extends JFrame {
 		mnControls.add(mntmAvançar);
 		mnControls.add(mntmVoltar);
 		mnControls.add(mntmAuto);
-		mnControls.add(mntmZoomIn);
-		mnControls.add(mntmZoomOut);
 		mnControls.add(mntmRestart);
+		menuBar.add(mnNavigation);
+		mnNavigation.add(mntmCenter);
+		mnNavigation.add(mntmNEast);
+		mnNavigation.add(mntmNWest);
+		mnNavigation.add(mntmSEast);
+		mnNavigation.add(mntmSWest);
 		menuBar.add(mnPrerncias);
 		mnPrerncias.add(mnIdioma);
 		mnIdioma.add(mntmPortugus);
@@ -549,16 +583,23 @@ public class AppRun extends JFrame {
 		mntmAvançar.setFont(controller.getBoldFont());
 		mntmVoltar.setFont(controller.getBoldFont());
 		mntmAuto.setFont(controller.getBoldFont());
-		mntmZoomIn.setFont(controller.getBoldFont());
-		mntmZoomOut.setFont(controller.getBoldFont());
 		mntmRestart.setFont(controller.getBoldFont());
+		mnNavigation.setFont(controller.getBoldFont());
+		mntmCenter.setFont(controller.getBoldFont());
+		mntmNEast.setFont(controller.getBoldFont());
+		mntmNWest.setFont(controller.getBoldFont());
+		mntmSEast.setFont(controller.getBoldFont());
+		mntmSWest.setFont(controller.getBoldFont());
 		// atalhos
 		mntmAvançar.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, 0, true));
 		mntmVoltar.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, 0, true));
 		mntmAuto.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0, true));
-		mntmZoomIn.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_UP, 0, true));
-		mntmZoomOut.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, 0, true));
 		mntmRestart.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_BACK_SPACE, 0, true));
+		mntmCenter.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F3, 0, true));
+		mntmNEast.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F1, 0, true));
+		mntmNWest.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F2, 0, true));
+		mntmSEast.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F4, 0, true));
+		mntmSWest.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F5, 0, true));
 		// ações
 		mntmAvançar.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
@@ -573,16 +614,6 @@ public class AppRun extends JFrame {
 		mntmAuto.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				autoAdvance(controller);
-			}
-		});
-		mntmZoomIn.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-				zoomIn(controller);
-			}
-		});
-		mntmZoomOut.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-				zoomOut(controller);
 			}
 		});
 		mntmRestart.addActionListener(new ActionListener() {
@@ -632,7 +663,32 @@ public class AppRun extends JFrame {
 				controller.showManualPopUp();
 			}
 		});
-
+		mntmCenter.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				setFocus(0);
+			}
+		});
+		mntmNEast.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				setFocus(1);
+			}
+		});
+		mntmNWest.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				setFocus(2);
+			}
+		});
+		mntmSEast.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				setFocus(3);
+			}
+		});
+		mntmSWest.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				setFocus(4);
+			}
+		});
+		
 		JPanel panelMenu = new JPanel();
 		panelMenu.setLayout(null);
 		panelMenu.setBounds(9, 3, 189, 643);
@@ -640,7 +696,7 @@ public class AppRun extends JFrame {
 
 		JPanel manualPanel = new JPanel();
 		manualPanel.setBorder(new LineBorder(new Color(0, 0, 0)));
-		manualPanel.setBounds(4, 228, 181, 80);
+		manualPanel.setBounds(4, 204, 181, 80);
 		panelMenu.add(manualPanel);
 		manualPanel.setLayout(null);
 
@@ -678,7 +734,7 @@ public class AppRun extends JFrame {
 		JPanel autoPanel = new JPanel();
 		autoPanel.setLayout(null);
 		autoPanel.setBorder(new LineBorder(new Color(0, 0, 0)));
-		autoPanel.setBounds(4, 317, 181, 80);
+		autoPanel.setBounds(4, 291, 181, 80);
 		panelMenu.add(autoPanel);
 
 		btnAvancoAutomatico.addActionListener(new ActionListener() {
@@ -710,7 +766,7 @@ public class AppRun extends JFrame {
 		JPanel statesPanel = new JPanel();
 		statesPanel.setLayout(null);
 		statesPanel.setBorder(new LineBorder(new Color(0, 0, 0)));
-		statesPanel.setBounds(4, 406, 181, 197);
+		statesPanel.setBounds(4, 378, 181, 197);
 		panelMenu.add(statesPanel);
 
 		JPanel panelNomes = new JPanel();
@@ -800,61 +856,55 @@ public class AppRun extends JFrame {
 		corEstado1.setToolTipText("");
 		corEstado1.setOpaque(true);
 		corEstado1.setBorder(new LineBorder(new Color(0, 0, 0)));
-		corEstado1.setBackground(controller.getDefaultCollor(1));
+		corEstado1.setBackground(controller.getColor(1));
 		corEstado1.setBounds(4, 7, 70, 16);
 		panelCores.add(corEstado1);
 
 		corEstado2 = new JLabel("102400");
-		corEstado2.setForeground(Color.WHITE);
 		corEstado2.setHorizontalAlignment(SwingConstants.RIGHT);
 		corEstado2.setOpaque(true);
 		corEstado2.setBorder(new LineBorder(new Color(0, 0, 0)));
-		corEstado2.setBackground(controller.getDefaultCollor(2));
+		corEstado2.setBackground(controller.getColor(2));
 		corEstado2.setBounds(4, 30, 70, 16);
 		panelCores.add(corEstado2);
 
 		corEstado3 = new JLabel("102400");
-		corEstado3.setForeground(Color.WHITE);
 		corEstado3.setHorizontalAlignment(SwingConstants.RIGHT);
 		corEstado3.setOpaque(true);
 		corEstado3.setBorder(new LineBorder(new Color(0, 0, 0)));
-		corEstado3.setBackground(controller.getDefaultCollor(3));
+		corEstado3.setBackground(controller.getColor(3));
 		corEstado3.setBounds(4, 53, 70, 16);
 		panelCores.add(corEstado3);
 
 		corEstado4 = new JLabel("102400");
-		corEstado4.setForeground(Color.WHITE);
 		corEstado4.setHorizontalAlignment(SwingConstants.RIGHT);
 		corEstado4.setOpaque(true);
 		corEstado4.setBorder(new LineBorder(new Color(0, 0, 0)));
-		corEstado4.setBackground(controller.getDefaultCollor(4));
+		corEstado4.setBackground(controller.getColor(4));
 		corEstado4.setBounds(4, 76, 70, 16);
 		panelCores.add(corEstado4);
 
 		corEstado5 = new JLabel("102400");
-		corEstado5.setForeground(Color.BLACK);
 		corEstado5.setHorizontalAlignment(SwingConstants.RIGHT);
 		corEstado5.setOpaque(true);
 		corEstado5.setBorder(new LineBorder(new Color(0, 0, 0)));
-		corEstado5.setBackground(controller.getDefaultCollor(5));
+		corEstado5.setBackground(controller.getColor(5));
 		corEstado5.setBounds(4, 99, 70, 16);
 		panelCores.add(corEstado5);
 
 		corEstado6 = new JLabel("102400");
-		corEstado6.setForeground(Color.BLACK);
 		corEstado6.setHorizontalAlignment(SwingConstants.RIGHT);
 		corEstado6.setOpaque(true);
 		corEstado6.setBorder(new LineBorder(new Color(0, 0, 0)));
-		corEstado6.setBackground(controller.getDefaultCollor(6));
+		corEstado6.setBackground(controller.getColor(6));
 		corEstado6.setBounds(4, 122, 70, 16);
 		panelCores.add(corEstado6);
 
 		corEstado7 = new JLabel("102400");
-		corEstado7.setForeground(Color.BLACK);
 		corEstado7.setHorizontalAlignment(SwingConstants.RIGHT);
 		corEstado7.setOpaque(true);
 		corEstado7.setBorder(new LineBorder(new Color(0, 0, 0)));
-		corEstado7.setBackground(controller.getDefaultCollor(7));
+		corEstado7.setBackground(controller.getColor(7));
 		corEstado7.setBounds(4, 145, 70, 16);
 		panelCores.add(corEstado7);
 
@@ -862,11 +912,11 @@ public class AppRun extends JFrame {
 		corEstado8.setHorizontalAlignment(SwingConstants.RIGHT);
 		corEstado8.setOpaque(true);
 		corEstado8.setBorder(new LineBorder(new Color(0, 0, 0)));
-		corEstado8.setBackground(controller.getDefaultCollor(8));
+		corEstado8.setBackground(controller.getColor(8));
 		corEstado8.setBounds(4, 168, 70, 16);
 		panelCores.add(corEstado8);
 
-		btnVoltar.addActionListener(new ActionListener() {
+		btnRules.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				// se já estiver avançando automaticamente, cancela o avanço
 				// automático
@@ -874,54 +924,40 @@ public class AppRun extends JFrame {
 					setTimer(false, controller);
 					avancoAutomatico = false;
 				}
-				// abre um JOptionPane pedindo para confirmar ou cancelar a
-				// voltar para tela anterior
-				String[] words = { "Confirmar", "Cancelar", "Atenção",
-						"Voltar para a tela de regras e esquecer os ciclos percorridos?" };
-				if (controller.getLanguage() == 1) {
-					words[0] = "Confirm";
-					words[1] = "Cancel";
-					words[2] = "Warning";
-					words[3] = "Return to the rules screen and forget the advanced cycles?";
-				}
-				Object[] options = { words[0], words[1] };
-				int option = JOptionPane.showOptionDialog(null, words[3], words[2], JOptionPane.DEFAULT_OPTION,
-						JOptionPane.WARNING_MESSAGE, null, options, options[0]);
 
-				// confirma
-				if (option == 0) {
-					// se já tiver avançado ao menos 1 ciclo
-					if (firstCycleRan) {
-						// reseta o vetor atual e vectorSaver
-						controller.setVector(controller.getInitialCycle());
-						controller.resetVectorSaver();
-					}
-					// reseta o ciclo
-					controller.setCiclo(0);
-					// instancia a janela de regras
-					AppConfigRules rules = new AppConfigRules(controller);
-					// torna a janela de regras visível
-					rules.setVisible(true);
-					// encerra a janela atual
-					dispose();
+				// se já tiver avançado ao menos 1 ciclo
+				if (firstCycleRan) {
+					// reseta o vetor atual e vectorSaver
+					controller.setVector(controller.getInitialCycle());
+					controller.resetVectorSaver();
 				}
+				// reseta o ciclo
+				controller.setCiclo(0);
+				// instancia a janela de regras
+				AppConfigRules rules = new AppConfigRules(controller);
+				// torna a janela de regras visível
+				rules.setVisible(true);
+				// encerra a janela atual
+				dispose();
 			}
 		});
-		btnVoltar.setPreferredSize(new Dimension(90, 20));
-		btnVoltar.setFont(controller.getBoldFont());
-		btnVoltar.setFocusable(false);
-		btnVoltar.setBounds(14, 612, 160, 20);
-		panelMenu.add(btnVoltar);
+		btnRules.setPreferredSize(new Dimension(90, 20));
+		btnRules.setFont(controller.getBoldFont());
+		btnRules.setFocusable(false);
+		btnRules.setBounds(14, 609, 160, 20);
+		panelMenu.add(btnRules);
 
 		JPanel filePanel = new JPanel();
 		filePanel.setBorder(new LineBorder(new Color(0, 0, 0)));
-		filePanel.setBounds(4, 9, 181, 80);
+		filePanel.setBounds(4, 7, 181, 70);
 		panelMenu.add(filePanel);
+		btnImportar.setBounds(30, 10, 120, 20);
 		btnImportar.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				importData(controller);
 			}
 		});
+		filePanel.setLayout(null);
 
 		btnImportar.setPreferredSize(new Dimension(120, 20));
 		btnImportar.setHorizontalTextPosition(SwingConstants.CENTER);
@@ -929,6 +965,7 @@ public class AppRun extends JFrame {
 		btnImportar.setFocusable(false);
 		btnImportar.setAlignmentX(0.5f);
 		filePanel.add(btnImportar);
+		btnExportar.setBounds(30, 40, 120, 20);
 
 		btnExportar.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
@@ -945,6 +982,14 @@ public class AppRun extends JFrame {
 		btnExportar.setAlignmentX(0.5f);
 		filePanel.add(btnExportar);
 
+		infoPanel = new JPanel();
+		infoPanel.setBorder(new LineBorder(new Color(0, 0, 0)));
+		infoPanel.setBounds(4, 84, 181, 113);
+		panelMenu.add(infoPanel);
+		infoPanel.setLayout(null);
+		btnReiniciar.setBounds(30, 51, 120, 20);
+		infoPanel.add(btnReiniciar);
+
 		btnReiniciar.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				restartAutomaton(controller);
@@ -955,57 +1000,51 @@ public class AppRun extends JFrame {
 		btnReiniciar.setFont(controller.getBoldFont());
 		btnReiniciar.setFocusable(false);
 		btnReiniciar.setAlignmentX(0.5f);
-		filePanel.add(btnReiniciar);
-
-		JPanel cyclePanel = new JPanel();
-		cyclePanel.setBorder(new LineBorder(new Color(0, 0, 0)));
-		cyclePanel.setBounds(4, 98, 181, 50);
-		panelMenu.add(cyclePanel);
-		cyclePanel.setLayout(null);
-
-		lblCiclo.setHorizontalAlignment(SwingConstants.CENTER);
-		lblCiclo.setBorder(new LineBorder(new Color(0, 0, 0)));
-		lblCiclo.setFont(controller.getBoldFont());
-		lblCiclo.setBounds(4, 11, 173, 27);
-		cyclePanel.add(lblCiclo);
-
-		JPanel zoomPanel = new JPanel();
-		zoomPanel.setBorder(new LineBorder(new Color(0, 0, 0)));
-		zoomPanel.setBounds(4, 157, 181, 62);
-		panelMenu.add(zoomPanel);
-		zoomPanel.setLayout(null);
-
-		JButton btnZoomIn = new JButton("");
-		btnZoomIn.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-				zoomIn(controller);
-			}
-		});
-		btnZoomIn.setFocusable(false);
-		btnZoomIn.setIcon(new ImageIcon(AppConfigAutomaton.class.getResource("/img/zoom-in.gif")));
-		btnZoomIn.setBounds(20, 5, 60, 30);
-		zoomPanel.add(btnZoomIn);
-
-		JButton btnZoomOut = new JButton("");
-		btnZoomOut.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-				zoomOut(controller);
-			}
-		});
-		btnZoomOut.setFocusable(false);
-		btnZoomOut.setBounds(100, 5, 60, 30);
-		btnZoomOut.setIcon(new ImageIcon(AppConfigAutomaton.class.getResource("/img/zoom-out.gif")));
-		zoomPanel.add(btnZoomOut);
 
 		lblEscala.setHorizontalAlignment(SwingConstants.CENTER);
 		lblEscala.setFont(controller.getNormalFont());
-		lblEscala.setBounds(15, 40, 70, 16);
-		zoomPanel.add(lblEscala);
+		lblEscala.setBounds(15, 83, 70, 16);
+		infoPanel.add(lblEscala);
 
 		lblCoord.setHorizontalAlignment(SwingConstants.CENTER);
 		lblCoord.setFont(controller.getNormalFont());
-		lblCoord.setBounds(97, 40, 66, 16);
-		zoomPanel.add(lblCoord);
+		lblCoord.setBounds(100, 83, 66, 16);
+		infoPanel.add(lblCoord);
+
+		lblCiclo.setHorizontalAlignment(SwingConstants.CENTER);
+		lblCiclo.setBorder(new EtchedBorder(EtchedBorder.RAISED, null, null));
+		lblCiclo.setFont(controller.getBoldFont());
+		btnConfiguration.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				// se já estiver avançando automaticamente, cancela o avanço
+				// automático
+				if (avancoAutomatico) {
+					setTimer(false, controller);
+					avancoAutomatico = false;
+				}
+
+				// se já tiver avançado ao menos 1 ciclo
+				if (firstCycleRan) {
+					// reseta o vetor atual e vectorSaver
+					controller.setVector(controller.getInitialCycle());
+					controller.resetVectorSaver();
+				}
+				// reseta o ciclo
+				controller.setCiclo(0);
+				// instancia a janela de configuração
+				AppConfigAutomaton config = new AppConfigAutomaton(controller);
+				// torna a janela de configuração visível
+				config.setVisible(true);
+				// encerra a janela atual
+				dispose();
+			}
+		});
+
+		btnConfiguration.setPreferredSize(new Dimension(90, 20));
+		btnConfiguration.setFont(controller.getBoldFont());
+		btnConfiguration.setFocusable(false);
+		btnConfiguration.setBounds(14, 582, 160, 20);
+		panelMenu.add(btnConfiguration);
 
 		squares = new DrawSquare(controller.getSqrSize() * controller.getTamVector());
 		squares.addMouseMotionListener(new MouseMotionAdapter() {
@@ -1028,18 +1067,72 @@ public class AppRun extends JFrame {
 		});
 		squares.setLayout(null);
 
-		JScrollPane scrollPane = new JScrollPane(squares);
+		scrollPane = new JScrollPane(squares);
+		scrollPane.addMouseWheelListener(new MouseWheelListener() {
+			public void mouseWheelMoved(MouseWheelEvent e) {
+				// determina a metade do scroll
+				int middle;
+				// posição do mouse
+				Point mouseLoc = e.getPoint();
+				// posição da view
+				Point viewPort = scrollPane.getViewport().getViewPosition();
+				Point novo;
+				if (e.getWheelRotation() >= 0) {// zoom out
+					// checa a escala
+					if (controller.getSqrSize() > 2) {
+						middle = (int) (scrollPane.getViewport().getExtentSize().getWidth());
+						// nova posição após zoom
+						novo = new Point((viewPort.x - (middle - mouseLoc.x)) / 2,
+								(viewPort.y - (middle - mouseLoc.y)) / 2);
+						// altera a escala, tamanho dos quadrados
+						controller.setSqrSize(controller.getSqrSize() / 2);
+						// atualiza as barras de scroll de squares
+						squares.setPrefSize(controller.getSqrSize() * controller.getTamVector());
+						// atualiza o texto de escala
+						updateScale(controller);
+						// redesenha o grid
+						controller.drawMatriz(squares);
+						repaint();
+						// ajusta a visualização
+						scrollPane.getViewport().setViewPosition(novo);
+					}
+				} else {// zoom in
+					// checa a escala
+					if (controller.getSqrSize() < 64) {
+						middle = (int) (scrollPane.getViewport().getExtentSize().getWidth() * 0.25);
+						// nova posição após zoom
+						novo = new Point((viewPort.x - (middle - mouseLoc.x)) * 2,
+								(viewPort.y - (middle - mouseLoc.y)) * 2);
+						// altera a escala, tamanho dos quadrados
+						controller.setSqrSize(controller.getSqrSize() * 2);
+						// atualiza as barras de scroll de squares
+						squares.setPrefSize(controller.getSqrSize() * controller.getTamVector());
+						// atualiza o texto de escala
+						updateScale(controller);
+						// redesenha o grid
+						controller.drawMatriz(squares);
+						repaint();
+						// ajusta a visualização
+						scrollPane.getViewport().setViewPosition(novo);
+					}
+				}
+			}
+		});
 		scrollPane.setBounds(207, 3, 643, 643);
 		scrollPane.getHorizontalScrollBar().setUnitIncrement(50);
 		scrollPane.getVerticalScrollBar().setUnitIncrement(50);
 		contentPane.add(scrollPane);
+		// remove o scroll utilizando a roda do mouse
+		scrollPane.removeMouseWheelListener(scrollPane.getMouseWheelListeners()[0]);
 
+		// determina o idioma
+		setLanguage(controller.getLanguage(), controller);
 		// desenha a matriz
 		controller.drawMatriz(squares);
 		// atualiza os contadores de estados
 		statesAmount = controller.countStates();
 		updateTexts(controller);
-		// determina o idioma
-		setLanguage(controller.getLanguage(), controller);
+		// determina a cor da fonte da população
+		updatePopBackground(controller);
 	}
 }
