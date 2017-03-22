@@ -40,7 +40,6 @@ import java.awt.event.MouseWheelListener;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Random;
-
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -64,7 +63,6 @@ import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.LineBorder;
-
 import controller.AppController;
 import model.DrawSquare;
 
@@ -115,6 +113,10 @@ public class AppConfigAutomaton extends JFrame {
 	private JMenuItem mntmPortugus = new JMenuItem();
 	private JMenuItem mntmEnglish = new JMenuItem();
 	private JMenuItem mntmSair = new JMenuItem();
+	private JMenuItem prefab1 = new JMenuItem("Conway's Game of Life");
+	private JMenuItem prefab2 = new JMenuItem("Ulam's Crystals");
+	private JMenuItem prefab3 = new JMenuItem("Rule 614");
+	private JMenuItem prefab4 = new JMenuItem("Tsunami");
 	private JButton btnImportar = new JButton();
 	private JButton btnLimpar = new JButton();
 	private JButton btnExportar = new JButton();
@@ -535,17 +537,17 @@ public class AppConfigAutomaton extends JFrame {
 			scrollPane.getHorizontalScrollBar().setValue(maxLessExtent / 2);
 			scrollPane.getVerticalScrollBar().setValue(maxLessExtent / 2);
 		} else if (area == 1) {// nordeste
-			scrollPane.getHorizontalScrollBar().setValue((int) (maxLessExtent * 0.75));
-			scrollPane.getVerticalScrollBar().setValue((int) (maxLessExtent * 0.25));
+			scrollPane.getHorizontalScrollBar().setValue((int) (maxLessExtent * 1.0));
+			scrollPane.getVerticalScrollBar().setValue((int) (maxLessExtent * 0.0));
 		} else if (area == 2) {// noroeste
-			scrollPane.getHorizontalScrollBar().setValue((int) (maxLessExtent * 0.25));
-			scrollPane.getVerticalScrollBar().setValue((int) (maxLessExtent * 0.25));
+			scrollPane.getHorizontalScrollBar().setValue((int) (maxLessExtent * 0.0));
+			scrollPane.getVerticalScrollBar().setValue((int) (maxLessExtent * 0.0));
 		} else if (area == 3) {// sudeste
-			scrollPane.getHorizontalScrollBar().setValue((int) (maxLessExtent * 0.75));
-			scrollPane.getVerticalScrollBar().setValue((int) (maxLessExtent * 0.75));
+			scrollPane.getHorizontalScrollBar().setValue((int) (maxLessExtent * 1.0));
+			scrollPane.getVerticalScrollBar().setValue((int) (maxLessExtent * 1.0));
 		} else if (area == 4) {// sudoeste
-			scrollPane.getHorizontalScrollBar().setValue((int) (maxLessExtent * 0.25));
-			scrollPane.getVerticalScrollBar().setValue((int) (maxLessExtent * 0.75));
+			scrollPane.getHorizontalScrollBar().setValue((int) (maxLessExtent * 0.0));
+			scrollPane.getVerticalScrollBar().setValue((int) (maxLessExtent * 1.0));
 		}
 	}
 
@@ -576,6 +578,10 @@ public class AppConfigAutomaton extends JFrame {
 		mnArquivo.add(mnImportar);
 		mnImportar.add(mntmProcurar);
 		mnImportar.add(mnModelos);
+		mnModelos.add(prefab1);
+		mnModelos.add(prefab2);
+		mnModelos.add(prefab3);
+		mnModelos.add(prefab4);
 		mnArquivo.add(mntmExportar);
 		mnArquivo.add(separator);
 		mnArquivo.add(mntmSair);
@@ -689,6 +695,42 @@ public class AppConfigAutomaton extends JFrame {
 		mntmSWest.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				setFocus(4);
+			}
+		});
+		prefab1.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				if (controller.loadPrefab(0)) {
+					AppRun run = new AppRun(controller);
+					run.setVisible(true);
+					dispose();
+				}
+			}
+		});
+		prefab2.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				if (controller.loadPrefab(1)) {
+					AppRun run = new AppRun(controller);
+					run.setVisible(true);
+					dispose();
+				}
+			}
+		});
+		prefab3.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				if (controller.loadPrefab(2)) {
+					AppRun run = new AppRun(controller);
+					run.setVisible(true);
+					dispose();
+				}
+			}
+		});
+		prefab4.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				if (controller.loadPrefab(3)) {
+					AppRun run = new AppRun(controller);
+					run.setVisible(true);
+					dispose();
+				}
 			}
 		});
 		contentPane = new JPanel();
@@ -1002,11 +1044,9 @@ public class AppConfigAutomaton extends JFrame {
 				} else if (controller.areStatesValid(controller.getVector()) == false) {
 					// se houverem estados inválidos, informa mensagem de erro
 					if (controller.getLanguage() == 0) {
-						infoTxtArea.setText(
-								"São necessários pelo menos dois estados diferentes para continuar. Caso hajam estados inválidos, remova-os.");
+						infoTxtArea.setText("Provavelmente há algum estado inválido, remova-o para continuar.");
 					} else if (controller.getLanguage() == 1) {
-						infoTxtArea.setText(
-								"It takes at least two different states to continue. If there are invalid states, remove them.");
+						infoTxtArea.setText("Probably there is an invalid state, remove it to proceed.");
 					}
 					// se tudo estiver válido
 				} else {
@@ -1234,16 +1274,22 @@ public class AppConfigAutomaton extends JFrame {
 				if (posY < 0) {
 					posY = 0;
 				}
-				// quantidade de estados ativos
-				int ativos = Integer.parseInt((String) estadosPossiveisComboBox.getSelectedItem());
-				// altera o vetor na posição clicada
-				controller.getVector()[posY][posX] = controller.getNextStateValue(controller.getVector()[posY][posX],
-						ativos);
-				// salva a posição do click e o estado, caso o usuário queira
-				// desenhar
-				x = posX;
-				y = posY;
-				state = controller.getVector()[posY][posX];
+				// se foi utilizado o botão direito do mouse, muda para estado 0
+				if (SwingUtilities.isRightMouseButton(arg0)) {
+					controller.getVector()[posY][posX] = 0;
+				} else {// clico com botão esquerdo
+					// quantidade de estados ativos
+					int ativos = Integer.parseInt((String) estadosPossiveisComboBox.getSelectedItem());
+					// altera o vetor na posição clicada
+					controller.getVector()[posY][posX] = controller
+							.getNextStateValue(controller.getVector()[posY][posX], ativos);
+					// salva a posição do click e o estado, caso o usuário
+					// queira
+					// desenhar
+					x = posX;
+					y = posY;
+					state = controller.getVector()[posY][posX];
+				}
 				// redesenha a matriz
 				controller.drawMatriz(squares2);
 				repaint();
@@ -1266,7 +1312,7 @@ public class AppConfigAutomaton extends JFrame {
 				Point novo;
 				if (arg0.getWheelRotation() >= 0) {// zoom out
 					// checa a escala
-					if (controller.getSqrSize() > 2) {
+					if (controller.getSqrSize() > 4) {
 						middle = (int) (scrollPane.getViewport().getExtentSize().getWidth());
 						// nova posição após zoom
 						novo = new Point((viewPort.x - (middle - mouseLoc.x)) / 2,
@@ -1306,7 +1352,7 @@ public class AppConfigAutomaton extends JFrame {
 			}
 		});
 		scrollPane.setAutoscrolls(false);
-		scrollPane.setBounds(203, 3, 643, 643);
+		scrollPane.setBounds(203, 3, 644, 644);
 		scrollPane.getHorizontalScrollBar().setUnitIncrement(40);
 		scrollPane.getVerticalScrollBar().setUnitIncrement(40);
 		contentPane.add(scrollPane);

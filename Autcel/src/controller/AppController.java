@@ -31,6 +31,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.Arrays;
 import javax.swing.ImageIcon;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
@@ -154,28 +155,18 @@ public class AppController {
 	 * 
 	 * @param vetor
 	 *            matriz do autômato
-	 * @return 'false' caso exista somente um estado ou existam estados além dos
-	 *         possíveis, 'true' caso não hajam irregularidades
+	 * @return 'false' caso existam estados além dos possíveis, 'true' caso não
+	 *         hajam irregularidades
 	 */
 	public boolean areStatesValid(int[][] vetor) {
 		boolean value = true;
-		boolean twoStates = false;
-		int state = vetor[0][0];
 		for (int i = 0; i < vetor.length; i++) {
 			for (int y = 0; y < vetor[i].length; y++) {
 				// se uma célula está em estado que não é possível
 				if ((vetor[i][y] + 1) > config.activeStates) {
 					value = false;
 				}
-				// checa se existem pelo menos 2 estados diferentes
-				if (twoStates == false && vetor[i][y] != state) {
-					twoStates = true;
-				}
 			}
-		}
-		// se todas as células estiverem no mesmo estado, retorna falso
-		if (twoStates == false) {
-			value = false;
 		}
 		return value;
 	}
@@ -185,7 +176,7 @@ public class AppController {
 	 * 
 	 * Author: Madson
 	 */
-	public int[] nextCycle() {
+	public int[] nextCycle(DrawSquare square) {
 		// quantidade de células em cada estado
 		int[] states = { 0, 0, 0, 0, 0, 0, 0, 0 };
 		// copia a matriz original para fazer alterações
@@ -210,27 +201,26 @@ public class AppController {
 				 */
 				boolean validou = false;
 				/*
-				 * [0] = ativo(1) ou inativo(0)
+				 * [0] = estado ao qual a regra se refere
 				 * 
-				 * [1] = estado ao qual a regra se refere
+				 * [1] = operador: ">="(0), ">"(1), "=="(2), "!="(3),"<"(4),
+				 * "<="(5)
 				 * 
-				 * [2] = operador: ">="(0), ">"(1), "=="(2), "<"(3), "<="(4)
+				 * [2] = novo estado
 				 * 
-				 * [3] = quantidade de vizinhos
+				 * [3] = estado do vizinho
 				 * 
-				 * [4] = estado do vizinho
-				 * 
-				 * [5] = novo estado
+				 * [4] = quantidade de vizinhos
 				 */
 				for (int j = 0; j < config.regras.size(); j++) {
 					// prossegue validando as regras caso nenhuma tenha sido
 					// validada para esta célula nesse ciclo
 					if (validou == false) {
 						validou = passRule(config.vector[i][y], vizinhos, config.regras.get(j)[0],
-								config.regras.get(j)[1], config.regras.get(j)[2], config.regras.get(j)[3]);
+								config.regras.get(j)[1], config.regras.get(j)[3], config.regras.get(j)[4]);
 						// se validar, muda o estado da célula
 						if (validou) {
-							tempVector[i][y] = config.regras.get(j)[4];
+							tempVector[i][y] = config.regras.get(j)[2];
 						}
 					}
 				}
@@ -370,29 +360,6 @@ public class AppController {
 		}
 	}
 
-	// TODO apagar quando finalizar
-	public void printArray(int[][] array) {
-		String texto = "[\n";
-		for (int i = 0; i < array.length; i++) {
-			texto += "[";
-			for (int j = 0; j < array[i].length; j++) {
-				if (j == (array[i].length - 1)) {
-					texto += array[i][j] + "]";
-				} else {
-					texto += array[i][j] + ", ";
-				}
-			}
-			if (i == (array.length - 1)) {
-				texto += "\n";
-			} else {
-				texto += ",\n";
-			}
-		}
-		texto += "]";
-
-		System.out.println(texto);
-	}
-
 	/**
 	 * Troca a posição dos itens de um ArrayList
 	 * 
@@ -429,16 +396,14 @@ public class AppController {
 	 *            estado ao qual a quantidade de vizinhos irá considerar
 	 * @param regraOperador
 	 *            operador relacional, de acordo com o seguinte dicionário:
-	 *            0(>=), 1(>), 2(==), 3(<) e 4(<=)
+	 *            0(>=), 1(>), 2(==), 3(!=), 4(<) e 5(<=)
 	 * @param regraQuant
 	 *            quantidade de vizinhos da célula atual de estado igual ao
 	 *            determinado em regraVizinho
 	 * @return caso os argumentos validem a regra, retorna verdadeiro
 	 */
-	public boolean passRule(int estadoAtual, int[] vizinhos, int regraReferese, int regraOperador, int regraQuant,
-			int regraVizinho) {
-		// incrementa a quantidade da regra para adaptação ao valor real
-		regraQuant++;
+	public boolean passRule(int estadoAtual, int[] vizinhos, int regraReferese, int regraOperador, int regraVizinho,
+			int regraQuant) {
 		// checa se a regra refere-se ao estado da célula atual
 		if (estadoAtual == regraReferese) {
 			switch (regraOperador) {
@@ -458,36 +423,22 @@ public class AppController {
 				}
 				break;
 			case 3:
-				if (vizinhos[regraVizinho] < regraQuant) {
+				if (vizinhos[regraVizinho] != regraQuant) {
 					return true;
 				}
 				break;
 			case 4:
+				if (vizinhos[regraVizinho] < regraQuant) {
+					return true;
+				}
+				break;
+			case 5:
 				if (vizinhos[regraVizinho] <= regraQuant) {
 					return true;
 				}
 				break;
 			}
 		}
-		return false;
-	}
-
-	// TODO nova regra http://psoup.math.wisc.edu/mcell/rullex_rtab.html
-	public boolean passFamilyRulesTables(int x, int y, int neighborwoodType, int center, int bitPlane, int[] neighbors,
-			int[] rule) {
-		int currentState = config.vector[x][y];
-		// Vizinhança de Moore
-		if (neighborwoodType == 1) {
-			// se a regra refere-se ao estado atual da célula
-			if (currentState == rule[0]) {
-
-			}
-
-			// Vizinhança de Von Neumann
-		} else if (neighborwoodType == 2) {
-
-		}
-
 		return false;
 	}
 
@@ -506,14 +457,76 @@ public class AppController {
 	public int[] getNeighborhood(int x, int y) {
 		// array contendo a quantidade de vizinhos em cada estado
 		int neighborhood[] = new int[8];
+		// tamanho do array;
+		ArrayList<Integer> mapX = new ArrayList<Integer>();
+		ArrayList<Integer> mapY = new ArrayList<Integer>();
 		// arrays das posições x e y em relação à célula
-		int[] mapX = { x - 1, x - 1, x - 1, x + 0, x + 0, x + 1, x + 1, x + 1 };
-		int[] mapY = { y - 1, y + 0, y + 1, y - 1, y + 1, y - 1, y + 0, y + 1 };
+		if (config.outerTotalistic == 1) {
+			if (config.neighborwoodType == 0) {
+				mapX.addAll(Arrays.asList(x, x - 1, x - 1, x - 1, x + 0, x + 0, x + 1, x + 1, x + 1));
+				mapY.addAll(Arrays.asList(y, y - 1, y + 0, y + 1, y - 1, y + 1, y - 1, y + 0, y + 1));
+			} else if (config.neighborwoodType == 1) {
+				mapX.addAll(Arrays.asList(x, x - 2, x - 2, x - 2, x - 2, x - 2, x - 1, x - 1, x - 1, x - 1, x - 1, x, x,
+						x, x, x + 1, x + 1, x + 1, x + 1, x + 1, x + 2, x + 2, x + 2, x + 2, x + 2));
+				mapY.addAll(Arrays.asList(y, y - 2, y - 1, y, y + 1, y + 2, y - 2, y - 1, y, y + 1, y + 2, y - 2, y - 1,
+						y + 1, y + 2, y - 2, y - 1, y, y + 1, y + 2, y - 2, y - 1, y, y + 1, y + 2));
+			} else if (config.neighborwoodType == 2) {
+				mapX.addAll(Arrays.asList(x, x - 3, x - 3, x - 3, x - 3, x - 3, x - 3, x - 3, x - 2, x - 2, x - 2,
+						x - 2, x - 2, x - 2, x - 2, x - 1, x - 1, x - 1, x - 1, x - 1, x - 1, x - 1, x, x, x, x, x, x,
+						x + 1, x + 1, x + 1, x + 1, x + 1, x + 1, x + 1, x + 2, x + 2, x + 2, x + 2, x + 2, x + 2,
+						x + 2, x + 3, x + 3, x + 3, x + 3, x + 3, x + 3, x + 3));
+				mapY.addAll(Arrays.asList(y, y - 3, y - 2, y - 1, y, y + 1, y + 2, y + 3, y - 3, y - 2, y - 1, y, y + 1,
+						y + 2, y + 3, y - 3, y - 2, y - 1, y, y + 1, y + 2, y + 3, y - 3, y - 2, y - 1, y + 1, y + 2,
+						y + 3, y - 3, y - 2, y - 1, y, y + 1, y + 2, y + 3, y - 3, y - 2, y - 1, y, y + 1, y + 2, y + 3,
+						y - 3, y - 2, y - 1, y, y + 1, y + 2, y + 3));
+			} else if (config.neighborwoodType == 3) {
+				mapX.addAll(Arrays.asList(x, x - 1, x, x + 1, x));
+				mapY.addAll(Arrays.asList(y, y, y + 1, y, y - 1));
+			} else if (config.neighborwoodType == 4) {
+				mapX.addAll(Arrays.asList(x, x - 1, x, x + 1, x, x - 1, x - 1, x + 1, x + 1, x - 2, x + 2, x, x));
+				mapY.addAll(Arrays.asList(y, y, y + 1, y, y - 1, y - 1, y + 1, y - 1, y + 1, y, y, y - 2, y + 2));
+			} else if (config.neighborwoodType == 5) {
+				mapX.addAll(Arrays.asList(x, x - 1, x, x + 1, x, x - 1, x - 1, x + 1, x + 1, x - 2, x + 2, x, x, x - 3,
+						x + 3, x, x, x - 1, x - 2, x - 2, x - 1, x + 1, x + 2, x + 2, x + 1));
+				mapY.addAll(Arrays.asList(y, y, y + 1, y, y - 1, y - 1, y + 1, y - 1, y + 1, y, y, y - 2, y + 2, y, y,
+						y - 3, y + 3, y - 2, y - 1, y + 1, y + 2, y - 2, y - 1, y + 1, y + 2));
+			}
+		} else {
+			if (config.neighborwoodType == 0) {
+				mapX.addAll(Arrays.asList(x - 1, x - 1, x - 1, x + 0, x + 0, x + 1, x + 1, x + 1));
+				mapY.addAll(Arrays.asList(y - 1, y + 0, y + 1, y - 1, y + 1, y - 1, y + 0, y + 1));
+			} else if (config.neighborwoodType == 1) {
+				mapX.addAll(Arrays.asList(x - 2, x - 2, x - 2, x - 2, x - 2, x - 1, x - 1, x - 1, x - 1, x - 1, x, x, x,
+						x, x + 1, x + 1, x + 1, x + 1, x + 1, x + 2, x + 2, x + 2, x + 2, x + 2));
+				mapY.addAll(Arrays.asList(y - 2, y - 1, y, y + 1, y + 2, y - 2, y - 1, y, y + 1, y + 2, y - 2, y - 1,
+						y + 1, y + 2, y - 2, y - 1, y, y + 1, y + 2, y - 2, y - 1, y, y + 1, y + 2));
+			} else if (config.neighborwoodType == 2) {
+				mapX.addAll(Arrays.asList(x - 3, x - 3, x - 3, x - 3, x - 3, x - 3, x - 3, x - 2, x - 2, x - 2, x - 2,
+						x - 2, x - 2, x - 2, x - 1, x - 1, x - 1, x - 1, x - 1, x - 1, x - 1, x, x, x, x, x, x, x + 1,
+						x + 1, x + 1, x + 1, x + 1, x + 1, x + 1, x + 2, x + 2, x + 2, x + 2, x + 2, x + 2, x + 2,
+						x + 3, x + 3, x + 3, x + 3, x + 3, x + 3, x + 3));
+				mapY.addAll(Arrays.asList(y - 3, y - 2, y - 1, y, y + 1, y + 2, y + 3, y - 3, y - 2, y - 1, y, y + 1,
+						y + 2, y + 3, y - 3, y - 2, y - 1, y, y + 1, y + 2, y + 3, y - 3, y - 2, y - 1, y + 1, y + 2,
+						y + 3, y - 3, y - 2, y - 1, y, y + 1, y + 2, y + 3, y - 3, y - 2, y - 1, y, y + 1, y + 2, y + 3,
+						y - 3, y - 2, y - 1, y, y + 1, y + 2, y + 3));
+			} else if (config.neighborwoodType == 3) {
+				mapX.addAll(Arrays.asList(x - 1, x, x + 1, x));
+				mapY.addAll(Arrays.asList(y, y + 1, y, y - 1));
+			} else if (config.neighborwoodType == 4) {
+				mapX.addAll(Arrays.asList(x - 1, x, x + 1, x, x - 1, x - 1, x + 1, x + 1, x - 2, x + 2, x, x));
+				mapY.addAll(Arrays.asList(y, y + 1, y, y - 1, y - 1, y + 1, y - 1, y + 1, y, y, y - 2, y + 2));
+			} else if (config.neighborwoodType == 5) {
+				mapX.addAll(Arrays.asList(x - 1, x, x + 1, x, x - 1, x - 1, x + 1, x + 1, x - 2, x + 2, x, x, x - 3,
+						x + 3, x, x, x - 1, x - 2, x - 2, x - 1, x + 1, x + 2, x + 2, x + 1));
+				mapY.addAll(Arrays.asList(y, y + 1, y, y - 1, y - 1, y + 1, y - 1, y + 1, y, y, y - 2, y + 2, y, y,
+						y - 3, y + 3, y - 2, y - 1, y + 1, y + 2, y - 2, y - 1, y + 1, y + 2));
+			}
+		}
 		// percorre a vizinhança
-		for (int i = 0; i < 8; i++) {
+		for (int i = 0; i < mapX.size(); i++) {
 			try {
 				// identifica o estado da célula vizinha
-				int neighborState = config.vector[mapX[i]][mapY[i]];
+				int neighborState = config.vector[mapX.get(i)][mapY.get(i)];
 				// incrementa neighborhood de acordo com o estado do vizinho
 				if (neighborState == 0) {
 					neighborhood[0]++;
@@ -602,6 +615,10 @@ public class AppController {
 		return config.regrasCristaisDeUlam;
 	}
 
+	public ArrayList<int[]> getRegra614() {
+		return config.regra614;
+	}
+
 	public Font getNormalFont() {
 		return config.normalFont;
 	}
@@ -627,7 +644,7 @@ public class AppController {
 		String about = "";
 		String title = "";
 		String version = "2.0";
-		String date = "20/03/2017";
+		String date = "22/03/2017";
 		ImageIcon icon = new ImageIcon(AppController.class.getResource("/img/main64x64.png"));
 		if (config.language == 0) {// Português
 			title = "Sobre o Autcel";
@@ -650,6 +667,56 @@ public class AppController {
 	public void showManualPopUp() {
 		Manual manual = new Manual(config.language);
 		manual.setVisible(true);
+	}
+
+	/**
+	 * Carrega o modelo pronto de autômato celular
+	 * 
+	 * Author: Madson
+	 * 
+	 * @param value
+	 * @return
+	 */
+	public boolean loadPrefab(int value) {
+		String fileName = "/prefabs/Conway's Game of Life";
+		if (value == 1) {
+			fileName = "/prefabs/Ulam's Crystals";
+		} else if (value == 2) {
+			fileName = "/prefabs/Rule 614";
+		} else if (value == 3) {
+			fileName = "/prefabs/Tsunami";
+		}
+
+		try {
+			File prefab = new File(AppController.class.getResource(fileName).toURI());
+			// necessários para ler o arquivo
+			FileInputStream fis = new FileInputStream(prefab);
+			BufferedReader reader = new BufferedReader(new InputStreamReader(fis));
+			// arrayList que receberá todas as linhas do arquivo
+			ArrayList<String> data = new ArrayList<String>();
+			// linha a ser lida
+			String line = reader.readLine();
+			while (line != null) {
+				// adiciona a linha ao arrayList
+				data.add(line);
+				// prepara a próxima linha
+				line = reader.readLine();
+			}
+			// fecha-os
+			reader.close();
+			fis.close();
+
+			// se o arquivo não estiver corrompido, devido a modificações
+			// manuais pelo usuário, importa seus dados
+			if (checkData(data)) {
+				return true;
+			} else {
+				return false;
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			return false;
+		}
 	}
 
 	/**
@@ -702,10 +769,8 @@ public class AppController {
 			fis.close();
 
 			// se o arquivo não estiver corrompido, devido a modificações
-			// manuais pelo usuário
+			// manuais pelo usuário, importa seus dados
 			if (checkData(data)) {
-				// atualiza as informações importadas
-				updateConfigs(data);
 				return true;
 			} else {
 				JOptionPane.showMessageDialog(null, messages[2], messages[0], JOptionPane.INFORMATION_MESSAGE, icon);
@@ -722,47 +787,8 @@ public class AppController {
 	}
 
 	/**
-	 * Substitui as configurações atuais pelas importadas
-	 * 
-	 * Author: Madson
-	 * 
-	 * @param data
-	 */
-	private void updateConfigs(ArrayList<String> data) {
-		// nome dos estados
-		config.nameState1 = data.get(4);
-		config.nameState2 = data.get(5);
-		config.nameState3 = data.get(6);
-		config.nameState4 = data.get(7);
-		config.nameState5 = data.get(8);
-		config.nameState6 = data.get(9);
-		config.nameState7 = data.get(10);
-		config.nameState8 = data.get(11);
-
-		// quantidade de estados possíveis
-		config.activeStates = Integer.parseInt(data.get(12));
-
-		// vetor
-		int pos0 = 0;
-		for (int i = 0; i < config.vector.length; i++) {
-			for (int j = 0; j < config.vector[0].length; j++) {
-				config.vector[i][j] = Character.getNumericValue(data.get(14).charAt(pos0));
-				pos0++;
-			}
-		}
-
-		// regras
-		int pos = 0;
-		for (int i = 0; i < config.regras.size(); i++) {
-			for (int j = 0; j < 6; j++) {
-				config.regras.get(i)[j] = Character.getNumericValue(data.get(3).charAt(pos));
-				pos++;
-			}
-		}
-	}
-
-	/**
-	 * Checa se há alguma irregularidade no arquivo importado
+	 * Checa se há alguma irregularidade no arquivo importado. Se não houver,
+	 * importa os dados
 	 * 
 	 * Author: Madson
 	 * 
@@ -771,122 +797,217 @@ public class AppController {
 	 * @return
 	 */
 	private boolean checkData(ArrayList<String> data) {
+		// valores temporários dos dados a serem importados
+		// se todos os dados foram válidos, então importa-os
+		int activeStates;
+		int neighborwoodType;
+		int outerTotalistic;
+		ArrayList<int[]> regras = new ArrayList<int[]>();
+		int tamVector;
+		Color color1;
+		Color color2;
+		Color color3;
+		Color color4;
+		Color color5;
+		Color color6;
+		Color color7;
+		Color color8;
+		int language;
+		String nameState1;
+		String nameState2;
+		String nameState3;
+		String nameState4;
+		String nameState5;
+		String nameState6;
+		String nameState7;
+		String nameState8;
+		int vector[][];
 
-		// quantidade de linhas
-		if (data.size() != 15) {
-			return false;
-		}
-
-		// cada regra ocupa 6 espaços
-		if (data.get(3).length() % 6 != 0) {
-			return false;
-		}
-
-		// checa se o nome do estado não é vazio nem maior que o tamanho limite
-		for (int i = 4; i < 12; i++) {
-			if (data.get(i).length() > config.maxStateNameSize || data.get(i).isEmpty()
-					|| data.get(i).trim().length() == 0) {
-				return false;
-			}
-		}
-
-		// garante que hajam somente números onde esperam-se apenas números
 		try {
-			// percorre a regra e verifica se todos os caracteres são números
-			for (int i = 0; i < data.get(3).length(); i++) {
-				Character.getNumericValue(data.get(3).charAt(i));
-			}
-			Integer.parseInt(data.get(12));
-			Integer.parseInt(data.get(13));
-			// percorre a matriz e verifica se todos os caracteres são números
-			for (int i = 0; i < data.get(14).length(); i++) {
-				Character.getNumericValue(data.get(14).charAt(i));
-			}
-		} catch (Exception e) {
-			return false;
-		}
-
-		// quantidade de estados possíveis
-		if (Integer.parseInt(data.get(12)) < 2 || Integer.parseInt(data.get(12)) > 8) {
-			return false;
-		}
-
-		// tamanho do vetor
-		if (Integer.parseInt(data.get(13)) != 10 && Integer.parseInt(data.get(13)) != 20
-				&& Integer.parseInt(data.get(13)) != 40) {
-			return false;
-		}
-
-		// tamanho da matriz
-		if (data.get(14).length() != 100 && data.get(14).length() != 400 && data.get(14).length() != 1600) {
-			return false;
-		}
-
-		// combinação entre tamanho do vetor e matriz
-		if ((Integer.parseInt(data.get(13)) == 10 && data.get(14).length() != 100)
-				|| (Integer.parseInt(data.get(13)) == 20 && data.get(14).length() != 400)
-				|| (Integer.parseInt(data.get(13)) == 40 && data.get(14).length() != 1600)) {
-			return false;
-		}
-
-		// checa cada grupo de 6 numeros, referentes às regras, com os limites:
-		// 174777
-		int pos = 0;
-		for (int i = 0; i < data.get(3).length(); i++) {
-			int num = Character.getNumericValue(data.get(3).charAt(i));
-			switch (pos) {
-			case 0:
-				if (num != 0 && num != 1) {
-					return false;
-				}
-				pos++;
-				break;
-			case 1:
-				if (num < 0 || num > 7) {
-					return false;
-				}
-				pos++;
-				break;
-			case 2:
-				if (num < 0 || num > 4) {
-					return false;
-				}
-				pos++;
-				break;
-			case 3:
-				if (num < 0 || num > 7) {
-					return false;
-				}
-				pos++;
-				break;
-			case 4:
-				if (num < 0 || num > 7) {
-					return false;
-				}
-				pos++;
-				break;
-			case 5:
-				if (num < 0 || num > 7) {
-					return false;
-				}
-				pos = 0;
-				break;
-			}
-		}
-
-		// checa se algum estado na matriz é maior que a quantidade de estados
-		// possíveis
-		// lê a linha da quantidade de estados possíveis
-		int estadosPossiveis = Integer.valueOf(data.get(12)) - 1;
-		// linha da matriz
-		for (int i = 0; i < data.get(14).length(); i++) {
-			int num = Character.getNumericValue(data.get(14).charAt(i));
-			if (num > estadosPossiveis) {
+			// alguns dados
+			activeStates = Integer.valueOf(data.get(3));
+			if (activeStates < 2 || activeStates > 8) {
 				return false;
 			}
-		}
+			neighborwoodType = Integer.valueOf(data.get(4));
+			if (neighborwoodType < 0 || neighborwoodType > 5) {
+				return false;
+			}
+			outerTotalistic = Integer.valueOf(data.get(5));
+			if (outerTotalistic < 0 || outerTotalistic > 1) {
+				return false;
+			}
 
-		return true;
+			// quantidade máxima de vizinhos nas regras
+			int maxVizinhos = 0;
+			if (neighborwoodType == 0) {
+				maxVizinhos = 8;
+			} else if (neighborwoodType == 1) {
+				maxVizinhos = 24;
+			} else if (neighborwoodType == 2) {
+				maxVizinhos = 48;
+			} else if (neighborwoodType == 3) {
+				maxVizinhos = 4;
+			} else if (neighborwoodType == 4) {
+				maxVizinhos = 12;
+			} else if (neighborwoodType == 5) {
+				maxVizinhos = 24;
+			}
+			if (outerTotalistic == 1) {
+				maxVizinhos++;
+			}
+
+			// REGRAS
+			// posição da primeira regra
+			int pos = 6;
+			// enquanto o tamanho for igual a 5, são regras
+			int size = data.get(pos).length();
+			while (size == 5 || size == 6) {
+				// garante que são inteiros e válidos
+				int refere = Character.getNumericValue(data.get(pos).charAt(0));
+				int operador = Character.getNumericValue(data.get(pos).charAt(1));
+				int novo = Character.getNumericValue(data.get(pos).charAt(2));
+				int vizinho = Character.getNumericValue(data.get(pos).charAt(3));
+				int qnt = Character.getNumericValue(data.get(pos).charAt(4));
+				if (size == 6) {
+					qnt = Integer.valueOf(data.get(pos).substring(4, 6));
+				}
+				// verificações
+				if (refere < 0 || refere > 7) {
+					return false;
+				}
+				if (operador < 0 || operador > 5) {
+					return false;
+				}
+				if (novo < 0 || novo > 7) {
+					return false;
+				}
+				if (vizinho < 0 || vizinho > 7) {
+					return false;
+				}
+				if (qnt < 0 || qnt > maxVizinhos) {
+					return false;
+				}
+
+				// regra válida, adiciona ao array temporário
+				regras.add(new int[] { refere, operador, novo, vizinho, qnt });
+				pos++;
+				size = data.get(pos).length();
+			}
+
+			// tamanho do vetor
+			tamVector = Integer.valueOf(data.get(pos));
+			if (tamVector != config.tamVector) {
+				return false;
+			}
+			vector = new int[tamVector][tamVector];
+			pos++;
+
+			// CORES
+			// é possível utilizar cores diferentes das 8 padrão, basta inserir
+			// o código rgb correto no arquivo a ser importado
+			color1 = new Color(Integer.valueOf(data.get(pos)));
+			pos++;
+			color2 = new Color(Integer.valueOf(data.get(pos)));
+			pos++;
+			color3 = new Color(Integer.valueOf(data.get(pos)));
+			pos++;
+			color4 = new Color(Integer.valueOf(data.get(pos)));
+			pos++;
+			color5 = new Color(Integer.valueOf(data.get(pos)));
+			pos++;
+			color6 = new Color(Integer.valueOf(data.get(pos)));
+			pos++;
+			color7 = new Color(Integer.valueOf(data.get(pos)));
+			pos++;
+			color8 = new Color(Integer.valueOf(data.get(pos)));
+			pos++;
+
+			// IDIOMA
+			language = Integer.valueOf(data.get(pos));
+			pos++;
+
+			// NOME DOS ESTADOS
+			// checa se algum é vazio ou de tamanho acima do permitido
+			for (int i = 0; i < 8; i++) {
+				if (data.get(pos + i).length() > config.maxStateNameSize || data.get(pos + i).isEmpty()
+						|| data.get(pos + i).trim().length() == 0) {
+					return false;
+				}
+			}
+			// salva os nomes dos estados
+			nameState1 = data.get(pos);
+			pos++;
+			nameState2 = data.get(pos);
+			pos++;
+			nameState3 = data.get(pos);
+			pos++;
+			nameState4 = data.get(pos);
+			pos++;
+			nameState5 = data.get(pos);
+			pos++;
+			nameState6 = data.get(pos);
+			pos++;
+			nameState7 = data.get(pos);
+			pos++;
+			nameState8 = data.get(pos);
+			pos++;
+
+			// VETOR
+			// percorre as linhas do array
+			for (int i = 0; i < config.tamVector; i++) {
+				// percorre cada caractere do array
+				for (int j = 0; j < config.tamVector; j++) {
+					int num = Character.getNumericValue(data.get(pos).charAt(j));
+					// checa se o estado é válido
+					if (num < 0 || num > (activeStates - 1)) {
+						return false;
+					} else {
+						vector[i][j] = num;
+					}
+				}
+				pos++;
+			}
+
+			// IMPORTA OS DADOS
+			config.activeStates = activeStates;
+			config.neighborwoodType = neighborwoodType;
+			config.outerTotalistic = outerTotalistic;
+			config.regras.clear();
+			config.regras.addAll(regras);
+			config.tamVector = tamVector;
+			config.color1 = color1;
+			config.color2 = color2;
+			config.color3 = color3;
+			config.color4 = color4;
+			config.color5 = color5;
+			config.color6 = color6;
+			config.color7 = color7;
+			config.color8 = color8;
+			config.language = language;
+			config.nameState1 = nameState1;
+			config.nameState2 = nameState2;
+			config.nameState3 = nameState3;
+			config.nameState4 = nameState4;
+			config.nameState5 = nameState5;
+			config.nameState6 = nameState6;
+			config.nameState7 = nameState7;
+			config.nameState8 = nameState8;
+			for (int i = 0; i < config.tamVector; i++) {
+				for (int j = 0; j < config.tamVector; j++) {
+					config.vector[i][j] = vector[i][j];
+				}
+			}
+			// reseta os dados não importados
+			resetVectorSaver();
+			config.cicloAtual = 0;
+			config.sqrSize = new AppConfig().sqrSize;
+
+			return true;
+		} catch (Exception e) {
+			// qualquer exceção que ocorrer no processo, invalida a importação
+			return false;
+		}
 	}
 
 	/**
@@ -914,10 +1035,35 @@ public class AppController {
 			FileWriter arq = new FileWriter(salvarArquivoEscolhido, false);
 			PrintWriter gravarArq = new PrintWriter(arq);
 			// aviso e configurações
-			String data = warning + arrayListToLine(config.regras) + "\n" + config.nameState1 + "\n" + config.nameState2
-					+ "\n" + config.nameState3 + "\n" + config.nameState4 + "\n" + config.nameState5 + "\n"
-					+ config.nameState6 + "\n" + config.nameState7 + "\n" + config.nameState8 + "\n"
-					+ config.activeStates + "\n" + config.tamVector + "\n" + arrayToLine(config.vector);
+			String data = warning;
+			data += config.activeStates + "\n";
+			data += config.neighborwoodType + "\n";
+			data += config.outerTotalistic + "\n";
+			data += arrayListToString(config.regras) + "\n";
+			data += config.tamVector + "\n";
+			data += config.color1.getRGB() + "\n";
+			data += config.color2.getRGB() + "\n";
+			data += config.color3.getRGB() + "\n";
+			data += config.color4.getRGB() + "\n";
+			data += config.color5.getRGB() + "\n";
+			data += config.color6.getRGB() + "\n";
+			data += config.color7.getRGB() + "\n";
+			data += config.color8.getRGB() + "\n";
+			data += config.language + "\n";
+			data += config.nameState1 + "\n";
+			data += config.nameState2 + "\n";
+			data += config.nameState3 + "\n";
+			data += config.nameState4 + "\n";
+			data += config.nameState5 + "\n";
+			data += config.nameState6 + "\n";
+			data += config.nameState7 + "\n";
+			data += config.nameState8 + "\n";
+			if (config.cicloAtual == 0) {
+				data += arrayToString(config.vector);
+			} else {
+				data += arrayToString(config.vectorSaver.get(0));
+			}
+
 			// aviso e configurações são gravadas no arquivo
 			gravarArq.printf(data);
 			// fecha o arquivo
@@ -930,8 +1076,7 @@ public class AppController {
 	}
 
 	/**
-	 * Converte um ArrayList de array de inteiros em string, com a finalidade de
-	 * exportá-la
+	 * Converte um ArrayList de array de inteiros em string
 	 * 
 	 * Author: Madson
 	 * 
@@ -939,12 +1084,15 @@ public class AppController {
 	 *            a ser convertido
 	 * @return string como todos os números em sequência e sem separadores
 	 */
-	private String arrayListToLine(ArrayList<int[]> array) {
+	private String arrayListToString(ArrayList<int[]> array) {
 		String text = "";
 
 		for (int i = 0; i < array.size(); i++) {
 			for (int j = 0; j < array.get(0).length; j++) {
 				text += array.get(i)[j];
+			}
+			if (i < array.size() - 1) {
+				text += "\n";
 			}
 		}
 		return text;
@@ -959,12 +1107,15 @@ public class AppController {
 	 *            a ser convertido
 	 * @return string como todos os números em sequência e sem separadores
 	 */
-	private String arrayToLine(int[][] array) {
+	private String arrayToString(int[][] array) {
 		String text = "";
 
 		for (int i = 0; i < array.length; i++) {
 			for (int j = 0; j < array[0].length; j++) {
 				text += array[i][j];
+			}
+			if (i < array.length - 1) {
+				text += "\n";
 			}
 		}
 		return text;
@@ -1098,5 +1249,21 @@ public class AppController {
 
 	public void setLanguage(int value) {
 		config.language = value;
+	}
+
+	public void setOuterTotalistic(int value) {
+		config.outerTotalistic = value;
+	}
+
+	public int getOuterTotalistic() {
+		return config.outerTotalistic;
+	}
+
+	public void setNeighborwoodType(int value) {
+		config.neighborwoodType = value;
+	}
+
+	public int getNeighborwoodType() {
+		return config.neighborwoodType;
 	}
 }

@@ -7,7 +7,6 @@ import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.util.ArrayList;
 import java.util.List;
-
 import javax.swing.JPanel;
 
 public class DrawSquare extends JPanel {
@@ -15,8 +14,8 @@ public class DrawSquare extends JPanel {
 	private List<Rectangle> squares = new ArrayList<Rectangle>();
 	private List<Color> colors = new ArrayList<Color>();
 	private int prefSize;;
-	
-	public DrawSquare(int size){
+
+	public DrawSquare(int size) {
 		prefSize = size;
 		setPrefSize(size);
 	}
@@ -35,6 +34,16 @@ public class DrawSquare extends JPanel {
 	@Override
 	public Dimension getPreferredSize() {
 		return new Dimension(prefSize, prefSize);
+	}
+
+	public void updatePosition(int pos, Color color) {
+		colors.set(pos, color);
+		Graphics2D g2 = (Graphics2D) getGraphics();
+		g2.setColor(color);
+		g2.fill(squares.get(pos));
+		g2.setColor(Color.BLACK);
+		g2.draw(squares.get(pos));
+		g2.dispose();
 	}
 
 	@Override

@@ -32,7 +32,6 @@ import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionAdapter;
 import java.text.NumberFormat;
-
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -50,7 +49,6 @@ import javax.swing.SwingConstants;
 import javax.swing.Timer;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.LineBorder;
-
 import controller.AppController;
 import model.DrawSquare;
 import java.awt.event.MouseWheelListener;
@@ -115,6 +113,10 @@ public class AppRun extends JFrame {
 	private JMenuItem mntmVoltar = new JMenuItem();
 	private JMenuItem mntmAuto = new JMenuItem();
 	private JMenuItem mntmRestart = new JMenuItem();
+	private JMenuItem prefab1 = new JMenuItem("Conway's Game of Life");
+	private JMenuItem prefab2 = new JMenuItem("Ulam's Crystals");
+	private JMenuItem prefab3 = new JMenuItem("Rule 614");
+	private JMenuItem prefab4 = new JMenuItem("Tsunami");
 
 	/**
 	 * Avança 1 ciclo
@@ -135,8 +137,8 @@ public class AppRun extends JFrame {
 			avancoAutomatico = false;
 		}
 		// chama o próximo ciclo no controller
-		statesAmount = controller.nextCycle();
-		// desenha a matriz
+		statesAmount = controller.nextCycle(squares);
+		// atualiza a tela
 		controller.drawMatriz(squares);
 		repaint();
 		// atualiza o label de ciclo atual
@@ -184,15 +186,15 @@ public class AppRun extends JFrame {
 		// Define o valor em milissegundos de intervalo entre as
 		// repetições de acordo com índice de comboBox_Intervalo
 		if (comboBoxVelocidade.getSelectedIndex() == 0) {
-			delay = 50;
+			delay = 20;
 		} else if (comboBoxVelocidade.getSelectedIndex() == 1) {
-			delay = 200;
+			delay = 50;
 		} else if (comboBoxVelocidade.getSelectedIndex() == 2) {
-			delay = 500;
+			delay = 100;
 		} else if (comboBoxVelocidade.getSelectedIndex() == 3) {
-			delay = 1000;
+			delay = 200;
 		} else if (comboBoxVelocidade.getSelectedIndex() == 4) {
-			delay = 2000;
+			delay = 1000;
 		}
 		// se já estiver avançando automaticamente, cancela o avanço
 		if (avancoAutomatico) {
@@ -214,12 +216,9 @@ public class AppRun extends JFrame {
 	 * @param controller
 	 */
 	private void setTimer(boolean iniciar, AppController controller) {
-		String stop = "";
-		String start = "";
-		if (controller.getLanguage() == 0) {
-			stop = "Parar";
-			start = "Iniciar";
-		} else if (controller.getLanguage() == 1) {
+		String stop = "Parar";
+		String start = "Iniciar";
+		if (controller.getLanguage() == 1) {
 			stop = "Stop";
 			start = "Start";
 		}
@@ -246,8 +245,8 @@ public class AppRun extends JFrame {
 		ActionListener task = new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				// chama o próximo ciclo no controller
-				statesAmount = contr.nextCycle();
-				// desenha a matriz
+				statesAmount = contr.nextCycle(squares);
+				// atualiza a tela
 				contr.drawMatriz(squares);
 				repaint();
 				// atualiza o label de ciclo atual
@@ -320,6 +319,12 @@ public class AppRun extends JFrame {
 	 *            controller
 	 */
 	private void importData(AppController contr) {
+		// se já estiver avançando automaticamente
+		if (avancoAutomatico) {
+			// para o avanço automático
+			setTimer(false, contr);
+			avancoAutomatico = false;
+		}
 		// se obtiver sucesso em importar as configurações do autômato
 		if (contr.importData()) {
 			// cria uma nova instância de execução
@@ -394,20 +399,20 @@ public class AppRun extends JFrame {
 			scrollPane.getHorizontalScrollBar().setValue(maxLessExtent / 2);
 			scrollPane.getVerticalScrollBar().setValue(maxLessExtent / 2);
 		} else if (area == 1) {// nordeste
-			scrollPane.getHorizontalScrollBar().setValue((int) (maxLessExtent * 0.75));
-			scrollPane.getVerticalScrollBar().setValue((int) (maxLessExtent * 0.25));
+			scrollPane.getHorizontalScrollBar().setValue((int) (maxLessExtent * 1.0));
+			scrollPane.getVerticalScrollBar().setValue((int) (maxLessExtent * 0.0));
 		} else if (area == 2) {// noroeste
-			scrollPane.getHorizontalScrollBar().setValue((int) (maxLessExtent * 0.25));
-			scrollPane.getVerticalScrollBar().setValue((int) (maxLessExtent * 0.25));
+			scrollPane.getHorizontalScrollBar().setValue((int) (maxLessExtent * 0.0));
+			scrollPane.getVerticalScrollBar().setValue((int) (maxLessExtent * 0.0));
 		} else if (area == 3) {// sudeste
-			scrollPane.getHorizontalScrollBar().setValue((int) (maxLessExtent * 0.75));
-			scrollPane.getVerticalScrollBar().setValue((int) (maxLessExtent * 0.75));
+			scrollPane.getHorizontalScrollBar().setValue((int) (maxLessExtent * 1.0));
+			scrollPane.getVerticalScrollBar().setValue((int) (maxLessExtent * 1.0));
 		} else if (area == 4) {// sudoeste
-			scrollPane.getHorizontalScrollBar().setValue((int) (maxLessExtent * 0.25));
-			scrollPane.getVerticalScrollBar().setValue((int) (maxLessExtent * 0.75));
+			scrollPane.getHorizontalScrollBar().setValue((int) (maxLessExtent * 0.0));
+			scrollPane.getVerticalScrollBar().setValue((int) (maxLessExtent * 1.0));
 		}
 	}
-	
+
 	/**
 	 * Altera o idioma
 	 * 
@@ -535,6 +540,10 @@ public class AppRun extends JFrame {
 		mnArquivo.add(mnImportar);
 		mnImportar.add(mntmProcurar);
 		mnImportar.add(mnModelos);
+		mnModelos.add(prefab1);
+		mnModelos.add(prefab2);
+		mnModelos.add(prefab3);
+		mnModelos.add(prefab4);
 		mnArquivo.add(mntmExportar);
 		mnArquivo.add(separator);
 		mnArquivo.add(mntmSair);
@@ -688,7 +697,43 @@ public class AppRun extends JFrame {
 				setFocus(4);
 			}
 		});
-		
+		prefab1.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				if (controller.loadPrefab(0)) {
+					AppRun run = new AppRun(controller);
+					run.setVisible(true);
+					dispose();
+				}
+			}
+		});
+		prefab2.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				if (controller.loadPrefab(1)) {
+					AppRun run = new AppRun(controller);
+					run.setVisible(true);
+					dispose();
+				}
+			}
+		});
+		prefab3.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				if (controller.loadPrefab(2)) {
+					AppRun run = new AppRun(controller);
+					run.setVisible(true);
+					dispose();
+				}
+			}
+		});
+		prefab4.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				if (controller.loadPrefab(3)) {
+					AppRun run = new AppRun(controller);
+					run.setVisible(true);
+					dispose();
+				}
+			}
+		});
+
 		JPanel panelMenu = new JPanel();
 		panelMenu.setLayout(null);
 		panelMenu.setBounds(9, 3, 189, 643);
@@ -758,7 +803,7 @@ public class AppRun extends JFrame {
 		comboBoxVelocidade = new JComboBox<String>();
 		comboBoxVelocidade.setFocusable(false);
 		comboBoxVelocidade.setModel(new DefaultComboBoxModel<String>(
-				new String[] { "     50 ms", "   200 ms", "   500 ms", " 1000 ms", " 2000 ms" }));
+				new String[] { "     20 ms", "     50 ms", "   100 ms", "   200 ms", " 1000 ms" }));
 		comboBoxVelocidade.setBounds(91, 46, 85, 20);
 		comboBoxVelocidade.setSelectedIndex(0);
 		autoPanel.add(comboBoxVelocidade);
@@ -969,6 +1014,12 @@ public class AppRun extends JFrame {
 
 		btnExportar.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
+				// se já estiver avançando automaticamente
+				if (avancoAutomatico) {
+					// para o avanço automático
+					setTimer(false, controller);
+					avancoAutomatico = false;
+				}
 				// exporta configurações atuais
 				controller.exportData();
 			}
@@ -1079,7 +1130,7 @@ public class AppRun extends JFrame {
 				Point novo;
 				if (e.getWheelRotation() >= 0) {// zoom out
 					// checa a escala
-					if (controller.getSqrSize() > 2) {
+					if (controller.getSqrSize() > 4) {
 						middle = (int) (scrollPane.getViewport().getExtentSize().getWidth());
 						// nova posição após zoom
 						novo = new Point((viewPort.x - (middle - mouseLoc.x)) / 2,
@@ -1118,7 +1169,7 @@ public class AppRun extends JFrame {
 				}
 			}
 		});
-		scrollPane.setBounds(207, 3, 643, 643);
+		scrollPane.setBounds(207, 3, 644, 644);
 		scrollPane.getHorizontalScrollBar().setUnitIncrement(50);
 		scrollPane.getVerticalScrollBar().setUnitIncrement(50);
 		contentPane.add(scrollPane);
@@ -1134,5 +1185,6 @@ public class AppRun extends JFrame {
 		updateTexts(controller);
 		// determina a cor da fonte da população
 		updatePopBackground(controller);
+		comboBoxVelocidade.setSelectedIndex(0);
 	}
 }
