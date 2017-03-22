@@ -28,6 +28,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.util.ArrayList;
@@ -688,10 +689,9 @@ public class AppController {
 		}
 
 		try {
-			File prefab = new File(AppController.class.getResource(fileName).toURI());
 			// necessários para ler o arquivo
-			FileInputStream fis = new FileInputStream(prefab);
-			BufferedReader reader = new BufferedReader(new InputStreamReader(fis));
+			InputStream in = this.getClass().getResourceAsStream(fileName);
+			BufferedReader reader = new BufferedReader(new InputStreamReader(in));
 			// arrayList que receberá todas as linhas do arquivo
 			ArrayList<String> data = new ArrayList<String>();
 			// linha a ser lida
@@ -704,7 +704,7 @@ public class AppController {
 			}
 			// fecha-os
 			reader.close();
-			fis.close();
+			in.close();
 
 			// se o arquivo não estiver corrompido, devido a modificações
 			// manuais pelo usuário, importa seus dados
@@ -714,7 +714,8 @@ public class AppController {
 				return false;
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			JOptionPane.showMessageDialog(null, e.getLocalizedMessage() + "\n\n\n" + e.getMessage(), "Pah",
+					JOptionPane.INFORMATION_MESSAGE, null);
 			return false;
 		}
 	}
