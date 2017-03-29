@@ -790,6 +790,12 @@ public class AppRun extends JFrame {
 		});
 		prefab1.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
+				// se já estiver avançando automaticamente
+				if (avancoAutomatico) {
+					// para o avanço automático
+					setTimer(false, controller);
+					avancoAutomatico = false;
+				}
 				if (controller.loadPrefab(0)) {
 					AppRun run = new AppRun(controller);
 					run.setVisible(true);
@@ -799,6 +805,12 @@ public class AppRun extends JFrame {
 		});
 		prefab2.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
+				// se já estiver avançando automaticamente
+				if (avancoAutomatico) {
+					// para o avanço automático
+					setTimer(false, controller);
+					avancoAutomatico = false;
+				}
 				if (controller.loadPrefab(1)) {
 					AppRun run = new AppRun(controller);
 					run.setVisible(true);
@@ -808,6 +820,12 @@ public class AppRun extends JFrame {
 		});
 		prefab3.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
+				// se já estiver avançando automaticamente
+				if (avancoAutomatico) {
+					// para o avanço automático
+					setTimer(false, controller);
+					avancoAutomatico = false;
+				}
 				if (controller.loadPrefab(2)) {
 					AppRun run = new AppRun(controller);
 					run.setVisible(true);
@@ -817,6 +835,12 @@ public class AppRun extends JFrame {
 		});
 		prefab4.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
+				// se já estiver avançando automaticamente
+				if (avancoAutomatico) {
+					// para o avanço automático
+					setTimer(false, controller);
+					avancoAutomatico = false;
+				}
 				if (controller.loadPrefab(3)) {
 					AppRun run = new AppRun(controller);
 					run.setVisible(true);
