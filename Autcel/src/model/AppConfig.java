@@ -105,7 +105,7 @@ public class AppConfig {
 		// é tipo de regra totalista exterior
 		this.outerTotalistic = 0;
 		// escala inicial padrão
-		this.sqrSize = 4;
+		this.sqrSize = 8;
 		// idioma inicial padrão
 		this.language = 1;// 0: Português, 1: Inglês
 		// regras do jogo da vida

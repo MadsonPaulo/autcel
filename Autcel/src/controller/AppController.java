@@ -56,7 +56,8 @@ public class AppController {
 	 * 
 	 * Author: Madson
 	 */
-	public void startApplication() {
+	public void startApplication(int size) {
+		changeTamVector(size);
 		AppConfigAutomaton view = new AppConfigAutomaton(this);
 		view.setVisible(true);
 	}
@@ -526,8 +527,22 @@ public class AppController {
 		// percorre a vizinhança
 		for (int i = 0; i < mapX.size(); i++) {
 			try {
-				// identifica o estado da célula vizinha
-				int neighborState = config.vector[mapX.get(i)][mapY.get(i)];
+				// as células da borda serão tratadas utilizando borda
+				// periódica, código a seguir
+				int pX = mapX.get(i);
+				int pY = mapY.get(i);
+				if (pX < 0) {
+					pX = config.tamVector + pX;
+				} else if (pX >= config.tamVector) {
+					pX = pX - config.tamVector;
+				}
+				if (pY < 0) {
+					pY = config.tamVector + pY;
+				} else if (pY >= config.tamVector) {
+					pY = pY - config.tamVector;
+				}
+				// identifica o estado da célula da vizinhança
+				int neighborState = config.vector[pX][pY];
 				// incrementa neighborhood de acordo com o estado do vizinho
 				if (neighborState == 0) {
 					neighborhood[0]++;
@@ -547,8 +562,6 @@ public class AppController {
 					neighborhood[7]++;
 				}
 			} catch (Exception e) {
-				// Acontece com células localizadas nas extremidades, quando não
-				// há vizinho nesta posição
 			}
 		}
 		return neighborhood;
@@ -898,7 +911,9 @@ public class AppController {
 
 			// tamanho do vetor
 			tamVector = Integer.valueOf(data.get(pos));
-			if (tamVector != config.tamVector) {
+			if (tamVector == 20 || tamVector == 40 || tamVector == 80 || tamVector == 160 || tamVector == 320) {
+				// se não for algum desses valores, é inválido
+			} else {
 				return false;
 			}
 			vector = new int[tamVector][tamVector];
@@ -956,9 +971,9 @@ public class AppController {
 
 			// VETOR
 			// percorre as linhas do array
-			for (int i = 0; i < config.tamVector; i++) {
+			for (int i = 0; i < tamVector; i++) {
 				// percorre cada caractere do array
-				for (int j = 0; j < config.tamVector; j++) {
+				for (int j = 0; j < tamVector; j++) {
 					int num = Character.getNumericValue(data.get(pos).charAt(j));
 					// checa se o estado é válido
 					if (num < 0 || num > (activeStates - 1)) {
@@ -977,6 +992,7 @@ public class AppController {
 			config.regras.clear();
 			config.regras.addAll(regras);
 			config.tamVector = tamVector;
+			config.vector = new int[tamVector][tamVector];
 			config.color1 = color1;
 			config.color2 = color2;
 			config.color3 = color3;
@@ -994,8 +1010,8 @@ public class AppController {
 			config.nameState6 = nameState6;
 			config.nameState7 = nameState7;
 			config.nameState8 = nameState8;
-			for (int i = 0; i < config.tamVector; i++) {
-				for (int j = 0; j < config.tamVector; j++) {
+			for (int i = 0; i < tamVector; i++) {
+				for (int j = 0; j < tamVector; j++) {
 					config.vector[i][j] = vector[i][j];
 				}
 			}
@@ -1162,6 +1178,46 @@ public class AppController {
 		} else if (position == 7) {
 			config.color8 = color;
 		}
+	}
+
+	/**
+	 * Altera o tamanho do vetor
+	 * 
+	 * Author: Madson
+	 * 
+	 * @param size
+	 */
+	public void changeTamVector(int size) {
+		int tamAtual = config.tamVector;
+		// se o novo tamanho for igual ao atual, não faz nada
+		if (size == tamAtual) {
+			return;
+		}
+		// vetor temporário para copiar o que for possível do atual
+		int[][] tempVector = new int[size][size];
+		config.tamVector = size;
+		// copia o quer for aproveitável do vetor atual
+		if (size < tamAtual) {
+			for (int i = 0; i < size; i++) {
+				for (int j = 0; j < size; j++) {
+					tempVector[i][j] = config.vector[i][j];
+				}
+			}
+		} else if (size > tamAtual) {
+			for (int i = 0; i < tamAtual; i++) {
+				for (int j = 0; j < tamAtual; j++) {
+					tempVector[i][j] = config.vector[i][j];
+				}
+			}
+		}
+		// transfere do vetor temporário para o atual
+		config.vector = new int[size][size];
+		for (int i = 0; i < size; i++) {
+			for (int j = 0; j < size; j++) {
+				config.vector[i][j] = tempVector[i][j];
+			}
+		}
+		resetVectorSaver();
 	}
 
 	public int getTamVector() {

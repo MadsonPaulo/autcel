@@ -95,12 +95,24 @@ public class AppConfigAutomaton extends JFrame {
 	private JLabel lblEscala = new JLabel();
 	private JLabel lblCoord = new JLabel("[0, 0]");
 	private JMenu mnArquivo = new JMenu();
+	private JMenu mnchangeSize = new JMenu();
 	private JMenu mnImportar = new JMenu();
 	private JMenu mnModelos = new JMenu();
 	private JMenu mnPrerncias = new JMenu();
 	private JMenu mnIdioma = new JMenu();
 	private JMenu mnAjuda = new JMenu();
 	private JMenu mnNavigation = new JMenu();
+	private JMenu mnNew = new JMenu();
+	private JMenuItem mntmNew20 = new JMenuItem();
+	private JMenuItem mntmNew40 = new JMenuItem();
+	private JMenuItem mntmNew80 = new JMenuItem();
+	private JMenuItem mntmNew160 = new JMenuItem();
+	private JMenuItem mntmNew320 = new JMenuItem();
+	private JMenuItem mntmSize20 = new JMenuItem();
+	private JMenuItem mntmSize40 = new JMenuItem();
+	private JMenuItem mntmSize80 = new JMenuItem();
+	private JMenuItem mntmSize160 = new JMenuItem();
+	private JMenuItem mntmSize320 = new JMenuItem();
 	private JMenuItem mntmCenter = new JMenuItem();
 	private JMenuItem mntmNEast = new JMenuItem();
 	private JMenuItem mntmNWest = new JMenuItem();
@@ -346,6 +358,7 @@ public class AppConfigAutomaton extends JFrame {
 			mnPrerncias.setText("Preferências");
 			mnIdioma.setText("Idioma");
 			mntmProcurar.setText("Procurar");
+			mnNew.setText("Novo Autômato");
 			mntmExportar.setText("Exportar");
 			mntmSair.setText("Sair");
 			mntmPortugus.setText("Português");
@@ -359,6 +372,7 @@ public class AppConfigAutomaton extends JFrame {
 			mntmNWest.setText("Noroeste");
 			mntmSEast.setText("Sudeste");
 			mntmSWest.setText("Sudoeste");
+			mnchangeSize.setText("Tamanho da Grade");
 			// botões
 			btnImportar.setText("Importar");
 			btnLimpar.setText("Limpar");
@@ -382,6 +396,7 @@ public class AppConfigAutomaton extends JFrame {
 			mnPrerncias.setText("Settings");
 			mnIdioma.setText("Language");
 			mntmProcurar.setText("Search");
+			mnNew.setText("New Automaton");
 			mntmExportar.setText("Export");
 			mntmSair.setText("Exit");
 			mntmPortugus.setText("Português");
@@ -395,6 +410,7 @@ public class AppConfigAutomaton extends JFrame {
 			mntmNWest.setText("North-West");
 			mntmSEast.setText("South-East");
 			mntmSWest.setText("South-West");
+			mnchangeSize.setText("Grid Size");
 			// botões
 			btnImportar.setText("Import");
 			btnLimpar.setText("Clean");
@@ -409,6 +425,17 @@ public class AppConfigAutomaton extends JFrame {
 			mensagemInicialTxtArea = "Please, define the number and name of possible states, as well as the initial state of each cell.";
 			infoTxtArea.setText(mensagemInicialTxtArea);
 		}
+		// independente do idioma
+		mntmNew20.setText("20x20");
+		mntmNew40.setText("40x40");
+		mntmNew80.setText("80x80");
+		mntmNew160.setText("160x160");
+		mntmNew320.setText("320x320");
+		mntmSize20.setText("20x20");
+		mntmSize40.setText("40x40");
+		mntmSize80.setText("80x80");
+		mntmSize160.setText("160x160");
+		mntmSize320.setText("320x320");
 	}
 
 	/**
@@ -551,6 +578,35 @@ public class AppConfigAutomaton extends JFrame {
 		}
 	}
 
+	/**
+	 * Conserta a escala quando há alteração no tamanho da matriz
+	 * 
+	 * Author: Madson
+	 */
+	private void fixScale(AppController contr) {
+		int size = 8;
+		if (contr.getTamVector() == 20) {
+			size = 32;
+		} else if (contr.getTamVector() == 40) {
+			size = 16;
+		} else if (contr.getTamVector() == 80) {
+			size = 8;
+		} else if (contr.getTamVector() == 160) {
+			size = 4;
+		} else if (contr.getTamVector() == 320) {
+			size = 2;
+		}
+		// altera a escala, tamanho dos quadrados
+		contr.setSqrSize(size);
+		// atualiza as barras de scroll de squares
+		squares2.setPrefSize(contr.getSqrSize() * contr.getTamVector());
+		// atualiza o texto de escala
+		updateScale(contr);
+		// redesenha o grid
+		contr.drawMatriz(squares2);
+		repaint();
+	}
+
 	public AppConfigAutomaton(AppController controller) {
 		// caso a janela seja movida, redesenha o grid
 		addComponentListener(new ComponentAdapter() {
@@ -575,6 +631,12 @@ public class AppConfigAutomaton extends JFrame {
 		JSeparator separator = new JSeparator();
 		// inclusões
 		menuBar.add(mnArquivo);
+		mnArquivo.add(mnNew);
+		mnNew.add(mntmNew20);
+		mnNew.add(mntmNew40);
+		mnNew.add(mntmNew80);
+		mnNew.add(mntmNew160);
+		mnNew.add(mntmNew320);
 		mnArquivo.add(mnImportar);
 		mnImportar.add(mntmProcurar);
 		mnImportar.add(mnModelos);
@@ -592,6 +654,12 @@ public class AppConfigAutomaton extends JFrame {
 		mnNavigation.add(mntmSEast);
 		mnNavigation.add(mntmSWest);
 		menuBar.add(mnPrerncias);
+		mnPrerncias.add(mnchangeSize);
+		mnchangeSize.add(mntmSize20);
+		mnchangeSize.add(mntmSize40);
+		mnchangeSize.add(mntmSize80);
+		mnchangeSize.add(mntmSize160);
+		mnchangeSize.add(mntmSize320);
 		mnPrerncias.add(mnIdioma);
 		mnIdioma.add(mntmPortugus);
 		mnIdioma.add(mntmEnglish);
@@ -599,15 +667,28 @@ public class AppConfigAutomaton extends JFrame {
 		mnAjuda.add(mntmManual);
 		mnAjuda.add(mntmSobre);
 		// ícones
+		mnNew.setIcon(new ImageIcon(AppConfigAutomaton.class.getResource("/img/plus.png")));
 		mnImportar.setIcon(new ImageIcon(AppConfigAutomaton.class.getResource("/img/import.gif")));
 		mntmExportar.setIcon(new ImageIcon(AppConfigAutomaton.class.getResource("/img/export.png")));
 		mntmSair.setIcon(new ImageIcon(AppConfigAutomaton.class.getResource("/img/exit.png")));
 		mnIdioma.setIcon(new ImageIcon(AppConfigAutomaton.class.getResource("/img/config.png")));
+		mnchangeSize.setIcon(new ImageIcon(AppConfigAutomaton.class.getResource("/img/size.png")));
 		mntmPortugus.setIcon(new ImageIcon(AppConfigAutomaton.class.getResource("/img/brasil.png")));
 		mntmEnglish.setIcon(new ImageIcon(AppConfigAutomaton.class.getResource("/img/United-States.png")));
 		mntmSobre.setIcon(new ImageIcon(AppConfigAutomaton.class.getResource("/img/main16x16.png")));
 		mntmManual.setIcon(new ImageIcon(AppConfigAutomaton.class.getResource("/img/manual.png")));
 		// fonte dos menus
+		mnNew.setFont(controller.getBoldFont());
+		mntmNew20.setFont(controller.getBoldFont());
+		mntmNew40.setFont(controller.getBoldFont());
+		mntmNew80.setFont(controller.getBoldFont());
+		mntmNew160.setFont(controller.getBoldFont());
+		mntmNew320.setFont(controller.getBoldFont());
+		mntmSize20.setFont(controller.getBoldFont());
+		mntmSize40.setFont(controller.getBoldFont());
+		mntmSize80.setFont(controller.getBoldFont());
+		mntmSize160.setFont(controller.getBoldFont());
+		mntmSize320.setFont(controller.getBoldFont());
 		mnArquivo.setFont(controller.getBoldFont());
 		mnImportar.setFont(controller.getBoldFont());
 		mnModelos.setFont(controller.getBoldFont());
@@ -636,6 +717,71 @@ public class AppConfigAutomaton extends JFrame {
 		// desabilita um menu
 		mntmExportar.setEnabled(false);
 		// ações
+		mntmSize20.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				controller.changeTamVector(20);
+				fixScale(controller);
+			}
+		});
+		mntmSize40.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				controller.changeTamVector(40);
+				fixScale(controller);
+			}
+		});
+		mntmSize80.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				controller.changeTamVector(80);
+				fixScale(controller);
+			}
+		});
+		mntmSize160.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				controller.changeTamVector(160);
+				fixScale(controller);
+			}
+		});
+		mntmSize320.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				controller.changeTamVector(320);
+				fixScale(controller);
+			}
+		});
+		mntmNew20.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				AppController contr = new AppController();
+				contr.startApplication(20);
+				dispose();
+			}
+		});
+		mntmNew40.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				AppController contr = new AppController();
+				contr.startApplication(40);
+				dispose();
+			}
+		});
+		mntmNew80.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				AppController contr = new AppController();
+				contr.startApplication(80);
+				dispose();
+			}
+		});
+		mntmNew160.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				AppController contr = new AppController();
+				contr.startApplication(160);
+				dispose();
+			}
+		});
+		mntmNew320.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				AppController contr = new AppController();
+				contr.startApplication(320);
+				dispose();
+			}
+		});
 		mntmProcurar.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				importData(controller);
@@ -1204,12 +1350,20 @@ public class AppConfigAutomaton extends JFrame {
 				// posição x e y do local clicado
 				int posX = (int) Math.ceil(arg0.getX() / value) - 1;
 				int posY = (int) Math.ceil(arg0.getY() / value) - 1;
-				// raramente, nas extremidades, é detectado -1
+				// nas extremidades, pode detectar -1
 				if (posX < 0) {
 					posX = 0;
 				}
 				if (posY < 0) {
 					posY = 0;
+				}
+				// nas extremidades, pode detectar valor acima do
+				// permitido
+				if (posX >= controller.getTamVector()) {
+					posX = controller.getTamVector() - 1;
+				}
+				if (posY >= controller.getTamVector()) {
+					posY = controller.getTamVector() - 1;
 				}
 				lblCoord.setText("[" + posY + ", " + posX + "]");
 			}
@@ -1221,12 +1375,20 @@ public class AppConfigAutomaton extends JFrame {
 				// posição x e y do local clicado
 				int posX = (int) Math.ceil(arg0.getX() / value) - 1;
 				int posY = (int) Math.ceil(arg0.getY() / value) - 1;
-				// raramente, nas extremidades, é detectado -1
+				// nas extremidades, pode detectar -1
 				if (posX < 0) {
 					posX = 0;
 				}
 				if (posY < 0) {
 					posY = 0;
+				}
+				// nas extremidades, pode detectar valor acima do
+				// permitido
+				if (posX >= controller.getTamVector()) {
+					posX = controller.getTamVector() - 1;
+				}
+				if (posY >= controller.getTamVector()) {
+					posY = controller.getTamVector() - 1;
 				}
 				// atualiza o label de coordenada
 				lblCoord.setText("[" + posY + ", " + posX + "]");
@@ -1267,12 +1429,20 @@ public class AppConfigAutomaton extends JFrame {
 				// posição x e y do local clicado
 				int posX = (int) Math.ceil(arg0.getX() / value) - 1;
 				int posY = (int) Math.ceil(arg0.getY() / value) - 1;
-				// raramente, nas extremidades, é detectado -1
+				// nas extremidades, pode detectar -1
 				if (posX < 0) {
 					posX = 0;
 				}
 				if (posY < 0) {
 					posY = 0;
+				}
+				// nas extremidades, pode detectar valor acima do
+				// permitido
+				if (posX >= controller.getTamVector()) {
+					posX = controller.getTamVector() - 1;
+				}
+				if (posY >= controller.getTamVector()) {
+					posY = controller.getTamVector() - 1;
 				}
 				// se foi utilizado o botão direito do mouse, muda para estado 0
 				if (SwingUtilities.isRightMouseButton(arg0)) {
@@ -1311,8 +1481,21 @@ public class AppConfigAutomaton extends JFrame {
 				Point viewPort = scrollPane.getViewport().getViewPosition();
 				Point novo;
 				if (arg0.getWheelRotation() >= 0) {// zoom out
+					// determina o zoom out máximo
+					int max = 4;
+					if (controller.getTamVector() == 20) {
+						max = 32;
+					} else if (controller.getTamVector() == 40) {
+						max = 16;
+					} else if (controller.getTamVector() == 80) {
+						max = 8;
+					} else if (controller.getTamVector() == 160) {
+						max = 4;
+					} else if (controller.getTamVector() == 320) {
+						max = 2;
+					}
 					// checa a escala
-					if (controller.getSqrSize() > 4) {
+					if (controller.getSqrSize() > max) {
 						middle = (int) (scrollPane.getViewport().getExtentSize().getWidth());
 						// nova posição após zoom
 						novo = new Point((viewPort.x - (middle - mouseLoc.x)) / 2,
@@ -1359,9 +1542,8 @@ public class AppConfigAutomaton extends JFrame {
 		// remove o scroll utilizando a roda do mouse
 		scrollPane.removeMouseWheelListener(scrollPane.getMouseWheelListeners()[0]);
 
-		// desenha a matriz
-		controller.drawMatriz(squares2);
-
+		// corrige a escala, se necessário
+		fixScale(controller);
 		// determina o idioma
 		setLanguage(controller.getLanguage(), controller);
 		// atualiza os contadores de estados

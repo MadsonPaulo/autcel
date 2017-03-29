@@ -75,6 +75,12 @@ public class AppConfigRules extends JFrame {
 	private JMenu mnPrerncias = new JMenu();
 	private JMenu mnIdioma = new JMenu();
 	private JMenu menuAjuda = new JMenu();
+	private JMenu mnNew = new JMenu();
+	private JMenuItem mntmNew20 = new JMenuItem();
+	private JMenuItem mntmNew40 = new JMenuItem();
+	private JMenuItem mntmNew80 = new JMenuItem();
+	private JMenuItem mntmNew160 = new JMenuItem();
+	private JMenuItem mntmNew320 = new JMenuItem();
 	private JMenuItem mntmExportar = new JMenuItem();
 	private JMenuItem mntmProcurar = new JMenuItem();
 	private JMenuItem mntmManual = new JMenuItem();
@@ -328,6 +334,7 @@ public class AppConfigRules extends JFrame {
 			mnIdioma.setText("Idioma");
 			mntmProcurar.setText("Procurar");
 			mntmExportar.setText("Exportar");
+			mnNew.setText("Novo Autômato");
 			mntmSair.setText("Sair");
 			mntmPortugus.setText("Português");
 			mntmEnglish.setText("English");
@@ -372,6 +379,7 @@ public class AppConfigRules extends JFrame {
 			mnIdioma.setText("Language");
 			mntmProcurar.setText("Search");
 			mntmExportar.setText("Export");
+			mnNew.setText("New Automaton");
 			mntmSair.setText("Exit");
 			mntmPortugus.setText("Português");
 			mntmEnglish.setText("English");
@@ -406,6 +414,12 @@ public class AppConfigRules extends JFrame {
 			// Texto
 			outerExplanation = "Define if the current state of the cell is counted in the sum of neighbor states.";
 		}
+		// independente do idioma
+		mntmNew20.setText("20x20");
+		mntmNew40.setText("40x40");
+		mntmNew80.setText("80x80");
+		mntmNew160.setText("160x160");
+		mntmNew320.setText("320x320");
 		// se houver alguma regra em produção, atualiza-a
 		if (textRegra.getText().length() > 0) {
 			updateRuleInProduction(contr);
@@ -529,6 +543,12 @@ public class AppConfigRules extends JFrame {
 		JSeparator separator = new JSeparator();
 		// inclusões
 		menuBar.add(mnArquivo);
+		mnArquivo.add(mnNew);
+		mnNew.add(mntmNew20);
+		mnNew.add(mntmNew40);
+		mnNew.add(mntmNew80);
+		mnNew.add(mntmNew160);
+		mnNew.add(mntmNew320);
 		mnArquivo.add(mnImportar);
 		mnImportar.add(mntmProcurar);
 		mnImportar.add(mnModelos);
@@ -547,6 +567,7 @@ public class AppConfigRules extends JFrame {
 		menuAjuda.add(mntmManual);
 		menuAjuda.add(mntmSobre);
 		// ícones
+		mnNew.setIcon(new ImageIcon(AppConfigAutomaton.class.getResource("/img/plus.png")));
 		mnImportar.setIcon(new ImageIcon(AppConfigAutomaton.class.getResource("/img/import.gif")));
 		mntmExportar.setIcon(new ImageIcon(AppConfigAutomaton.class.getResource("/img/export.png")));
 		mntmSair.setIcon(new ImageIcon(AppConfigAutomaton.class.getResource("/img/exit.png")));
@@ -556,6 +577,12 @@ public class AppConfigRules extends JFrame {
 		mntmSobre.setIcon(new ImageIcon(AppConfigAutomaton.class.getResource("/img/main16x16.png")));
 		mntmManual.setIcon(new ImageIcon(AppConfigAutomaton.class.getResource("/img/manual.png")));
 		// fonte dos menus
+		mnNew.setFont(controller.getBoldFont());
+		mntmNew20.setFont(controller.getBoldFont());
+		mntmNew40.setFont(controller.getBoldFont());
+		mntmNew80.setFont(controller.getBoldFont());
+		mntmNew160.setFont(controller.getBoldFont());
+		mntmNew320.setFont(controller.getBoldFont());
 		mnArquivo.setFont(controller.getBoldFont());
 		mnImportar.setFont(controller.getBoldFont());
 		mnModelos.setFont(controller.getBoldFont());
@@ -572,6 +599,41 @@ public class AppConfigRules extends JFrame {
 		// desabilita um menu
 		mntmExportar.setEnabled(false);
 		// ações
+		mntmNew20.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				AppController contr = new AppController();
+				contr.startApplication(20);
+				dispose();
+			}
+		});
+		mntmNew40.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				AppController contr = new AppController();
+				contr.startApplication(40);
+				dispose();
+			}
+		});
+		mntmNew80.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				AppController contr = new AppController();
+				contr.startApplication(80);
+				dispose();
+			}
+		});
+		mntmNew160.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				AppController contr = new AppController();
+				contr.startApplication(160);
+				dispose();
+			}
+		});
+		mntmNew320.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				AppController contr = new AppController();
+				contr.startApplication(320);
+				dispose();
+			}
+		});
 		mntmProcurar.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				importData(controller);

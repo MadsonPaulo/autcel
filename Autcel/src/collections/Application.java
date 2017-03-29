@@ -22,7 +22,6 @@ package collections;
 
 import controller.*;
 
-
 /**
  * @author Madson
  *
@@ -36,6 +35,8 @@ public class Application {
 		// inicializa o controller
 		AppController controller = new AppController();
 		// inicia a aplicação
-		controller.startApplication();
+		// em parênteses o tamanho do vetor, recomendado valores 20, 40, 80, 160
+		// ou 320
+		controller.startApplication(160);
 	}
 }

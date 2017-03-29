@@ -97,6 +97,12 @@ public class AppRun extends JFrame {
 	private JMenu mnIdioma = new JMenu();
 	private JMenu menuAjuda = new JMenu();
 	private JMenu mnNavigation = new JMenu();
+	private JMenu mnNew = new JMenu();
+	private JMenuItem mntmNew20 = new JMenuItem();
+	private JMenuItem mntmNew40 = new JMenuItem();
+	private JMenuItem mntmNew80 = new JMenuItem();
+	private JMenuItem mntmNew160 = new JMenuItem();
+	private JMenuItem mntmNew320 = new JMenuItem();
 	private JMenuItem mntmCenter = new JMenuItem();
 	private JMenuItem mntmNEast = new JMenuItem();
 	private JMenuItem mntmNWest = new JMenuItem();
@@ -260,6 +266,35 @@ public class AppRun extends JFrame {
 		timer.setInitialDelay(0);
 		// inicia o timer
 		timer.start();
+	}
+
+	/**
+	 * Conserta a escala quando há alteração no tamanho da matriz
+	 * 
+	 * Author: Madson
+	 */
+	private void fixScale(AppController contr) {
+		int size = 8;
+		if (contr.getTamVector() == 20) {
+			size = 32;
+		} else if (contr.getTamVector() == 40) {
+			size = 16;
+		} else if (contr.getTamVector() == 80) {
+			size = 8;
+		} else if (contr.getTamVector() == 160) {
+			size = 4;
+		} else if (contr.getTamVector() == 320) {
+			size = 2;
+		}
+		// altera a escala, tamanho dos quadrados
+		contr.setSqrSize(size);
+		// atualiza as barras de scroll de squares
+		squares.setPrefSize(contr.getSqrSize() * contr.getTamVector());
+		// atualiza o texto de escala
+		updateScale(contr);
+		// redesenha o grid
+		contr.drawMatriz(squares);
+		repaint();
 	}
 
 	/**
@@ -434,6 +469,7 @@ public class AppRun extends JFrame {
 			mnIdioma.setText("Idioma");
 			mntmProcurar.setText("Procurar");
 			mntmExportar.setText("Exportar");
+			mnNew.setText("Novo Autômato");
 			mnControls.setText("Controles");
 			mntmSair.setText("Sair");
 			mntmPortugus.setText("Português");
@@ -477,6 +513,7 @@ public class AppRun extends JFrame {
 			mntmProcurar.setText("Search");
 			mntmExportar.setText("Export");
 			mnControls.setText("Controls");
+			mnNew.setText("New Automaton");
 			mntmSair.setText("Exit");
 			mntmPortugus.setText("Português");
 			mntmEnglish.setText("English");
@@ -508,6 +545,12 @@ public class AppRun extends JFrame {
 			lblAvanoAutomtico.setText("Auto Advance");
 			updateScale(contr);
 		}
+		// independente do idioma
+		mntmNew20.setText("20x20");
+		mntmNew40.setText("40x40");
+		mntmNew80.setText("80x80");
+		mntmNew160.setText("160x160");
+		mntmNew320.setText("320x320");
 	}
 
 	public AppRun(AppController controller) {
@@ -537,6 +580,12 @@ public class AppRun extends JFrame {
 		JSeparator separator = new JSeparator();
 		// inclusões
 		menuBar.add(mnArquivo);
+		mnArquivo.add(mnNew);
+		mnNew.add(mntmNew20);
+		mnNew.add(mntmNew40);
+		mnNew.add(mntmNew80);
+		mnNew.add(mntmNew160);
+		mnNew.add(mntmNew320);
 		mnArquivo.add(mnImportar);
 		mnImportar.add(mntmProcurar);
 		mnImportar.add(mnModelos);
@@ -566,6 +615,7 @@ public class AppRun extends JFrame {
 		menuAjuda.add(mntmManual);
 		menuAjuda.add(mntmSobre);
 		// ícones
+		mnNew.setIcon(new ImageIcon(AppConfigAutomaton.class.getResource("/img/plus.png")));
 		mnImportar.setIcon(new ImageIcon(AppConfigAutomaton.class.getResource("/img/import.gif")));
 		mntmExportar.setIcon(new ImageIcon(AppConfigAutomaton.class.getResource("/img/export.png")));
 		mntmSair.setIcon(new ImageIcon(AppConfigAutomaton.class.getResource("/img/exit.png")));
@@ -575,6 +625,12 @@ public class AppRun extends JFrame {
 		mntmSobre.setIcon(new ImageIcon(AppConfigAutomaton.class.getResource("/img/main16x16.png")));
 		mntmManual.setIcon(new ImageIcon(AppConfigAutomaton.class.getResource("/img/manual.png")));
 		// fonte dos menus
+		mnNew.setFont(controller.getBoldFont());
+		mntmNew20.setFont(controller.getBoldFont());
+		mntmNew40.setFont(controller.getBoldFont());
+		mntmNew80.setFont(controller.getBoldFont());
+		mntmNew160.setFont(controller.getBoldFont());
+		mntmNew320.setFont(controller.getBoldFont());
 		mnArquivo.setFont(controller.getBoldFont());
 		mnControls.setFont(controller.getBoldFont());
 		mnImportar.setFont(controller.getBoldFont());
@@ -610,6 +666,41 @@ public class AppRun extends JFrame {
 		mntmSEast.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F4, 0, true));
 		mntmSWest.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F5, 0, true));
 		// ações
+		mntmNew20.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				AppController contr = new AppController();
+				contr.startApplication(20);
+				dispose();
+			}
+		});
+		mntmNew40.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				AppController contr = new AppController();
+				contr.startApplication(40);
+				dispose();
+			}
+		});
+		mntmNew80.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				AppController contr = new AppController();
+				contr.startApplication(80);
+				dispose();
+			}
+		});
+		mntmNew160.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				AppController contr = new AppController();
+				contr.startApplication(160);
+				dispose();
+			}
+		});
+		mntmNew320.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				AppController contr = new AppController();
+				contr.startApplication(320);
+				dispose();
+			}
+		});
 		mntmAvançar.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				nextCycle(controller);
@@ -1129,8 +1220,21 @@ public class AppRun extends JFrame {
 				Point viewPort = scrollPane.getViewport().getViewPosition();
 				Point novo;
 				if (e.getWheelRotation() >= 0) {// zoom out
+					// determina o zoom out máximo
+					int max = 4;
+					if (controller.getTamVector() == 20) {
+						max = 32;
+					} else if (controller.getTamVector() == 40) {
+						max = 16;
+					} else if (controller.getTamVector() == 80) {
+						max = 8;
+					} else if (controller.getTamVector() == 160) {
+						max = 4;
+					} else if (controller.getTamVector() == 320) {
+						max = 2;
+					}
 					// checa a escala
-					if (controller.getSqrSize() > 4) {
+					if (controller.getSqrSize() > max) {
 						middle = (int) (scrollPane.getViewport().getExtentSize().getWidth());
 						// nova posição após zoom
 						novo = new Point((viewPort.x - (middle - mouseLoc.x)) / 2,
@@ -1178,8 +1282,8 @@ public class AppRun extends JFrame {
 
 		// determina o idioma
 		setLanguage(controller.getLanguage(), controller);
-		// desenha a matriz
-		controller.drawMatriz(squares);
+		// ajusta a escala, caso necessário
+		fixScale(controller);
 		// atualiza os contadores de estados
 		statesAmount = controller.countStates();
 		updateTexts(controller);
