@@ -1,5 +1,5 @@
 /*******************************************************************************
- * 	Autcel, a tool for editing and simulating cellular automatons.
+ * 	ESACEL, a tool for editing and simulating cellular automatons.
  *     Copyright (C) 2017 Madson Paulo Alexandre da Silva
  *
  *     This program is free software: you can redistribute it and/or modify
@@ -25,7 +25,7 @@ import java.awt.Font;
 import java.util.ArrayList;
 
 /**
- * Guarda configurações básicas
+ * Keeps basic configurations
  * 
  * @author Madson
  *
@@ -43,14 +43,14 @@ public class AppConfig {
 	public Font boldFont;
 	public Font normalFont;
 	public ArrayList<int[][]> vectorSaver;
-	public ArrayList<int[]> regras;
-	public ArrayList<int[]> regrasJogoDaVida;
-	public ArrayList<int[]> regrasCristaisDeUlam;
-	public ArrayList<int[]> regra614;
+	public ArrayList<int[]> rules;
+	public ArrayList<int[]> rulesGameOfLife;
+	public ArrayList<int[]> rulesUlamCrystals;
+	public ArrayList<int[]> rules614;
 	public int vector[][];
-	public int tamVector;
+	public int vectorSize;
 	public int activeStates;
-	public int cicloAtual;
+	public int currentCycle;
 	public int maxStateNameSize;
 	public int sqrSize;
 	public int language;
@@ -67,7 +67,7 @@ public class AppConfig {
 
 	public AppConfig() {
 		super();
-		// cor dos estados
+		// color of the states
 		this.color1 = Color.WHITE;
 		this.color2 = Color.GRAY;
 		this.color3 = Color.BLUE;
@@ -76,18 +76,19 @@ public class AppConfig {
 		this.color6 = Color.CYAN;
 		this.color7 = Color.MAGENTA;
 		this.color8 = Color.LIGHT_GRAY;
-		// fontes padrão
+		// standard fonts
 		this.boldFont = new Font("Calibri", Font.BOLD, 14);
 		this.normalFont = new Font("Calibri", Font.PLAIN, 14);
-		// tamanho do vetor, grid
-		this.tamVector = 160;
-		this.vector = new int[tamVector][tamVector];
-		// salva o grid a cada ciclo, permitindo voltar para ciclo anterior
+		// size of the vector
+		this.vectorSize = 160;
+		this.vector = new int[vectorSize][vectorSize];
+		// saves the matrix of each cycle, allowing to go back to a previous
+		// cycle
 		this.vectorSaver = new ArrayList<>();
-		// por padrão, inicia com 2 estados possíveis
+		// number of active states
 		this.activeStates = 2;
-		this.cicloAtual = 0;
-		// nome padrão dos estados
+		this.currentCycle = 0;
+		// standard name for the states
 		this.nameState1 = "State 01";
 		this.nameState2 = "State 02";
 		this.nameState3 = "State 03";
@@ -96,33 +97,34 @@ public class AppConfig {
 		this.nameState6 = "State 06";
 		this.nameState7 = "State 07";
 		this.nameState8 = "State 08";
-		// guardará as regras do autômato
-		this.regras = new ArrayList<>();
-		// tamanho máximo do nome de um estado
+		// rules of the automaton
+		this.rules = new ArrayList<>();
+		// maximum size of the name of a state
 		this.maxStateNameSize = 12;
-		// tipo de vizinhança
+		// standard neighborwood type
 		this.neighborwoodType = 0;
-		// é tipo de regra totalista exterior
+		// if is outer totalistic
 		this.outerTotalistic = 0;
-		// escala inicial padrão
+		// scale
 		this.sqrSize = 8;
-		// idioma inicial padrão
-		this.language = 1;// 0: Português, 1: Inglês
-		// regras do jogo da vida
-		this.regrasJogoDaVida = new ArrayList<>();
-		this.regrasJogoDaVida.add(new int[] { 0, 2, 1, 1, 3 });
-		this.regrasJogoDaVida.add(new int[] { 1, 4, 0, 1, 2 });
-		this.regrasJogoDaVida.add(new int[] { 1, 1, 0, 1, 3 });
-		// regras de cristais de ulam
-		this.regrasCristaisDeUlam = new ArrayList<>();
-		this.regrasCristaisDeUlam.add(new int[] { 0, 2, 1, 1, 1 });
-		/// regra 614
-		this.regra614 = new ArrayList<>();
-		this.regra614.add(new int[] { 0, 2, 1, 1, 1 });
-		this.regra614.add(new int[] { 0, 2, 1, 1, 3 });
-		this.regra614.add(new int[] { 0, 2, 1, 1, 5 });
-		this.regra614.add(new int[] { 1, 2, 0, 1, 0 });
-		this.regra614.add(new int[] { 1, 2, 0, 1, 2 });
-		this.regra614.add(new int[] { 1, 2, 0, 1, 4 });
+		// standard language
+		// TODO Implement Internacionalization
+		this.language = 1;// 0: Portuguese, 1: English
+		// Game of Life rules
+		this.rulesGameOfLife = new ArrayList<>();
+		this.rulesGameOfLife.add(new int[] { 0, 2, 1, 1, 3 });
+		this.rulesGameOfLife.add(new int[] { 1, 4, 0, 1, 2 });
+		this.rulesGameOfLife.add(new int[] { 1, 1, 0, 1, 3 });
+		// Ulam's Crystals rules
+		this.rulesUlamCrystals = new ArrayList<>();
+		this.rulesUlamCrystals.add(new int[] { 0, 2, 1, 1, 1 });
+		/// rules of Rule 614
+		this.rules614 = new ArrayList<>();
+		this.rules614.add(new int[] { 0, 2, 1, 1, 1 });
+		this.rules614.add(new int[] { 0, 2, 1, 1, 3 });
+		this.rules614.add(new int[] { 0, 2, 1, 1, 5 });
+		this.rules614.add(new int[] { 1, 2, 0, 1, 0 });
+		this.rules614.add(new int[] { 1, 2, 0, 1, 2 });
+		this.rules614.add(new int[] { 1, 2, 0, 1, 4 });
 	}
 }

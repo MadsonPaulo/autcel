@@ -1,5 +1,5 @@
 /*******************************************************************************
- * 	Autcel, a tool for editing and simulating cellular automatons.
+ * 	ESACEL, a tool for editing and simulating cellular automatons.
  *     Copyright (C) 2017 Madson Paulo Alexandre da Silva
  *
  *     This program is free software: you can redistribute it and/or modify
@@ -71,36 +71,36 @@ public class AppConfigAutomaton extends JFrame {
 	private static final long serialVersionUID = 1L;
 	private JPanel contentPane;
 	private DrawSquare squares2;
-	private JComboBox<String> estadosPossiveisComboBox;
+	private JComboBox<String> possibleStatesComboBox;
 	private JTextArea infoTxtArea = new JTextArea();
-	private String mensagemInicialTxtArea = "";
+	private String initialMsgTxtArea = "";
 	private JSpinner densitySpinner = new JSpinner();
-	private JTextField txtEstado1;
-	private JTextField txtEstado2;
-	private JTextField txtEstado3;
-	private JTextField txtEstado4;
-	private JTextField txtEstado5;
-	private JTextField txtEstado6;
-	private JTextField txtEstado7;
-	private JTextField txtEstado8;
-	private JLabel lblCor1 = new JLabel();
-	private JLabel lblCor2 = new JLabel();
-	private JLabel lblCor3 = new JLabel();
-	private JLabel lblCor4 = new JLabel();
-	private JLabel lblCor5 = new JLabel();
-	private JLabel lblCor6 = new JLabel();
-	private JLabel lblCor7 = new JLabel();
-	private JLabel lblCor8 = new JLabel();
-	private JLabel lblEstadosPossveis = new JLabel();
-	private JLabel lblEscala = new JLabel();
+	private JTextField txtState1;
+	private JTextField txtState2;
+	private JTextField txtState3;
+	private JTextField txtState4;
+	private JTextField txtState5;
+	private JTextField txtState6;
+	private JTextField txtState7;
+	private JTextField txtState8;
+	private JLabel lblColor1 = new JLabel();
+	private JLabel lblColor2 = new JLabel();
+	private JLabel lblColor3 = new JLabel();
+	private JLabel lblColor4 = new JLabel();
+	private JLabel lblColor5 = new JLabel();
+	private JLabel lblColor6 = new JLabel();
+	private JLabel lblColor7 = new JLabel();
+	private JLabel lblColor8 = new JLabel();
+	private JLabel lblPossibleStates = new JLabel();
+	private JLabel lblScale = new JLabel();
 	private JLabel lblCoord = new JLabel("[0, 0]");
-	private JMenu mnArquivo = new JMenu();
+	private JMenu mnFile = new JMenu();
 	private JMenu mnchangeSize = new JMenu();
-	private JMenu mnImportar = new JMenu();
-	private JMenu mnModelos = new JMenu();
-	private JMenu mnPrerncias = new JMenu();
-	private JMenu mnIdioma = new JMenu();
-	private JMenu mnAjuda = new JMenu();
+	private JMenu mnImport = new JMenu();
+	private JMenu mnModels = new JMenu();
+	private JMenu mnPrefs = new JMenu();
+	private JMenu mnLanguage = new JMenu();
+	private JMenu mnHelp = new JMenu();
 	private JMenu mnNavigation = new JMenu();
 	private JMenu mnNew = new JMenu();
 	private JMenuItem mntmNew20 = new JMenuItem();
@@ -118,24 +118,24 @@ public class AppConfigAutomaton extends JFrame {
 	private JMenuItem mntmNWest = new JMenuItem();
 	private JMenuItem mntmSEast = new JMenuItem();
 	private JMenuItem mntmSWest = new JMenuItem();
-	private JMenuItem mntmExportar = new JMenuItem();
-	private JMenuItem mntmProcurar = new JMenuItem();
+	private JMenuItem mntmExport = new JMenuItem();
+	private JMenuItem mntmSearch = new JMenuItem();
 	private JMenuItem mntmManual = new JMenuItem();
-	private JMenuItem mntmSobre = new JMenuItem();
-	private JMenuItem mntmPortugus = new JMenuItem();
+	private JMenuItem mntmAbout = new JMenuItem();
+	private JMenuItem mntmPortuguese = new JMenuItem();
 	private JMenuItem mntmEnglish = new JMenuItem();
-	private JMenuItem mntmSair = new JMenuItem();
+	private JMenuItem mntmExit = new JMenuItem();
 	private JMenuItem prefab1 = new JMenuItem("Conway's Game of Life");
 	private JMenuItem prefab2 = new JMenuItem("Ulam's Crystals");
 	private JMenuItem prefab3 = new JMenuItem("Rule 614");
 	private JMenuItem prefab4 = new JMenuItem("Tsunami");
-	private JButton btnImportar = new JButton();
-	private JButton btnLimpar = new JButton();
-	private JButton btnExportar = new JButton();
+	private JButton btnImport = new JButton();
+	private JButton btnClean = new JButton();
+	private JButton btnExport = new JButton();
 	private JButton btnRules = new JButton();
 	private JButton btnExecution = new JButton();
 	private JButton btnRandomize = new JButton();
-	// temporários, usados para desenhar
+	// temps, used to draw
 	private int x;
 	private int y;
 	private int state;
@@ -143,36 +143,39 @@ public class AppConfigAutomaton extends JFrame {
 	private JScrollPane scrollPane;
 
 	/**
+	 * Checks if the nomes of the 8 states are valid
+	 * 
 	 * Author: Madson
 	 * 
-	 * @return 'false' caso algum dos 8 txtEstado seja vazio ou formado apenas
-	 *         por espaços, 'true' caso contrário
+	 * @return 'false' if any of the 8 state names if empty or made of spaces,
+	 *         'true' otherwise
 	 */
-	private boolean areTxtEstadosValid() {
-		// checa quais estados estão ativos
-		int estadosPossiveis = Integer.parseInt(estadosPossiveisComboBox.getSelectedItem().toString());
-		// arrayList com os campos de texto dos estados ativos
-		ArrayList<JTextField> campos = new ArrayList<>();
-		switch (estadosPossiveis) {
+	private boolean checkStateNames() {
+		// checks how many states are active
+		int possibleStates = Integer.parseInt(possibleStatesComboBox.getSelectedItem().toString());
+		// ArrayList with the fields of the active states, to check only the
+		// active ones
+		ArrayList<JTextField> arrayFields = new ArrayList<>();
+		switch (possibleStates) {
 		case 8:
-			campos.add(txtEstado8);
+			arrayFields.add(txtState8);
 		case 7:
-			campos.add(txtEstado7);
+			arrayFields.add(txtState7);
 		case 6:
-			campos.add(txtEstado6);
+			arrayFields.add(txtState6);
 		case 5:
-			campos.add(txtEstado5);
+			arrayFields.add(txtState5);
 		case 4:
-			campos.add(txtEstado4);
+			arrayFields.add(txtState4);
 		case 3:
-			campos.add(txtEstado3);
+			arrayFields.add(txtState3);
 		case 2:
-			campos.add(txtEstado2);
-			campos.add(txtEstado1);
+			arrayFields.add(txtState2);
+			arrayFields.add(txtState1);
 		}
-		// verifica se é vario ou formado por espaços em branco
-		for (int i = 0; i < campos.size(); i++) {
-			if (campos.get(i).getText().isEmpty() || campos.get(i).getText().trim().length() == 0) {
+		// verifies if its empty or made only with blanks
+		for (int i = 0; i < arrayFields.size(); i++) {
+			if (arrayFields.get(i).getText().trim().isEmpty()) {
 				return false;
 			}
 		}
@@ -180,31 +183,32 @@ public class AppConfigAutomaton extends JFrame {
 	}
 
 	/**
-	 * Atualiza os contadores de população
+	 * Update the population counters
 	 * 
 	 * Author: Madson
 	 */
 	private void updateTexts() {
-		lblCor1.setHorizontalAlignment(SwingConstants.RIGHT);
-		lblCor1.setText(NumberFormat.getIntegerInstance().format(statesAmount[0]));
-		lblCor2.setHorizontalAlignment(SwingConstants.RIGHT);
-		lblCor2.setText(NumberFormat.getIntegerInstance().format(statesAmount[1]));
-		lblCor3.setHorizontalAlignment(SwingConstants.RIGHT);
-		lblCor3.setText(NumberFormat.getIntegerInstance().format(statesAmount[2]));
-		lblCor4.setHorizontalAlignment(SwingConstants.RIGHT);
-		lblCor4.setText(NumberFormat.getIntegerInstance().format(statesAmount[3]));
-		lblCor5.setHorizontalAlignment(SwingConstants.RIGHT);
-		lblCor5.setText(NumberFormat.getIntegerInstance().format(statesAmount[4]));
-		lblCor6.setHorizontalAlignment(SwingConstants.RIGHT);
-		lblCor6.setText(NumberFormat.getIntegerInstance().format(statesAmount[5]));
-		lblCor7.setHorizontalAlignment(SwingConstants.RIGHT);
-		lblCor7.setText(NumberFormat.getIntegerInstance().format(statesAmount[6]));
-		lblCor8.setHorizontalAlignment(SwingConstants.RIGHT);
-		lblCor8.setText(NumberFormat.getIntegerInstance().format(statesAmount[7]));
+		lblColor1.setHorizontalAlignment(SwingConstants.RIGHT);
+		lblColor1.setText(NumberFormat.getIntegerInstance().format(statesAmount[0]));
+		lblColor2.setHorizontalAlignment(SwingConstants.RIGHT);
+		lblColor2.setText(NumberFormat.getIntegerInstance().format(statesAmount[1]));
+		lblColor3.setHorizontalAlignment(SwingConstants.RIGHT);
+		lblColor3.setText(NumberFormat.getIntegerInstance().format(statesAmount[2]));
+		lblColor4.setHorizontalAlignment(SwingConstants.RIGHT);
+		lblColor4.setText(NumberFormat.getIntegerInstance().format(statesAmount[3]));
+		lblColor5.setHorizontalAlignment(SwingConstants.RIGHT);
+		lblColor5.setText(NumberFormat.getIntegerInstance().format(statesAmount[4]));
+		lblColor6.setHorizontalAlignment(SwingConstants.RIGHT);
+		lblColor6.setText(NumberFormat.getIntegerInstance().format(statesAmount[5]));
+		lblColor7.setHorizontalAlignment(SwingConstants.RIGHT);
+		lblColor7.setText(NumberFormat.getIntegerInstance().format(statesAmount[6]));
+		lblColor8.setHorizontalAlignment(SwingConstants.RIGHT);
+		lblColor8.setText(NumberFormat.getIntegerInstance().format(statesAmount[7]));
 	}
 
 	/**
-	 * Atualiza a cor da fonte dos contadores de população
+	 * Updates the font color of the population counters to make sure the number
+	 * is visible, based on the state color
 	 * 
 	 * Author: Madson
 	 * 
@@ -212,7 +216,7 @@ public class AppConfigAutomaton extends JFrame {
 	 */
 	private void updatePopBackground(AppController contr) {
 		Color[] colors = contr.getArrayOfCollors();
-		JLabel[] labels = { lblCor1, lblCor2, lblCor3, lblCor4, lblCor5, lblCor6, lblCor7, lblCor8 };
+		JLabel[] labels = { lblColor1, lblColor2, lblColor3, lblColor4, lblColor5, lblColor6, lblColor7, lblColor8 };
 		for (int i = 0; i < colors.length; i++) {
 			if (colors[i] == Color.GRAY || colors[i] == Color.BLUE || colors[i] == Color.RED) {
 				labels[i].setForeground(Color.WHITE);
@@ -222,14 +226,22 @@ public class AppConfigAutomaton extends JFrame {
 		}
 	}
 
+	/**
+	 * Changes the color of a state
+	 * 
+	 * Author: Madson
+	 * 
+	 * @param state
+	 * @param contr
+	 */
 	private void changeColor(int state, AppController contr) {
-		// array de cores
+		// array of colors
 		Color[] colors = { Color.WHITE, Color.GRAY, Color.BLUE, Color.RED, Color.YELLOW, Color.CYAN, Color.MAGENTA,
 				Color.LIGHT_GRAY };
-		// array de nome de cores
+		// array of state names
 		String[] words = { "Escolha a nova cor", "Alterar Cor", "Branco", "Cinza", "Azul", "Vermelho", "Amarelo",
 				"Ciano", "Rosa", "Cinza Claro" };
-		// tradução
+		// translation
 		if (contr.getLanguage() == 1) {
 			words[0] = "Change the new color";
 			words[1] = "Change Color";
@@ -242,130 +254,129 @@ public class AppConfigAutomaton extends JFrame {
 			words[8] = "Pink";
 			words[9] = "Light Gray";
 		}
-		// opções do joptionpane
+		// options of the JOptionpane
 		String[] options = { words[2], words[3], words[4], words[5], words[6], words[7], words[8], words[9] };
-		Object res = JOptionPane.showInputDialog(null, words[0], words[1], JOptionPane.PLAIN_MESSAGE, null, options,
+		Object choice = JOptionPane.showInputDialog(null, words[0], words[1], JOptionPane.PLAIN_MESSAGE, null, options,
 				"");
 
-		if (res != null) {
+		if (choice != null) {
 			int selectedIndex = -1;
-			// descobre qual o índice da escolha
+			// discovers which is the index of the choice
 			for (int i = 0; i < options.length; i++) {
-				if (options[i].equals(res)) {
+				if (options[i].equals(choice)) {
 					selectedIndex = i;
 					break;
 				}
 			}
-			// se a cor escolhida for diferente da atual
+			// if the chosen color is different from the current
 			if (colors[selectedIndex] != contr.getArrayOfCollors()[state]) {
-				int posNew = 0;
+				int newPos = 0;
 				Color[] currentColors = contr.getArrayOfCollors();
 				for (int i = 0; i < currentColors.length; i++) {
 					if (currentColors[i] == colors[selectedIndex]) {
-						posNew = i;
+						newPos = i;
 						break;
 					}
 				}
-				// salva a cor atual e faz SWAP
+				// saves the current color and SWAPs it
 				Color tempColor = currentColors[state];
 				contr.setColor(colors[selectedIndex], state);
-				contr.setColor(tempColor, posNew);
-				// altera a cor dos labels
-				lblCor1.setBackground(contr.getArrayOfCollors()[0]);
-				lblCor2.setBackground(contr.getArrayOfCollors()[1]);
-				lblCor3.setBackground(contr.getArrayOfCollors()[2]);
-				lblCor4.setBackground(contr.getArrayOfCollors()[3]);
-				lblCor5.setBackground(contr.getArrayOfCollors()[4]);
-				lblCor6.setBackground(contr.getArrayOfCollors()[5]);
-				lblCor7.setBackground(contr.getArrayOfCollors()[6]);
-				lblCor8.setBackground(contr.getArrayOfCollors()[7]);
-				// atualiza o grid
+				contr.setColor(tempColor, newPos);
+				// changes the color of the labels
+				lblColor1.setBackground(contr.getArrayOfCollors()[0]);
+				lblColor2.setBackground(contr.getArrayOfCollors()[1]);
+				lblColor3.setBackground(contr.getArrayOfCollors()[2]);
+				lblColor4.setBackground(contr.getArrayOfCollors()[3]);
+				lblColor5.setBackground(contr.getArrayOfCollors()[4]);
+				lblColor6.setBackground(contr.getArrayOfCollors()[5]);
+				lblColor7.setBackground(contr.getArrayOfCollors()[6]);
+				lblColor8.setBackground(contr.getArrayOfCollors()[7]);
+				// updates the grid
 				contr.drawMatriz(squares2);
 				repaint();
 			}
 		}
-		// altera a cor da fonte da população
+		// changes the color of the population counter's font
 		updatePopBackground(contr);
 	}
 
 	/**
-	 * Tenta importar configurações. Se obtiver sucesso, fecha a tela atual e
-	 * abre a tela de execução
+	 * Tries to import configurations. If succeed,closes the current screen and
+	 * opens the execution screen
 	 * 
 	 * Author: Madson
 	 * 
 	 * @param contr
-	 *            controller
 	 */
 	private void importData(AppController contr) {
-		// se obtiver sucesso em importar as configurações do autômato
 		if (contr.importData()) {
-			// cria uma nova instância de execução
+			// creates a new instance of execution
 			AppRun run = new AppRun(contr);
-			// torna a nova instância visível
+			// turns the new instance visible
 			run.setVisible(true);
-			// encerra a instância atual
+			// disposes of the current instance
 			dispose();
 		}
 	}
 
 	/**
-	 * Desfaz as alterações feitas e reseta a matriz
+	 * Undo the changes made and clean the matrix
 	 * 
 	 * Author: Madson
 	 * 
 	 * @param contr
 	 */
 	private void cleanData(AppController contr) {
-		// renomeia estados
-		txtEstado1.setText(contr.getNameState1());
-		txtEstado2.setText(contr.getNameState2());
-		txtEstado3.setText(contr.getNameState3());
-		txtEstado4.setText(contr.getNameState4());
-		txtEstado5.setText(contr.getNameState5());
-		txtEstado6.setText(contr.getNameState6());
-		txtEstado7.setText(contr.getNameState7());
-		txtEstado8.setText(contr.getNameState8());
-		// reseta a matriz
+		// rename the states
+		txtState1.setText(contr.getNameState1());
+		txtState2.setText(contr.getNameState2());
+		txtState3.setText(contr.getNameState3());
+		txtState4.setText(contr.getNameState4());
+		txtState5.setText(contr.getNameState5());
+		txtState6.setText(contr.getNameState6());
+		txtState7.setText(contr.getNameState7());
+		txtState8.setText(contr.getNameState8());
+		// resets the matrix
 		contr.resetVector();
-		// desenha a matriz
+		// draws a matrix
 		contr.drawMatriz(squares2);
 		repaint();
-		// reseta txtArea
-		infoTxtArea.setText(mensagemInicialTxtArea);
-		// atualiza os contadores de estados
+		// resets the infoTxtArea
+		infoTxtArea.setText(initialMsgTxtArea);
+		// updates the state counters
 		statesAmount = contr.countStates();
 		updateTexts();
 	}
 
+	// TODO Implement Internacionalization
 	/**
-	 * Altera o idioma
+	 * Changes the language
 	 * 
 	 * Author: Madson
 	 * 
 	 * @param value
-	 *            0:Português, 1 Inglês
+	 *            0:Portuguese, 1 English
 	 * @param contr
 	 */
 	private void setLanguage(int value, AppController contr) {
 		if (value == 0) {
-			// título
-			setTitle("Autcel: Configuração");
+			// title
+			setTitle("ESACEL: Configuração");
 			// menus
-			mnArquivo.setText("Arquivo");
-			mnImportar.setText("Importar");
-			mnModelos.setText("Modelos");
-			mnPrerncias.setText("Preferências");
-			mnIdioma.setText("Idioma");
-			mntmProcurar.setText("Procurar");
+			mnFile.setText("Arquivo");
+			mnImport.setText("Importar");
+			mnModels.setText("Modelos");
+			mnPrefs.setText("Preferências");
+			mnLanguage.setText("Idioma");
+			mntmSearch.setText("Procurar");
 			mnNew.setText("Novo Autômato");
-			mntmExportar.setText("Exportar");
-			mntmSair.setText("Sair");
-			mntmPortugus.setText("Português");
+			mntmExport.setText("Exportar");
+			mntmExit.setText("Sair");
+			mntmPortuguese.setText("Português");
 			mntmEnglish.setText("English");
 			mntmManual.setText("Manual de Uso");
-			mntmSobre.setText("Sobre o Autcel");
-			mnAjuda.setText("Ajuda");
+			mntmAbout.setText("Sobre o ESACEL");
+			mnHelp.setText("Ajuda");
 			mnNavigation.setText("Navegação");
 			mntmCenter.setText("Centro");
 			mntmNEast.setText("Nordeste");
@@ -373,37 +384,37 @@ public class AppConfigAutomaton extends JFrame {
 			mntmSEast.setText("Sudeste");
 			mntmSWest.setText("Sudoeste");
 			mnchangeSize.setText("Tamanho da Grade");
-			// botões
-			btnImportar.setText("Importar");
-			btnLimpar.setText("Limpar");
+			// buttons
+			btnImport.setText("Importar");
+			btnClean.setText("Limpar");
 			btnRules.setText("Regras");
 			btnExecution.setText("Execução");
-			btnExportar.setText("Exportar");
+			btnExport.setText("Exportar");
 			btnRandomize.setText("Pop. Aleatória");
 			// labels
-			lblEstadosPossveis.setText("Estados Possíveis");
+			lblPossibleStates.setText("Estados Possíveis");
 			updateScale(contr);
 			// textArea
-			mensagemInicialTxtArea = "Por favor, defina a quantidade e o nome dos estados poss\u00EDveis, assim como o estado inicial de cada célula.";
-			infoTxtArea.setText(mensagemInicialTxtArea);
+			initialMsgTxtArea = "Por favor, defina a quantidade e o nome dos estados poss\u00EDveis, assim como o estado inicial de cada célula.";
+			infoTxtArea.setText(initialMsgTxtArea);
 		} else if (value == 1) {
-			// título
-			setTitle("Autcel: Configuration");
+			// title
+			setTitle("ESACEL: Configuration");
 			// menus
-			mnArquivo.setText("File");
-			mnImportar.setText("Import");
-			mnModelos.setText("Templates");
-			mnPrerncias.setText("Settings");
-			mnIdioma.setText("Language");
-			mntmProcurar.setText("Search");
+			mnFile.setText("File");
+			mnImport.setText("Import");
+			mnModels.setText("Templates");
+			mnPrefs.setText("Settings");
+			mnLanguage.setText("Language");
+			mntmSearch.setText("Search");
 			mnNew.setText("New Automaton");
-			mntmExportar.setText("Export");
-			mntmSair.setText("Exit");
-			mntmPortugus.setText("Português");
+			mntmExport.setText("Export");
+			mntmExit.setText("Exit");
+			mntmPortuguese.setText("Português");
 			mntmEnglish.setText("English");
 			mntmManual.setText("User Manual");
-			mntmSobre.setText("About Autcel");
-			mnAjuda.setText("Help");
+			mntmAbout.setText("About ESACEL");
+			mnHelp.setText("Help");
 			mnNavigation.setText("Navigation");
 			mntmCenter.setText("Center");
 			mntmNEast.setText("North-East");
@@ -411,21 +422,21 @@ public class AppConfigAutomaton extends JFrame {
 			mntmSEast.setText("South-East");
 			mntmSWest.setText("South-West");
 			mnchangeSize.setText("Grid Size");
-			// botões
-			btnImportar.setText("Import");
-			btnLimpar.setText("Clean");
+			// buttons
+			btnImport.setText("Import");
+			btnClean.setText("Clean");
 			btnRules.setText("Rules");
 			btnExecution.setText("Execution");
-			btnExportar.setText("Export");
+			btnExport.setText("Export");
 			btnRandomize.setText("Random Pop.");
 			// labels
-			lblEstadosPossveis.setText("Possible States");
+			lblPossibleStates.setText("Possible States");
 			updateScale(contr);
 			// textArea
-			mensagemInicialTxtArea = "Please, define the number and name of possible states, as well as the initial state of each cell.";
-			infoTxtArea.setText(mensagemInicialTxtArea);
+			initialMsgTxtArea = "Please, define the number and name of possible states, as well as the initial state of each cell.";
+			infoTxtArea.setText(initialMsgTxtArea);
 		}
-		// independente do idioma
+		// language independent
 		mntmNew20.setText("20x20");
 		mntmNew40.setText("40x40");
 		mntmNew80.setText("80x80");
@@ -439,7 +450,7 @@ public class AppConfigAutomaton extends JFrame {
 	}
 
 	/**
-	 * Atualiza o texto da escala
+	 * updates the scale text
 	 * 
 	 * Author: Madson
 	 * 
@@ -447,168 +458,167 @@ public class AppConfigAutomaton extends JFrame {
 	 */
 	private void updateScale(AppController contr) {
 		if (contr.getLanguage() == 0) {
-			lblEscala.setText("Escala: 1:" + contr.getSqrSize());
+			lblScale.setText("Escala: 1:" + contr.getSqrSize());
 		} else if (contr.getLanguage() == 1) {
-			lblEscala.setText("Scale: 1:" + contr.getSqrSize());
+			lblScale.setText("Scale: 1:" + contr.getSqrSize());
 		}
 	}
 
 	/**
-	 * Salva o nome dos estados
+	 * Saves the name of the states
 	 * 
 	 * Author: Madson
 	 * 
 	 * @param controller
 	 */
 	private void saveStateNames(AppController controller) {
-		controller.setNameState1(txtEstado1.getText());
-		controller.setNameState2(txtEstado2.getText());
-		controller.setNameState3(txtEstado3.getText());
-		controller.setNameState4(txtEstado4.getText());
-		controller.setNameState5(txtEstado5.getText());
-		controller.setNameState6(txtEstado6.getText());
-		controller.setNameState7(txtEstado7.getText());
-		controller.setNameState8(txtEstado8.getText());
+		controller.setNameState1(txtState1.getText());
+		controller.setNameState2(txtState2.getText());
+		controller.setNameState3(txtState3.getText());
+		controller.setNameState4(txtState4.getText());
+		controller.setNameState5(txtState5.getText());
+		controller.setNameState6(txtState6.getText());
+		controller.setNameState7(txtState7.getText());
+		controller.setNameState8(txtState8.getText());
 	}
 
 	/**
+	 * Determinates which JTextField of state names are enabled
+	 * 
 	 * Author: Madson
 	 * 
-	 * @param ativos
-	 *            quantidade de estados possiveis
-	 * 
-	 *            Ativa ou desativa os txtEstado de acordo com a quantidade de
-	 *            estados possiveis
+	 * @param activeStates
+	 *            amount of possible states
 	 */
-	private void updateActiveStates(int ativos) {
-		switch (ativos) {
+	private void updateActiveStates(int activeStates) {
+		switch (activeStates) {
 		case 2:
-			txtEstado3.setEnabled(false);
-			txtEstado4.setEnabled(false);
-			txtEstado5.setEnabled(false);
-			txtEstado6.setEnabled(false);
-			txtEstado7.setEnabled(false);
-			txtEstado8.setEnabled(false);
+			txtState3.setEnabled(false);
+			txtState4.setEnabled(false);
+			txtState5.setEnabled(false);
+			txtState6.setEnabled(false);
+			txtState7.setEnabled(false);
+			txtState8.setEnabled(false);
 			break;
 		case 3:
-			txtEstado3.setEnabled(true);
-			txtEstado4.setEnabled(false);
-			txtEstado5.setEnabled(false);
-			txtEstado6.setEnabled(false);
-			txtEstado7.setEnabled(false);
-			txtEstado8.setEnabled(false);
+			txtState3.setEnabled(true);
+			txtState4.setEnabled(false);
+			txtState5.setEnabled(false);
+			txtState6.setEnabled(false);
+			txtState7.setEnabled(false);
+			txtState8.setEnabled(false);
 			break;
 		case 4:
-			txtEstado3.setEnabled(true);
-			txtEstado4.setEnabled(true);
-			txtEstado5.setEnabled(false);
-			txtEstado6.setEnabled(false);
-			txtEstado7.setEnabled(false);
-			txtEstado8.setEnabled(false);
+			txtState3.setEnabled(true);
+			txtState4.setEnabled(true);
+			txtState5.setEnabled(false);
+			txtState6.setEnabled(false);
+			txtState7.setEnabled(false);
+			txtState8.setEnabled(false);
 			break;
 		case 5:
-			txtEstado3.setEnabled(true);
-			txtEstado4.setEnabled(true);
-			txtEstado5.setEnabled(true);
-			txtEstado6.setEnabled(false);
-			txtEstado7.setEnabled(false);
-			txtEstado8.setEnabled(false);
+			txtState3.setEnabled(true);
+			txtState4.setEnabled(true);
+			txtState5.setEnabled(true);
+			txtState6.setEnabled(false);
+			txtState7.setEnabled(false);
+			txtState8.setEnabled(false);
 			break;
 		case 6:
-			txtEstado3.setEnabled(true);
-			txtEstado4.setEnabled(true);
-			txtEstado5.setEnabled(true);
-			txtEstado6.setEnabled(true);
-			txtEstado7.setEnabled(false);
-			txtEstado8.setEnabled(false);
+			txtState3.setEnabled(true);
+			txtState4.setEnabled(true);
+			txtState5.setEnabled(true);
+			txtState6.setEnabled(true);
+			txtState7.setEnabled(false);
+			txtState8.setEnabled(false);
 			break;
 		case 7:
-			txtEstado3.setEnabled(true);
-			txtEstado4.setEnabled(true);
-			txtEstado5.setEnabled(true);
-			txtEstado6.setEnabled(true);
-			txtEstado7.setEnabled(true);
-			txtEstado8.setEnabled(false);
+			txtState3.setEnabled(true);
+			txtState4.setEnabled(true);
+			txtState5.setEnabled(true);
+			txtState6.setEnabled(true);
+			txtState7.setEnabled(true);
+			txtState8.setEnabled(false);
 			break;
 		case 8:
-			txtEstado3.setEnabled(true);
-			txtEstado4.setEnabled(true);
-			txtEstado5.setEnabled(true);
-			txtEstado6.setEnabled(true);
-			txtEstado7.setEnabled(true);
-			txtEstado8.setEnabled(true);
+			txtState3.setEnabled(true);
+			txtState4.setEnabled(true);
+			txtState5.setEnabled(true);
+			txtState6.setEnabled(true);
+			txtState7.setEnabled(true);
+			txtState8.setEnabled(true);
 			break;
 		default:
-			txtEstado3.setEnabled(true);
-			txtEstado4.setEnabled(true);
-			txtEstado5.setEnabled(true);
-			txtEstado6.setEnabled(true);
-			txtEstado7.setEnabled(true);
-			txtEstado8.setEnabled(true);
+			txtState3.setEnabled(true);
+			txtState4.setEnabled(true);
+			txtState5.setEnabled(true);
+			txtState6.setEnabled(true);
+			txtState7.setEnabled(true);
+			txtState8.setEnabled(true);
 		}
 	}
 
 	/**
-	 * Altera o foco dos scrolls para uma região específica
+	 * Changes the focus of the scrolls to a specified area
 	 * 
 	 * Author: Madson
 	 * 
 	 * @param area
 	 */
 	private void setFocus(int area) {
-		// limite da borda - extensão, ou seja, a distância que pode dar scroll
+		// limit of the border, the scrollable range
 		int maxLessExtent = scrollPane.getHorizontalScrollBar().getMaximum()
 				- scrollPane.getHorizontalScrollBar().getModel().getExtent();
 
-		if (area == 0) {// cetro
+		if (area == 0) {// center
 			scrollPane.getHorizontalScrollBar().setValue(maxLessExtent / 2);
 			scrollPane.getVerticalScrollBar().setValue(maxLessExtent / 2);
-		} else if (area == 1) {// nordeste
+		} else if (area == 1) {// north-east
 			scrollPane.getHorizontalScrollBar().setValue((int) (maxLessExtent * 1.0));
 			scrollPane.getVerticalScrollBar().setValue((int) (maxLessExtent * 0.0));
-		} else if (area == 2) {// noroeste
+		} else if (area == 2) {// north-west
 			scrollPane.getHorizontalScrollBar().setValue((int) (maxLessExtent * 0.0));
 			scrollPane.getVerticalScrollBar().setValue((int) (maxLessExtent * 0.0));
-		} else if (area == 3) {// sudeste
+		} else if (area == 3) {// south-east
 			scrollPane.getHorizontalScrollBar().setValue((int) (maxLessExtent * 1.0));
 			scrollPane.getVerticalScrollBar().setValue((int) (maxLessExtent * 1.0));
-		} else if (area == 4) {// sudoeste
+		} else if (area == 4) {// south-west
 			scrollPane.getHorizontalScrollBar().setValue((int) (maxLessExtent * 0.0));
 			scrollPane.getVerticalScrollBar().setValue((int) (maxLessExtent * 1.0));
 		}
 	}
 
 	/**
-	 * Conserta a escala quando há alteração no tamanho da matriz
+	 * Fix the scale when a change in the matrix size is made
 	 * 
 	 * Author: Madson
 	 */
 	private void fixScale(AppController contr) {
 		int size = 8;
-		if (contr.getTamVector() == 20) {
+		if (contr.getVectorSize() == 20) {
 			size = 32;
-		} else if (contr.getTamVector() == 40) {
+		} else if (contr.getVectorSize() == 40) {
 			size = 16;
-		} else if (contr.getTamVector() == 80) {
+		} else if (contr.getVectorSize() == 80) {
 			size = 8;
-		} else if (contr.getTamVector() == 160) {
+		} else if (contr.getVectorSize() == 160) {
 			size = 4;
-		} else if (contr.getTamVector() == 320) {
+		} else if (contr.getVectorSize() == 320) {
 			size = 2;
 		}
-		// altera a escala, tamanho dos quadrados
+		// changes the scale, size of the rectangles
 		contr.setSqrSize(size);
-		// atualiza as barras de scroll de squares
-		squares2.setPrefSize(contr.getSqrSize() * contr.getTamVector());
-		// atualiza o texto de escala
+		// updates the scroll bars
+		squares2.setPrefSize(contr.getSqrSize() * contr.getVectorSize());
+		// updates the scale text
 		updateScale(contr);
-		// redesenha o grid
+		// draws the matrix
 		contr.drawMatriz(squares2);
 		repaint();
 	}
 
 	public AppConfigAutomaton(AppController controller) {
-		// caso a janela seja movida, redesenha o grid
+		// if the window if moved, redraws the grid
 		addComponentListener(new ComponentAdapter() {
 			@Override
 			public void componentMoved(ComponentEvent arg0) {
@@ -624,60 +634,60 @@ public class AppConfigAutomaton extends JFrame {
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 860, 700);
 
-		// cria a barra de menu
+		// creates the menu bar
 		JMenuBar menuBar = new JMenuBar();
 		setJMenuBar(menuBar);
 		// separator
 		JSeparator separator = new JSeparator();
-		// inclusões
-		menuBar.add(mnArquivo);
-		mnArquivo.add(mnNew);
+		// inclusions
+		menuBar.add(mnFile);
+		mnFile.add(mnNew);
 		mnNew.add(mntmNew20);
 		mnNew.add(mntmNew40);
 		mnNew.add(mntmNew80);
 		mnNew.add(mntmNew160);
 		mnNew.add(mntmNew320);
-		mnArquivo.add(mnImportar);
-		mnImportar.add(mntmProcurar);
-		mnImportar.add(mnModelos);
-		mnModelos.add(prefab1);
-		mnModelos.add(prefab2);
-		mnModelos.add(prefab3);
-		mnModelos.add(prefab4);
-		mnArquivo.add(mntmExportar);
-		mnArquivo.add(separator);
-		mnArquivo.add(mntmSair);
+		mnFile.add(mnImport);
+		mnImport.add(mntmSearch);
+		mnImport.add(mnModels);
+		mnModels.add(prefab1);
+		mnModels.add(prefab2);
+		mnModels.add(prefab3);
+		mnModels.add(prefab4);
+		mnFile.add(mntmExport);
+		mnFile.add(separator);
+		mnFile.add(mntmExit);
 		menuBar.add(mnNavigation);
 		mnNavigation.add(mntmCenter);
 		mnNavigation.add(mntmNEast);
 		mnNavigation.add(mntmNWest);
 		mnNavigation.add(mntmSEast);
 		mnNavigation.add(mntmSWest);
-		menuBar.add(mnPrerncias);
-		mnPrerncias.add(mnchangeSize);
+		menuBar.add(mnPrefs);
+		mnPrefs.add(mnchangeSize);
 		mnchangeSize.add(mntmSize20);
 		mnchangeSize.add(mntmSize40);
 		mnchangeSize.add(mntmSize80);
 		mnchangeSize.add(mntmSize160);
 		mnchangeSize.add(mntmSize320);
-		mnPrerncias.add(mnIdioma);
-		mnIdioma.add(mntmPortugus);
-		mnIdioma.add(mntmEnglish);
-		menuBar.add(mnAjuda);
-		mnAjuda.add(mntmManual);
-		mnAjuda.add(mntmSobre);
-		// ícones
+		mnPrefs.add(mnLanguage);
+		mnLanguage.add(mntmPortuguese);
+		mnLanguage.add(mntmEnglish);
+		menuBar.add(mnHelp);
+		mnHelp.add(mntmManual);
+		mnHelp.add(mntmAbout);
+		// icons
 		mnNew.setIcon(new ImageIcon(AppConfigAutomaton.class.getResource("/img/plus.png")));
-		mnImportar.setIcon(new ImageIcon(AppConfigAutomaton.class.getResource("/img/import.gif")));
-		mntmExportar.setIcon(new ImageIcon(AppConfigAutomaton.class.getResource("/img/export.png")));
-		mntmSair.setIcon(new ImageIcon(AppConfigAutomaton.class.getResource("/img/exit.png")));
-		mnIdioma.setIcon(new ImageIcon(AppConfigAutomaton.class.getResource("/img/config.png")));
+		mnImport.setIcon(new ImageIcon(AppConfigAutomaton.class.getResource("/img/import.gif")));
+		mntmExport.setIcon(new ImageIcon(AppConfigAutomaton.class.getResource("/img/export.png")));
+		mntmExit.setIcon(new ImageIcon(AppConfigAutomaton.class.getResource("/img/exit.png")));
+		mnLanguage.setIcon(new ImageIcon(AppConfigAutomaton.class.getResource("/img/config.png")));
 		mnchangeSize.setIcon(new ImageIcon(AppConfigAutomaton.class.getResource("/img/size.png")));
-		mntmPortugus.setIcon(new ImageIcon(AppConfigAutomaton.class.getResource("/img/brasil.png")));
+		mntmPortuguese.setIcon(new ImageIcon(AppConfigAutomaton.class.getResource("/img/brasil.png")));
 		mntmEnglish.setIcon(new ImageIcon(AppConfigAutomaton.class.getResource("/img/United-States.png")));
-		mntmSobre.setIcon(new ImageIcon(AppConfigAutomaton.class.getResource("/img/main16x16.png")));
+		mntmAbout.setIcon(new ImageIcon(AppConfigAutomaton.class.getResource("/img/main16x16.png")));
 		mntmManual.setIcon(new ImageIcon(AppConfigAutomaton.class.getResource("/img/manual.png")));
-		// fonte dos menus
+		// menu fonts
 		mnNew.setFont(controller.getBoldFont());
 		mntmNew20.setFont(controller.getBoldFont());
 		mntmNew40.setFont(controller.getBoldFont());
@@ -689,62 +699,72 @@ public class AppConfigAutomaton extends JFrame {
 		mntmSize80.setFont(controller.getBoldFont());
 		mntmSize160.setFont(controller.getBoldFont());
 		mntmSize320.setFont(controller.getBoldFont());
-		mnArquivo.setFont(controller.getBoldFont());
-		mnImportar.setFont(controller.getBoldFont());
-		mnModelos.setFont(controller.getBoldFont());
-		mnPrerncias.setFont(controller.getBoldFont());
-		mnIdioma.setFont(controller.getBoldFont());
-		mnAjuda.setFont(controller.getBoldFont());
-		mntmExportar.setFont(controller.getBoldFont());
-		mntmProcurar.setFont(controller.getBoldFont());
+		mnFile.setFont(controller.getBoldFont());
+		mnImport.setFont(controller.getBoldFont());
+		mnModels.setFont(controller.getBoldFont());
+		mnPrefs.setFont(controller.getBoldFont());
+		mnLanguage.setFont(controller.getBoldFont());
+		mnHelp.setFont(controller.getBoldFont());
+		mntmExport.setFont(controller.getBoldFont());
+		mntmSearch.setFont(controller.getBoldFont());
 		mntmManual.setFont(controller.getBoldFont());
-		mntmSobre.setFont(controller.getBoldFont());
-		mntmPortugus.setFont(controller.getBoldFont());
+		mntmAbout.setFont(controller.getBoldFont());
+		mntmPortuguese.setFont(controller.getBoldFont());
 		mntmEnglish.setFont(controller.getBoldFont());
-		mntmSair.setFont(controller.getBoldFont());
+		mntmExit.setFont(controller.getBoldFont());
 		mnNavigation.setFont(controller.getBoldFont());
 		mntmCenter.setFont(controller.getBoldFont());
 		mntmNEast.setFont(controller.getBoldFont());
 		mntmNWest.setFont(controller.getBoldFont());
 		mntmSEast.setFont(controller.getBoldFont());
 		mntmSWest.setFont(controller.getBoldFont());
-		// atalhos
+		// shortcuts
 		mntmCenter.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F3, 0, true));
 		mntmNEast.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F1, 0, true));
 		mntmNWest.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F2, 0, true));
 		mntmSEast.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F4, 0, true));
 		mntmSWest.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F5, 0, true));
-		// desabilita um menu
-		mntmExportar.setEnabled(false);
-		// ações
+		// disables a menu
+		mntmExport.setEnabled(false);
+		// actions
 		mntmSize20.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				controller.changeTamVector(20);
+				controller.changeVectorSize(20);
 				fixScale(controller);
+				statesAmount = controller.countStates();
+				updateTexts();
 			}
 		});
 		mntmSize40.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				controller.changeTamVector(40);
+				controller.changeVectorSize(40);
 				fixScale(controller);
+				statesAmount = controller.countStates();
+				updateTexts();
 			}
 		});
 		mntmSize80.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				controller.changeTamVector(80);
+				controller.changeVectorSize(80);
 				fixScale(controller);
+				statesAmount = controller.countStates();
+				updateTexts();
 			}
 		});
 		mntmSize160.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				controller.changeTamVector(160);
+				controller.changeVectorSize(160);
 				fixScale(controller);
+				statesAmount = controller.countStates();
+				updateTexts();
 			}
 		});
 		mntmSize320.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				controller.changeTamVector(320);
+				controller.changeVectorSize(320);
 				fixScale(controller);
+				statesAmount = controller.countStates();
+				updateTexts();
 			}
 		});
 		mntmNew20.addActionListener(new ActionListener() {
@@ -782,17 +802,17 @@ public class AppConfigAutomaton extends JFrame {
 				dispose();
 			}
 		});
-		mntmProcurar.addActionListener(new ActionListener() {
+		mntmSearch.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				importData(controller);
 			}
 		});
-		mntmSair.addActionListener(new ActionListener() {
+		mntmExit.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				dispose();
 			}
 		});
-		mntmPortugus.addActionListener(new ActionListener() {
+		mntmPortuguese.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				if (controller.getLanguage() == 1) {
 					controller.setLanguage(0);
@@ -808,7 +828,7 @@ public class AppConfigAutomaton extends JFrame {
 				}
 			}
 		});
-		mntmSobre.addActionListener(new ActionListener() {
+		mntmAbout.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				controller.showAboutPopUp();
 			}
@@ -890,322 +910,321 @@ public class AppConfigAutomaton extends JFrame {
 		contentPane.add(configPanel);
 		configPanel.setLayout(null);
 
-		JPanel estadosPanel = new JPanel();
-		estadosPanel.setBounds(4, 186, 181, 284);
-		configPanel.add(estadosPanel);
-		estadosPanel.setBorder(new LineBorder(new Color(0, 0, 0)));
-		estadosPanel.setLayout(null);
+		JPanel statesPanel = new JPanel();
+		statesPanel.setBounds(4, 186, 181, 284);
+		configPanel.add(statesPanel);
+		statesPanel.setBorder(new LineBorder(new Color(0, 0, 0)));
+		statesPanel.setLayout(null);
 
-		JPanel esqPanel = new JPanel();
-		esqPanel.setBounds(1, 2, 111, 280);
-		estadosPanel.add(esqPanel);
-		esqPanel.setLayout(null);
-		lblEstadosPossveis.setHorizontalAlignment(SwingConstants.CENTER);
+		JPanel leftPanel = new JPanel();
+		leftPanel.setBounds(1, 2, 111, 280);
+		statesPanel.add(leftPanel);
+		leftPanel.setLayout(null);
+		lblPossibleStates.setHorizontalAlignment(SwingConstants.CENTER);
 
-		lblEstadosPossveis.setBounds(3, 10, 105, 20);
-		esqPanel.add(lblEstadosPossveis);
-		lblEstadosPossveis.setFont(controller.getBoldFont());
+		lblPossibleStates.setBounds(3, 10, 105, 20);
+		leftPanel.add(lblPossibleStates);
+		lblPossibleStates.setFont(controller.getBoldFont());
 
-		txtEstado1 = new JTextField();
-		txtEstado1.addKeyListener(new KeyAdapter() {
+		txtState1 = new JTextField();
+		txtState1.addKeyListener(new KeyAdapter() {
 			@Override
 			public void keyTyped(KeyEvent e) {
-				// checa se o nome não é maior que o tamanho limite
-				if (txtEstado1.getText().length() >= controller.getMaxStateNameSize()) {
-					txtEstado1.setText(txtEstado1.getText().substring(0, 11));
+				// checks if the name isn't longer than the size limit
+				if (txtState1.getText().length() >= controller.getMaxStateNameSize()) {
+					txtState1.setText(txtState1.getText().substring(0, 11));
 				}
 			}
 		});
-		txtEstado1.setFont(controller.getNormalFont());
-		txtEstado1.setHorizontalAlignment(SwingConstants.CENTER);
-		txtEstado1.setText(controller.getNameState1());
-		txtEstado1.setBounds(5, 40, 100, 20);
-		esqPanel.add(txtEstado1);
+		txtState1.setFont(controller.getNormalFont());
+		txtState1.setHorizontalAlignment(SwingConstants.CENTER);
+		txtState1.setText(controller.getNameState1());
+		txtState1.setBounds(5, 40, 100, 20);
+		leftPanel.add(txtState1);
 
-		txtEstado2 = new JTextField();
-		txtEstado2.addKeyListener(new KeyAdapter() {
+		txtState2 = new JTextField();
+		txtState2.addKeyListener(new KeyAdapter() {
 			@Override
 			public void keyTyped(KeyEvent e) {
-				// checa se o nome não é maior que o tamanho limite
-				if (txtEstado2.getText().length() >= controller.getMaxStateNameSize()) {
-					txtEstado2.setText(txtEstado2.getText().substring(0, 11));
+				// checks if the name isn't longer than the size limit
+				if (txtState2.getText().length() >= controller.getMaxStateNameSize()) {
+					txtState2.setText(txtState2.getText().substring(0, 11));
 				}
 			}
 		});
-		txtEstado2.setFont(controller.getNormalFont());
-		txtEstado2.setText(controller.getNameState2());
-		txtEstado2.setHorizontalAlignment(SwingConstants.CENTER);
-		txtEstado2.setBounds(5, 70, 100, 20);
-		esqPanel.add(txtEstado2);
+		txtState2.setFont(controller.getNormalFont());
+		txtState2.setText(controller.getNameState2());
+		txtState2.setHorizontalAlignment(SwingConstants.CENTER);
+		txtState2.setBounds(5, 70, 100, 20);
+		leftPanel.add(txtState2);
 
-		txtEstado3 = new JTextField();
-		txtEstado3.addKeyListener(new KeyAdapter() {
+		txtState3 = new JTextField();
+		txtState3.addKeyListener(new KeyAdapter() {
 			@Override
 			public void keyTyped(KeyEvent arg0) {
-				// checa se o nome não é maior que o tamanho limite
-				if (txtEstado3.getText().length() >= controller.getMaxStateNameSize()) {
-					txtEstado3.setText(txtEstado3.getText().substring(0, 11));
+				// checks if the name isn't longer than the size limit
+				if (txtState3.getText().length() >= controller.getMaxStateNameSize()) {
+					txtState3.setText(txtState3.getText().substring(0, 11));
 				}
 			}
 		});
-		txtEstado3.setText(controller.getNameState3());
-		txtEstado3.setFont(controller.getNormalFont());
-		txtEstado3.setHorizontalAlignment(SwingConstants.CENTER);
-		txtEstado3.setBounds(5, 100, 100, 20);
-		esqPanel.add(txtEstado3);
+		txtState3.setText(controller.getNameState3());
+		txtState3.setFont(controller.getNormalFont());
+		txtState3.setHorizontalAlignment(SwingConstants.CENTER);
+		txtState3.setBounds(5, 100, 100, 20);
+		leftPanel.add(txtState3);
 
-		txtEstado4 = new JTextField();
-		txtEstado4.addKeyListener(new KeyAdapter() {
+		txtState4 = new JTextField();
+		txtState4.addKeyListener(new KeyAdapter() {
 			@Override
 			public void keyTyped(KeyEvent e) {
-				// checa se o nome não é maior que o tamanho limite
-				if (txtEstado4.getText().length() >= controller.getMaxStateNameSize()) {
-					txtEstado4.setText(txtEstado4.getText().substring(0, 11));
+				// checks if the name isn't longer than the size limit
+				if (txtState4.getText().length() >= controller.getMaxStateNameSize()) {
+					txtState4.setText(txtState4.getText().substring(0, 11));
 				}
 			}
 		});
-		txtEstado4.setFont(controller.getNormalFont());
-		txtEstado4.setText(controller.getNameState4());
-		txtEstado4.setHorizontalAlignment(SwingConstants.CENTER);
-		txtEstado4.setBounds(5, 130, 100, 20);
-		esqPanel.add(txtEstado4);
+		txtState4.setFont(controller.getNormalFont());
+		txtState4.setText(controller.getNameState4());
+		txtState4.setHorizontalAlignment(SwingConstants.CENTER);
+		txtState4.setBounds(5, 130, 100, 20);
+		leftPanel.add(txtState4);
 
-		txtEstado5 = new JTextField();
-		txtEstado5.addKeyListener(new KeyAdapter() {
+		txtState5 = new JTextField();
+		txtState5.addKeyListener(new KeyAdapter() {
 			@Override
 			public void keyTyped(KeyEvent e) {
-				// checa se o nome não é maior que o tamanho limite
-				if (txtEstado5.getText().length() >= controller.getMaxStateNameSize()) {
-					txtEstado5.setText(txtEstado5.getText().substring(0, 11));
+				// checks if the name isn't longer than the size limit
+				if (txtState5.getText().length() >= controller.getMaxStateNameSize()) {
+					txtState5.setText(txtState5.getText().substring(0, 11));
 				}
 			}
 		});
-		txtEstado5.setFont(controller.getNormalFont());
-		txtEstado5.setText(controller.getNameState5());
-		txtEstado5.setHorizontalAlignment(SwingConstants.CENTER);
-		txtEstado5.setBounds(5, 160, 100, 20);
-		esqPanel.add(txtEstado5);
+		txtState5.setFont(controller.getNormalFont());
+		txtState5.setText(controller.getNameState5());
+		txtState5.setHorizontalAlignment(SwingConstants.CENTER);
+		txtState5.setBounds(5, 160, 100, 20);
+		leftPanel.add(txtState5);
 
-		txtEstado6 = new JTextField();
-		txtEstado6.addKeyListener(new KeyAdapter() {
+		txtState6 = new JTextField();
+		txtState6.addKeyListener(new KeyAdapter() {
 			@Override
 			public void keyTyped(KeyEvent e) {
-				// checa se o nome não é maior que o tamanho limite
-				if (txtEstado6.getText().length() >= controller.getMaxStateNameSize()) {
-					txtEstado6.setText(txtEstado6.getText().substring(0, 11));
+				// checks if the name isn't longer than the size limit
+				if (txtState6.getText().length() >= controller.getMaxStateNameSize()) {
+					txtState6.setText(txtState6.getText().substring(0, 11));
 				}
 			}
 		});
-		txtEstado6.setFont(controller.getNormalFont());
-		txtEstado6.setText(controller.getNameState6());
-		txtEstado6.setHorizontalAlignment(SwingConstants.CENTER);
-		txtEstado6.setBounds(5, 190, 100, 20);
-		esqPanel.add(txtEstado6);
+		txtState6.setFont(controller.getNormalFont());
+		txtState6.setText(controller.getNameState6());
+		txtState6.setHorizontalAlignment(SwingConstants.CENTER);
+		txtState6.setBounds(5, 190, 100, 20);
+		leftPanel.add(txtState6);
 
-		txtEstado7 = new JTextField();
-		txtEstado7.addKeyListener(new KeyAdapter() {
+		txtState7 = new JTextField();
+		txtState7.addKeyListener(new KeyAdapter() {
 			@Override
 			public void keyTyped(KeyEvent e) {
-				// checa se o nome não é maior que o tamanho limite
-				if (txtEstado7.getText().length() >= controller.getMaxStateNameSize()) {
-					txtEstado7.setText(txtEstado7.getText().substring(0, 11));
+				// checks if the name isn't longer than the size limit
+				if (txtState7.getText().length() >= controller.getMaxStateNameSize()) {
+					txtState7.setText(txtState7.getText().substring(0, 11));
 				}
 			}
 		});
-		txtEstado7.setFont(controller.getNormalFont());
-		txtEstado7.setText(controller.getNameState7());
-		txtEstado7.setHorizontalAlignment(SwingConstants.CENTER);
-		txtEstado7.setBounds(5, 220, 100, 20);
-		esqPanel.add(txtEstado7);
+		txtState7.setFont(controller.getNormalFont());
+		txtState7.setText(controller.getNameState7());
+		txtState7.setHorizontalAlignment(SwingConstants.CENTER);
+		txtState7.setBounds(5, 220, 100, 20);
+		leftPanel.add(txtState7);
 
-		txtEstado8 = new JTextField();
-		txtEstado8.addKeyListener(new KeyAdapter() {
+		txtState8 = new JTextField();
+		txtState8.addKeyListener(new KeyAdapter() {
 			@Override
 			public void keyTyped(KeyEvent arg0) {
-				// checa se o nome não é maior que o tamanho limite
-				if (txtEstado8.getText().length() >= controller.getMaxStateNameSize()) {
-					txtEstado8.setText(txtEstado8.getText().substring(0, 11));
+				// checks if the name isn't longer than the size limit
+				if (txtState8.getText().length() >= controller.getMaxStateNameSize()) {
+					txtState8.setText(txtState8.getText().substring(0, 11));
 				}
 			}
 		});
-		txtEstado8.setFont(controller.getNormalFont());
-		txtEstado8.setText(controller.getNameState8());
-		txtEstado8.setHorizontalAlignment(SwingConstants.CENTER);
-		txtEstado8.setBounds(5, 250, 100, 20);
-		esqPanel.add(txtEstado8);
+		txtState8.setFont(controller.getNormalFont());
+		txtState8.setText(controller.getNameState8());
+		txtState8.setHorizontalAlignment(SwingConstants.CENTER);
+		txtState8.setBounds(5, 250, 100, 20);
+		leftPanel.add(txtState8);
 
-		JPanel dirPanel = new JPanel();
-		dirPanel.setBounds(113, 2, 66, 280);
-		estadosPanel.add(dirPanel);
-		dirPanel.setLayout(null);
+		JPanel rightPanel = new JPanel();
+		rightPanel.setBounds(113, 2, 66, 280);
+		statesPanel.add(rightPanel);
+		rightPanel.setLayout(null);
 
-		estadosPossiveisComboBox = new JComboBox<String>();
-		estadosPossiveisComboBox.addActionListener(new ActionListener() {
+		possibleStatesComboBox = new JComboBox<String>();
+		possibleStatesComboBox.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				// altera quais estados estão ativos, habilitando ou
-				// desabilitando os componentes a estes relacionados
-				int ativos = Integer.parseInt((String) estadosPossiveisComboBox.getSelectedItem());
-				updateActiveStates(ativos);
-				controller.setActiveStates(ativos);
+				// changes which JTextfields of state names are enabled based on
+				// the possibleStatesComboBox selected amount
+				int numberOfActiveStates = Integer.parseInt((String) possibleStatesComboBox.getSelectedItem());
+				updateActiveStates(numberOfActiveStates);
+				controller.setActiveStates(numberOfActiveStates);
 			}
 		});
-		estadosPossiveisComboBox.setBounds(3, 10, 60, 20);
-		dirPanel.add(estadosPossiveisComboBox);
-		estadosPossiveisComboBox
+		possibleStatesComboBox.setBounds(3, 10, 60, 20);
+		rightPanel.add(possibleStatesComboBox);
+		possibleStatesComboBox
 				.setModel(new DefaultComboBoxModel<String>(new String[] { "2", "3", "4", "5", "6", "7", "8" }));
-		estadosPossiveisComboBox.setSelectedIndex(controller.getActiveStates() - 2);
+		possibleStatesComboBox.setSelectedIndex(controller.getActiveStates() - 2);
 
-		lblCor1.addMouseListener(new MouseAdapter() {
+		lblColor1.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent arg0) {
 				changeColor(0, controller);
 			}
 		});
-		lblCor1.setBounds(3, 40, 60, 20);
-		dirPanel.add(lblCor1);
-		lblCor1.setOpaque(true);
-		lblCor1.setBorder(new LineBorder(new Color(0, 0, 0)));
-		lblCor1.setBackground(controller.getColor(1));
+		lblColor1.setBounds(3, 40, 60, 20);
+		rightPanel.add(lblColor1);
+		lblColor1.setOpaque(true);
+		lblColor1.setBorder(new LineBorder(new Color(0, 0, 0)));
+		lblColor1.setBackground(controller.getColor(1));
 
-		lblCor2.addMouseListener(new MouseAdapter() {
+		lblColor2.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent arg0) {
 				changeColor(1, controller);
 			}
 		});
-		lblCor2.setBounds(3, 70, 60, 20);
-		dirPanel.add(lblCor2);
-		lblCor2.setOpaque(true);
-		lblCor2.setBorder(new LineBorder(new Color(0, 0, 0)));
-		lblCor2.setBackground(controller.getColor(2));
+		lblColor2.setBounds(3, 70, 60, 20);
+		rightPanel.add(lblColor2);
+		lblColor2.setOpaque(true);
+		lblColor2.setBorder(new LineBorder(new Color(0, 0, 0)));
+		lblColor2.setBackground(controller.getColor(2));
 
-		lblCor3.addMouseListener(new MouseAdapter() {
+		lblColor3.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
 				changeColor(2, controller);
 			}
 		});
-		lblCor3.setBounds(3, 100, 60, 20);
-		dirPanel.add(lblCor3);
-		lblCor3.setOpaque(true);
-		lblCor3.setBorder(new LineBorder(new Color(0, 0, 0)));
-		lblCor3.setBackground(controller.getColor(3));
+		lblColor3.setBounds(3, 100, 60, 20);
+		rightPanel.add(lblColor3);
+		lblColor3.setOpaque(true);
+		lblColor3.setBorder(new LineBorder(new Color(0, 0, 0)));
+		lblColor3.setBackground(controller.getColor(3));
 
-		lblCor4.addMouseListener(new MouseAdapter() {
+		lblColor4.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
 				changeColor(3, controller);
 			}
 		});
-		lblCor4.setBounds(3, 130, 60, 20);
-		dirPanel.add(lblCor4);
-		lblCor4.setOpaque(true);
-		lblCor4.setBorder(new LineBorder(new Color(0, 0, 0)));
-		lblCor4.setBackground(controller.getColor(4));
+		lblColor4.setBounds(3, 130, 60, 20);
+		rightPanel.add(lblColor4);
+		lblColor4.setOpaque(true);
+		lblColor4.setBorder(new LineBorder(new Color(0, 0, 0)));
+		lblColor4.setBackground(controller.getColor(4));
 
-		lblCor5.addMouseListener(new MouseAdapter() {
+		lblColor5.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
 				changeColor(4, controller);
 			}
 		});
-		lblCor5.setBounds(3, 160, 60, 20);
-		dirPanel.add(lblCor5);
-		lblCor5.setOpaque(true);
-		lblCor5.setBackground(controller.getColor(5));
-		lblCor5.setBorder(new LineBorder(new Color(0, 0, 0)));
+		lblColor5.setBounds(3, 160, 60, 20);
+		rightPanel.add(lblColor5);
+		lblColor5.setOpaque(true);
+		lblColor5.setBackground(controller.getColor(5));
+		lblColor5.setBorder(new LineBorder(new Color(0, 0, 0)));
 
-		lblCor6.addMouseListener(new MouseAdapter() {
+		lblColor6.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
 				changeColor(5, controller);
 			}
 		});
-		lblCor6.setBounds(3, 190, 60, 20);
-		dirPanel.add(lblCor6);
-		lblCor6.setOpaque(true);
-		lblCor6.setBorder(new LineBorder(new Color(0, 0, 0)));
-		lblCor6.setBackground(controller.getColor(6));
+		lblColor6.setBounds(3, 190, 60, 20);
+		rightPanel.add(lblColor6);
+		lblColor6.setOpaque(true);
+		lblColor6.setBorder(new LineBorder(new Color(0, 0, 0)));
+		lblColor6.setBackground(controller.getColor(6));
 
-		lblCor7.addMouseListener(new MouseAdapter() {
+		lblColor7.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
 				changeColor(6, controller);
 			}
 		});
-		lblCor7.setBounds(3, 220, 60, 20);
-		dirPanel.add(lblCor7);
-		lblCor7.setOpaque(true);
-		lblCor7.setBorder(new LineBorder(new Color(0, 0, 0)));
-		lblCor7.setBackground(controller.getColor(7));
+		lblColor7.setBounds(3, 220, 60, 20);
+		rightPanel.add(lblColor7);
+		lblColor7.setOpaque(true);
+		lblColor7.setBorder(new LineBorder(new Color(0, 0, 0)));
+		lblColor7.setBackground(controller.getColor(7));
 
-		lblCor8.addMouseListener(new MouseAdapter() {
+		lblColor8.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
 				changeColor(7, controller);
 			}
 		});
-		lblCor8.setBounds(3, 250, 60, 20);
-		dirPanel.add(lblCor8);
-		lblCor8.setOpaque(true);
-		lblCor8.setBorder(new LineBorder(new Color(0, 0, 0)));
-		lblCor8.setBackground(controller.getColor(8));
+		lblColor8.setBounds(3, 250, 60, 20);
+		rightPanel.add(lblColor8);
+		lblColor8.setOpaque(true);
+		lblColor8.setBorder(new LineBorder(new Color(0, 0, 0)));
+		lblColor8.setBackground(controller.getColor(8));
 
-		JPanel arquivoPanel = new JPanel();
-		arquivoPanel.setBounds(4, 6, 181, 70);
-		configPanel.add(arquivoPanel);
-		arquivoPanel.setBorder(new LineBorder(new Color(0, 0, 0)));
-		arquivoPanel.setLayout(null);
+		JPanel filePanel = new JPanel();
+		filePanel.setBounds(4, 6, 181, 70);
+		configPanel.add(filePanel);
+		filePanel.setBorder(new LineBorder(new Color(0, 0, 0)));
+		filePanel.setLayout(null);
 
-		btnImportar.setBounds(30, 10, 120, 20);
-		arquivoPanel.add(btnImportar);
-		btnImportar.setFont(controller.getBoldFont());
-		btnImportar.setFocusable(false);
-		btnImportar.setHorizontalTextPosition(SwingConstants.CENTER);
-		btnImportar.addActionListener(new ActionListener() {
+		btnImport.setBounds(30, 10, 120, 20);
+		filePanel.add(btnImport);
+		btnImport.setFont(controller.getBoldFont());
+		btnImport.setFocusable(false);
+		btnImport.setHorizontalTextPosition(SwingConstants.CENTER);
+		btnImport.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				importData(controller);
 			}
 		});
-		btnImportar.setAlignmentX(Component.CENTER_ALIGNMENT);
-		btnExportar.setBounds(30, 40, 120, 20);
+		btnImport.setAlignmentX(Component.CENTER_ALIGNMENT);
+		btnExport.setBounds(30, 40, 120, 20);
 
-		btnExportar.setEnabled(false);
-		arquivoPanel.add(btnExportar);
-		btnExportar.setFont(controller.getBoldFont());
-		btnExportar.setFocusable(false);
-		btnExportar.setHorizontalTextPosition(SwingConstants.CENTER);
-		btnExportar.setAlignmentX(Component.CENTER_ALIGNMENT);
+		btnExport.setEnabled(false);
+		filePanel.add(btnExport);
+		btnExport.setFont(controller.getBoldFont());
+		btnExport.setFocusable(false);
+		btnExport.setHorizontalTextPosition(SwingConstants.CENTER);
+		btnExport.setAlignmentX(Component.CENTER_ALIGNMENT);
 
 		btnRules.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				// checa se os nomes dos estados são válidos
-				if (areTxtEstadosValid() == false) {
-					// se forem inválidos, informa mensagem de erro
+				// checks if the name of the states are valid
+				if (checkStateNames() == false) {
+					// if they're invalid, show a message error
 					if (controller.getLanguage() == 0) {
 						infoTxtArea.setText("Não podem haver estados com nome vazio.");
 					} else if (controller.getLanguage() == 1) {
 						infoTxtArea.setText("There can be no empty state names.");
 					}
 				} else if (controller.areStatesValid(controller.getVector()) == false) {
-					// se houverem estados inválidos, informa mensagem de erro
+					// if there are invalid states, show a message error
 					if (controller.getLanguage() == 0) {
 						infoTxtArea.setText("Provavelmente há algum estado inválido, remova-o para continuar.");
 					} else if (controller.getLanguage() == 1) {
 						infoTxtArea.setText("Probably there is an invalid state, remove it to proceed.");
 					}
-					// se tudo estiver válido
+					// if everything is valid
 				} else {
-					// salva o nome atual dos estados
+					// save the actual name of the states
 					saveStateNames(controller);
-					// instancia a janela de regras
+					// instantiates the rules screen
 					AppConfigRules rules = new AppConfigRules(controller);
-					// torna a janela de regras visível
+					// show the rule screen
 					rules.setVisible(true);
-					// encerra a janela atual
+					// disposes the current screen
 					dispose();
 				}
-
 			}
 		});
 		btnRules.setFont(controller.getBoldFont());
@@ -1234,37 +1253,37 @@ public class AppConfigAutomaton extends JFrame {
 		configPanel.add(ZoomPanel);
 		ZoomPanel.setLayout(null);
 
-		lblEscala.setHorizontalAlignment(SwingConstants.CENTER);
-		lblEscala.setFont(controller.getNormalFont());
-		lblEscala.setBounds(14, 70, 70, 16);
-		ZoomPanel.add(lblEscala);
+		lblScale.setHorizontalAlignment(SwingConstants.CENTER);
+		lblScale.setFont(controller.getNormalFont());
+		lblScale.setBounds(14, 70, 70, 16);
+		ZoomPanel.add(lblScale);
 
 		lblCoord.setHorizontalAlignment(SwingConstants.CENTER);
 		lblCoord.setFont(controller.getNormalFont());
 		lblCoord.setBounds(98, 70, 66, 16);
 		ZoomPanel.add(lblCoord);
-		btnLimpar.setBounds(8, 40, 120, 20);
-		ZoomPanel.add(btnLimpar);
+		btnClean.setBounds(8, 40, 120, 20);
+		ZoomPanel.add(btnClean);
 
-		btnLimpar.addActionListener(new ActionListener() {
+		btnClean.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				cleanData(controller);
 			}
 		});
-		btnLimpar.setFocusable(false);
-		btnLimpar.setFont(controller.getBoldFont());
-		btnLimpar.setHorizontalTextPosition(SwingConstants.CENTER);
-		btnLimpar.setAlignmentX(Component.CENTER_ALIGNMENT);
+		btnClean.setFocusable(false);
+		btnClean.setFont(controller.getBoldFont());
+		btnClean.setHorizontalTextPosition(SwingConstants.CENTER);
+		btnClean.setAlignmentX(Component.CENTER_ALIGNMENT);
 		btnRandomize.setBounds(8, 10, 120, 20);
 		ZoomPanel.add(btnRandomize);
 
 		btnRandomize.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				// gera uma população aleatória
+				// generates a random population
 				Random r = new Random();
-				// quanto menor, maior a densidade
+				// the smaller, the more dense
 				int density = (int) densitySpinner.getValue();
-				// limpa o vetor
+				// cleans the vector
 				cleanData(controller);
 				for (int i = 0; i < controller.getVector().length;) {
 					for (int j = 0; j < controller.getVector().length;) {
@@ -1273,10 +1292,10 @@ public class AppConfigAutomaton extends JFrame {
 					}
 					i += r.nextInt(density);
 				}
-				// redesenha
+				// redraws
 				controller.drawMatriz(squares2);
 				repaint();
-				// atualiza os contadores de população
+				// update the population counters
 				statesAmount = controller.countStates();
 				updateTexts();
 			}
@@ -1298,19 +1317,18 @@ public class AppConfigAutomaton extends JFrame {
 				if (controller.getLanguage() == 1) {
 					error = "It is necessary to define the rules of the automaton before you can execute it.";
 				}
-				// se já existir alguma regra
-				if (controller.getRegras().size() > 0) {
-					// checa se os nomes dos estados são válidos
-					if (areTxtEstadosValid() == false) {
-						// se forem inválidos, informa mensagem de erro
+				// if there is already a rule created
+				if (controller.getRules().size() > 0) {
+					// checks if the name of the states are valid
+					if (checkStateNames() == false) {
+						// if they're invalid, shows an error message
 						if (controller.getLanguage() == 0) {
 							infoTxtArea.setText("Não podem haver estados com nome vazio.");
 						} else if (controller.getLanguage() == 1) {
 							infoTxtArea.setText("There can be no empty state names.");
 						}
 					} else if (controller.areStatesValid(controller.getVector()) == false) {
-						// se houverem estados inválidos, informa mensagem de
-						// erro
+						// if there are invalid states, show an error message
 						if (controller.getLanguage() == 0) {
 							infoTxtArea.setText(
 									"São necessários pelo menos dois estados diferentes para continuar. Caso hajam estados inválidos, remova-os.");
@@ -1318,15 +1336,15 @@ public class AppConfigAutomaton extends JFrame {
 							infoTxtArea.setText(
 									"It takes at least two different states to continue. If there are invalid states, remove them.");
 						}
-						// se tudo estiver válido
+						// if everything is valid
 					} else {
-						// salva o nome atual dos estados
+						// saves the name of the states
 						saveStateNames(controller);
-						// instancia a janela de execução
+						// instantiates the execution screen
 						AppRun execution = new AppRun(controller);
-						// torna a janela de execução visível
+						// turns the execution screen visible
 						execution.setVisible(true);
-						// encerra a janela atual
+						// disposes the current screen
 						dispose();
 					}
 				} else {
@@ -1341,80 +1359,78 @@ public class AppConfigAutomaton extends JFrame {
 
 		configPanel.add(btnExecution);
 
-		squares2 = new DrawSquare(controller.getSqrSize() * controller.getTamVector());
+		squares2 = new DrawSquare(controller.getSqrSize() * controller.getVectorSize());
 		squares2.addMouseMotionListener(new MouseMotionAdapter() {
 			@Override
 			public void mouseMoved(MouseEvent arg0) {
-				// razão entre a largura de squares2 e tamanho da matriz
-				double value = (squares2.getWidth() * 1.0) / controller.getTamVector();
-				// posição x e y do local clicado
+				// ratio between the width of squares and the size of the matrix
+				double value = (squares2.getWidth() * 1.0) / controller.getVectorSize();
+				// x and y positions of the clicked place
 				int posX = (int) Math.ceil(arg0.getX() / value) - 1;
 				int posY = (int) Math.ceil(arg0.getY() / value) - 1;
-				// nas extremidades, pode detectar -1
+				// it is possible to detect -1 in the borders
 				if (posX < 0) {
 					posX = 0;
 				}
 				if (posY < 0) {
 					posY = 0;
 				}
-				// nas extremidades, pode detectar valor acima do
-				// permitido
-				if (posX >= controller.getTamVector()) {
-					posX = controller.getTamVector() - 1;
+				// in the borders, its possible to detect values above the limit
+				if (posX >= controller.getVectorSize()) {
+					posX = controller.getVectorSize() - 1;
 				}
-				if (posY >= controller.getTamVector()) {
-					posY = controller.getTamVector() - 1;
+				if (posY >= controller.getVectorSize()) {
+					posY = controller.getVectorSize() - 1;
 				}
 				lblCoord.setText("[" + posY + ", " + posX + "]");
 			}
 
 			@Override
 			public void mouseDragged(MouseEvent arg0) {
-				// razão entre a largura de squares2 e tamanho da matriz
-				double value = (squares2.getWidth() * 1.0) / controller.getTamVector();
-				// posição x e y do local clicado
+				// ratio between the width of squares and the size of the matrix
+				double value = (squares2.getWidth() * 1.0) / controller.getVectorSize();
+				// x and y positions of the clicked place
 				int posX = (int) Math.ceil(arg0.getX() / value) - 1;
 				int posY = (int) Math.ceil(arg0.getY() / value) - 1;
-				// nas extremidades, pode detectar -1
+				// it is possible to detect -1 in the borders
 				if (posX < 0) {
 					posX = 0;
 				}
 				if (posY < 0) {
 					posY = 0;
 				}
-				// nas extremidades, pode detectar valor acima do
-				// permitido
-				if (posX >= controller.getTamVector()) {
-					posX = controller.getTamVector() - 1;
+				// in the borders, its possible to detect values above the limit
+				if (posX >= controller.getVectorSize()) {
+					posX = controller.getVectorSize() - 1;
 				}
-				if (posY >= controller.getTamVector()) {
-					posY = controller.getTamVector() - 1;
+				if (posY >= controller.getVectorSize()) {
+					posY = controller.getVectorSize() - 1;
 				}
-				// atualiza o label de coordenada
+				// updates the coordinates label
 				lblCoord.setText("[" + posY + ", " + posX + "]");
-				// se a coordenada for diferente da anterior
+				// if the coordinate is different from the previous
 				if (posX != x || posY != y) {
-					// altera o vetor na posição clicada
+					// changes the vector in the clicked position
 					if (SwingUtilities.isRightMouseButton(arg0)) {
-						// se foi utilizado o botão direito do mouse, muda para
-						// estado 0
+						// if right mouse button was used, change to first state
 						controller.getVector()[posY][posX] = 0;
 					} else {
-						// se foi utilizado o botão esquerdo, muda para o ultimo
-						// estado. Se o ultimo estado era 0, torna em 1
+						// if left mouse button was used, change to the last
+						// clicked state. If it were the first state, set to the
+						// second
 						if (state == 0) {
 							state = 1;
 						}
 						controller.getVector()[posY][posX] = state;
 					}
 
-					// redesenha a matriz
+					// redraws the matrix
 					controller.drawMatriz(squares2);
 					repaint();
-					// atualiza a posição salva
+					// updates the saved position
 					x = posX;
 					y = posY;
-					// atualiza os contadores de população
+					// updates the population counters
 					statesAmount = controller.countStates();
 					updateTexts();
 				}
@@ -1424,46 +1440,43 @@ public class AppConfigAutomaton extends JFrame {
 		squares2.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent arg0) {
-				// razão entre a largura de squares2 e tamanho da matriz
-				double value = (squares2.getWidth() * 1.0) / controller.getTamVector();
-				// posição x e y do local clicado
+				// ratio between the width of squares and the size of the matrix
+				double value = (squares2.getWidth() * 1.0) / controller.getVectorSize();
+				// x and y positions of the clicked place
 				int posX = (int) Math.ceil(arg0.getX() / value) - 1;
 				int posY = (int) Math.ceil(arg0.getY() / value) - 1;
-				// nas extremidades, pode detectar -1
+				// it is possible to detect -1 in the borders
 				if (posX < 0) {
 					posX = 0;
 				}
 				if (posY < 0) {
 					posY = 0;
 				}
-				// nas extremidades, pode detectar valor acima do
-				// permitido
-				if (posX >= controller.getTamVector()) {
-					posX = controller.getTamVector() - 1;
+				// in the borders, its possible to detect values above the limit
+				if (posX >= controller.getVectorSize()) {
+					posX = controller.getVectorSize() - 1;
 				}
-				if (posY >= controller.getTamVector()) {
-					posY = controller.getTamVector() - 1;
+				if (posY >= controller.getVectorSize()) {
+					posY = controller.getVectorSize() - 1;
 				}
-				// se foi utilizado o botão direito do mouse, muda para estado 0
+				// if right mouse button was used, change to first state
 				if (SwingUtilities.isRightMouseButton(arg0)) {
 					controller.getVector()[posY][posX] = 0;
-				} else {// clico com botão esquerdo
+				} else {// left mouse button used
 					// quantidade de estados ativos
-					int ativos = Integer.parseInt((String) estadosPossiveisComboBox.getSelectedItem());
-					// altera o vetor na posição clicada
+					int activeStates = Integer.parseInt((String) possibleStatesComboBox.getSelectedItem());
+					// changes the vector at the clicked position
 					controller.getVector()[posY][posX] = controller
-							.getNextStateValue(controller.getVector()[posY][posX], ativos);
-					// salva a posição do click e o estado, caso o usuário
-					// queira
-					// desenhar
+							.getNextStateValue(controller.getVector()[posY][posX], activeStates);
+					// saves the clicked position and the state
 					x = posX;
 					y = posY;
 					state = controller.getVector()[posY][posX];
 				}
-				// redesenha a matriz
+				// redraws the matrix
 				controller.drawMatriz(squares2);
 				repaint();
-				// atualiza os contadores de população
+				// updates the population counters
 				statesAmount = controller.countStates();
 				updateTexts();
 			}
@@ -1473,63 +1486,63 @@ public class AppConfigAutomaton extends JFrame {
 		scrollPane = new JScrollPane(squares2);
 		scrollPane.addMouseWheelListener(new MouseWheelListener() {
 			public void mouseWheelMoved(MouseWheelEvent arg0) {
-				// determina a metade do scroll
+				// determinates the middle of the scroll
 				int middle;
-				// posição do mouse
+				// position of the mouse
 				Point mouseLoc = arg0.getPoint();
-				// posição da view
+				// position of the view
 				Point viewPort = scrollPane.getViewport().getViewPosition();
-				Point novo;
+				Point positionAfterZoom;
 				if (arg0.getWheelRotation() >= 0) {// zoom out
-					// determina o zoom out máximo
+					// determinates the maximum zoom out
 					int max = 4;
-					if (controller.getTamVector() == 20) {
+					if (controller.getVectorSize() == 20) {
 						max = 32;
-					} else if (controller.getTamVector() == 40) {
+					} else if (controller.getVectorSize() == 40) {
 						max = 16;
-					} else if (controller.getTamVector() == 80) {
+					} else if (controller.getVectorSize() == 80) {
 						max = 8;
-					} else if (controller.getTamVector() == 160) {
+					} else if (controller.getVectorSize() == 160) {
 						max = 4;
-					} else if (controller.getTamVector() == 320) {
+					} else if (controller.getVectorSize() == 320) {
 						max = 2;
 					}
-					// checa a escala
+					// checks the scale
 					if (controller.getSqrSize() > max) {
 						middle = (int) (scrollPane.getViewport().getExtentSize().getWidth());
-						// nova posição após zoom
-						novo = new Point((viewPort.x - (middle - mouseLoc.x)) / 2,
+						// new position after the zoom
+						positionAfterZoom = new Point((viewPort.x - (middle - mouseLoc.x)) / 2,
 								(viewPort.y - (middle - mouseLoc.y)) / 2);
-						// altera a escala, tamanho dos quadrados
+						// changes the scale, size of the rectangles
 						controller.setSqrSize(controller.getSqrSize() / 2);
-						// atualiza as barras de scroll de squares
-						squares2.setPrefSize(controller.getSqrSize() * controller.getTamVector());
-						// atualiza o texto de escala
+						// updates the scroll bars
+						squares2.setPrefSize(controller.getSqrSize() * controller.getVectorSize());
+						// updates the scale text
 						updateScale(controller);
-						// redesenha o grid
+						// redraws the grid
 						controller.drawMatriz(squares2);
 						repaint();
-						// ajusta a visualização
-						scrollPane.getViewport().setViewPosition(novo);
+						// adjusts the visualization
+						scrollPane.getViewport().setViewPosition(positionAfterZoom);
 					}
 				} else {// zoom in
-					// checa a escala
+					// checks the scale
 					if (controller.getSqrSize() < 64) {
 						middle = (int) (scrollPane.getViewport().getExtentSize().getWidth() * 0.25);
-						// nova posição após zoom
-						novo = new Point((viewPort.x - (middle - mouseLoc.x)) * 2,
+						// new position after zoom
+						positionAfterZoom = new Point((viewPort.x - (middle - mouseLoc.x)) * 2,
 								(viewPort.y - (middle - mouseLoc.y)) * 2);
-						// altera a escala, tamanho dos quadrados
+						// changes the scale, size of the rectangles
 						controller.setSqrSize(controller.getSqrSize() * 2);
-						// atualiza as barras de scroll de squares
-						squares2.setPrefSize(controller.getSqrSize() * controller.getTamVector());
-						// atualiza o texto de escala
+						// updates the scroll bars
+						squares2.setPrefSize(controller.getSqrSize() * controller.getVectorSize());
+						// updates the scale text
 						updateScale(controller);
-						// redesenha o grid
+						// redraws the grid
 						controller.drawMatriz(squares2);
 						repaint();
-						// ajusta a visualização
-						scrollPane.getViewport().setViewPosition(novo);
+						// adjusts the visualization
+						scrollPane.getViewport().setViewPosition(positionAfterZoom);
 					}
 				}
 			}
@@ -1539,17 +1552,18 @@ public class AppConfigAutomaton extends JFrame {
 		scrollPane.getHorizontalScrollBar().setUnitIncrement(40);
 		scrollPane.getVerticalScrollBar().setUnitIncrement(40);
 		contentPane.add(scrollPane);
-		// remove o scroll utilizando a roda do mouse
+		// remove the scrolling by using the mouse wheel, to do not interfere
+		// with the zoom
 		scrollPane.removeMouseWheelListener(scrollPane.getMouseWheelListeners()[0]);
 
-		// corrige a escala, se necessário
+		// fix the scale, if needed
 		fixScale(controller);
-		// determina o idioma
+		// determinates the language
 		setLanguage(controller.getLanguage(), controller);
-		// atualiza os contadores de estados
+		// updates the population counters
 		statesAmount = controller.countStates();
 		updateTexts();
-		// determina a cor da fonte da população
+		// determinates the population font colors
 		updatePopBackground(controller);
 	}
 }

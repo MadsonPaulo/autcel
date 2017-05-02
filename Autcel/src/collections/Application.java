@@ -1,5 +1,5 @@
 /*******************************************************************************
- * 	Autcel, a tool for editing and simulating cellular automatons.
+ * 	ESACEL, a tool for editing and simulating cellular automatons.
  *     Copyright (C) 2017 Madson Paulo Alexandre da Silva
  *
  *     This program is free software: you can redistribute it and/or modify
@@ -29,14 +29,14 @@ import controller.*;
 public class Application {
 
 	/**
-	 * Inicializa a aplicação
+	 * Starts the application
 	 */
 	public static void main(String[] args) {
-		// inicializa o controller
+		// starts the controller
 		AppController controller = new AppController();
-		// inicia a aplicação
-		// em parênteses o tamanho do vetor, recomendado valores 20, 40, 80, 160
-		// ou 320
+		// starts the application
+		// in parentheses is the size of the vector, recomended values are 20,
+		// 40, 80, 160 or 320
 		controller.startApplication(160);
 	}
 }
