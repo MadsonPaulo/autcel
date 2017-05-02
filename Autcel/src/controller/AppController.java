@@ -689,8 +689,8 @@ public class AppController {
 	public void showAboutPopUp() {
 		String about = "";
 		String title = "";
-		String version = "2.1";
-		String date = "29/03/2017";
+		String version = "2.2";
+		String date = "01/05/2017";
 		ImageIcon icon = new ImageIcon(AppController.class.getResource("/img/main64x64.png"));
 		if (config.language == 0) {// Portuguese
 			title = "Sobre o ESACEL";
